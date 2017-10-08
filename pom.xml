@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>keybridge.lib</groupId>
+  <artifactId>lib-jose</artifactId>
+  <version>0.0.1</version>
+  <packaging>jar</packaging>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+  <name>jose</name>
+  <description>               JSON Object Signing and Encryption (JOSE)
+
+    A clean-room implementation of the JSON Object Signing
+    and Encryption (JOSE) specifications. Inlcudes
+    RFC 7515 JSON Web Signature (JWS),
+    RFC 7516 JSON Web Encryption (JWE),
+    RFC 7517 JSON Web Key (JWK),
+    RFC 7518 JSON Web Algorithm (JWA),
+    RFC 7519 JSON Web Token (JWT),
+    RFC 7797 JWS Unencoded payload ("JUP").
+
+    History:
+
+    v0.0.1 - new project
+  </description>
+</project>
