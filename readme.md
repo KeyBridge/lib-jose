@@ -24,7 +24,7 @@ A number of examples are defined in:
 
 JSON Web Key is a data structure representing a cryptographic key with both the cryptographic data and other attributes, such as key usage.
 
-```javascript
+```
 { 
   "kty":"EC",
   "crv":"P-256",
@@ -41,15 +41,17 @@ Mandatory "kty" key type parameter describes the cryptographic algorithm associa
 
 JSON Web Signature standard describes process of creation and validation of datastructure representing signed payload. As example take following string as a payload:
 
-```javascript
-'{"iss":"joe",
+```
+{
+ "iss":"joe",
  "exp":1300819380,
- "http://example.com/is_root":true}'
+ "http://example.com/is_root":true
+ }
 ```
 
 Incidentally, this string contains JSON data, but this is not relevant for the signing procedure and it might as well be any data. Before signing, the payload is always converted to base64url encoding:
 
-```javascript
+```
 eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLm
 NvbS9pc19yb290Ijp0cnVlfQ
 ```
@@ -58,7 +60,7 @@ Additional parameters are associated with each payload. Required parameter is "a
 
 As example, the protected header will contain following data:
 
-```javascript
+```
 {"alg":"ES256"}
 ```
 
@@ -70,7 +72,7 @@ The "ES356" here is identifier for ECDSA signature algorithm using P-256 curve a
 
 Unprotected header can contain a key id parameter:
 
-```javascript
+```
 {"kid":"e9bc097a-ce51-4036-9562-d2ade882db0d"}
 ```
 
@@ -78,7 +80,7 @@ The base64url encoded payload and protected header are concatenated with '.' to 
 
 Finally, the JWS output is serialized using one of JSON or Compact serializations. Compact serialization is simple concatenation of comma separated base64url encoded protected header, payload and signature. JSON serialization is a human readable JSON object, which for the example above would look like this:
 
-```javascript
+```
 {
   "payload": "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6
               Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ",
@@ -102,7 +104,7 @@ JSON Web Encryption follows the same logic as JWS with a few differences:
 
 Just like with JWS, header data of JWE object can be transmitted in either integrity protected, unprotected or per-recipient unprotected header. The final JSON serialized output then has the following structure:
 
-```javascript
+```
 {
   "protected": "<integrity-protected header contents>",
   "unprotected": <non-integrity-protected header contents>,
@@ -125,25 +127,25 @@ The two used algorithms need to be specified as a header parameters. "alg" param
 
 As example, assume we have RSA public key of the first recipient and share a symmetric key with second recipient. The "alg" parameter for the first recipient will have value "RSA1_5" denoting RSAES-PKCS1-V1_5 algorithm and "A128KW" denoting AES 128 Keywrap for the second recipient, along with key IDs:
 
-```javascript
+```
 {"alg":"RSA1_5","kid":"2011-04-29"}
 ```
 
 and
 
-```javascript
+```
 {"alg":"A128KW","kid":"7"}
 ```
 
 These algorithms will be used to encrypt content encryption key (CEK) to each of the recipients. After CEK is generated, we use it to encrypt the plaintext with AES 128 in CBC mode with HMAC SHA 256 for integrity:
 
-```javascript
+```
 {"enc":"A128CBC-HS256"}
 ```
 
 We can protect this information by putting it into a protected header, which, when base64url encoded, will look like this:
 
-```javascript
+```
 eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0
 ```
 
@@ -151,7 +153,7 @@ This data will be fed as associated data to AEAD encryption algorithm and theref
 
 Putting this all together, the resulting JWE object will looks like this:
 
-```javascript
+```
 {
   "protected": "eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0",
   "recipients":[
@@ -176,17 +178,17 @@ Putting this all together, the resulting JWE object will looks like this:
 
 JSON Web Algorithms defines algorithms and their identifiers to be used in JWS and JWE. The three parameters that specify algorithms are "alg" for JWS, "alg" and "enc" for JWE.
 
-  "enc": 
+ * **enc**  
       A128CBC-HS256, A192CBC-HS384, A256CBC-HS512 (AES in CBC with HMAC), 
       A128GCM, A192GCM, A256GCM
 
-  "alg" for JWS: 
+ * **"alg" for JWS**   
       HS256, HS384, HS512 (HMAC with SHA), 
       RS256, RS384, RS512 (RSASSA-PKCS-v1_5 with SHA), 
       ES256, ES384, ES512 (ECDSA with SHA), 
       PS256, PS384, PS512 (RSASSA-PSS with SHA for digest and MGF1)
 
-  "alg" for JWE: 
+ * **"alg" for JWE**  
       RSA1_5, RSA-OAEP, RSA-OAEP-256, 
       A128KW, A192KW, A256KW (AES Keywrap), 
       dir (direct encryption), 
