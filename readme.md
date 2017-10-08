@@ -6,21 +6,25 @@ The standard provides a general approach to signing and encryption of any conten
 
 It consists of several RFCs:
 
- * 7515    JWS - JSON Web Signature, describes producing and handling signed messages
- * 7516    JWE - JSON Web Encryption, describes producting and handling encrypted messages
- * 7517    JWK - JSON Web Key, describes format and handling of cryptographic keys in JOSE
- * 7518    JWA - JSON Web Algorithms, describes cryptographic algorithms used in JOSE
- * 7519    JWT - JSON Web Token, describes representation of claims encoded in JSON and protected by JWS or JWE
+ * [7515](docs/rfc7515.pdf)    JWS - JSON Web Signature, describes producing and handling signed messages
+ * [7516](docs/rfc7516.pdf)    JWE - JSON Web Encryption, describes producting and handling encrypted messages
+ * [7517](docs/rfc7517.pdf)    JWK - JSON Web Key, describes format and handling of cryptographic keys in JOSE
+ * [7518](docs/rfc7518.pdf)    JWA - JSON Web Algorithms, describes cryptographic algorithms used in JOSE
+ * [7519](docs/rfc7519.pdf)    JWT - JSON Web Token, describes representation of claims encoded in JSON and protected by JWS or JWE
 
 plus
 
- * 7797    JUP - JSON Web Signature for Unencoded Payloads
+ * [7797](docs/rfc7797.pdf)    JUP - JSON Web Signature for Unencoded Payloads
+
+A number of examples are defined in: 
+ 
+ * [7520](docs/rfc7520.pdf)    JOSE examples
 
 ## JWK - JSON Web Key
 
 JSON Web Key is a data structure representing a cryptographic key with both the cryptographic data and other attributes, such as key usage.
 
-```
+```javascript
 { 
   "kty":"EC",
   "crv":"P-256",
@@ -36,21 +40,25 @@ Mandatory "kty" key type parameter describes the cryptographic algorithm associa
 ## JWS - JSON Web Signature
 
 JSON Web Signature standard describes process of creation and validation of datastructure representing signed payload. As example take following string as a payload:
-```
+
+```javascript
 '{"iss":"joe",
  "exp":1300819380,
  "http://example.com/is_root":true}'
 ```
+
 Incidentally, this string contains JSON data, but this is not relevant for the signing procedure and it might as well be any data. Before signing, the payload is always converted to base64url encoding:
-```
+
+```javascript
 eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLm
 NvbS9pc19yb290Ijp0cnVlfQ
 ```
+
 Additional parameters are associated with each payload. Required parameter is "alg", which denotes the algorithm used for generating a signature (one of the possible values is "none" for unprotected messages). The parameters are included in final JWS in either protected or unprotected header. The data in protected header is integrity protected and base64url encoded, whereas unprotected header human readable associated data.
 
 As example, the protected header will contain following data:
 
-```
+```javascript
 {"alg":"ES256"}
 ```
 
@@ -62,7 +70,7 @@ The "ES356" here is identifier for ECDSA signature algorithm using P-256 curve a
 
 Unprotected header can contain a key id parameter:
 
-```
+```javascript
 {"kid":"e9bc097a-ce51-4036-9562-d2ade882db0d"}
 ```
 
@@ -70,7 +78,7 @@ The base64url encoded payload and protected header are concatenated with '.' to 
 
 Finally, the JWS output is serialized using one of JSON or Compact serializations. Compact serialization is simple concatenation of comma separated base64url encoded protected header, payload and signature. JSON serialization is a human readable JSON object, which for the example above would look like this:
 
-```
+```javascript
 {
   "payload": "eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6
               Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ",
@@ -89,12 +97,12 @@ Such process for generating signature is pretty straightforward, yet still suppo
 
 JSON Web Encryption follows the same logic as JWS with a few differences:
 
-    by default, for each message new content encryption key (CEK) should be generated. This key is used to encrypt the plaintext and is attached to the final message. Public key of recipient or a shared key is used only to encrypt the CEK (unless direct encryption is used, see below).
-    only AEAD (Authenticated Encryption with Associated Data) algorithms are defined in the standard, so users do not have to think about how to combine JWE with JWS.
+  *  by default, for each message new content encryption key (CEK) should be generated. This key is used to encrypt the plaintext and is attached to the final message. Public key of recipient or a shared key is used only to encrypt the CEK (unless direct encryption is used, see below).
+  *  only AEAD (Authenticated Encryption with Associated Data) algorithms are defined in the standard, so users do not have to think about how to combine JWE with JWS.
 
 Just like with JWS, header data of JWE object can be transmitted in either integrity protected, unprotected or per-recipient unprotected header. The final JSON serialized output then has the following structure:
 
-```
+```javascript
 {
   "protected": "<integrity-protected header contents>",
   "unprotected": <non-integrity-protected header contents>,
@@ -117,25 +125,25 @@ The two used algorithms need to be specified as a header parameters. "alg" param
 
 As example, assume we have RSA public key of the first recipient and share a symmetric key with second recipient. The "alg" parameter for the first recipient will have value "RSA1_5" denoting RSAES-PKCS1-V1_5 algorithm and "A128KW" denoting AES 128 Keywrap for the second recipient, along with key IDs:
 
-```
+```javascript
 {"alg":"RSA1_5","kid":"2011-04-29"}
 ```
 
 and
 
-```
+```javascript
 {"alg":"A128KW","kid":"7"}
 ```
 
 These algorithms will be used to encrypt content encryption key (CEK) to each of the recipients. After CEK is generated, we use it to encrypt the plaintext with AES 128 in CBC mode with HMAC SHA 256 for integrity:
 
-```
+```javascript
 {"enc":"A128CBC-HS256"}
 ```
 
 We can protect this information by putting it into a protected header, which, when base64url encoded, will look like this:
 
-```
+```javascript
 eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0
 ```
 
@@ -143,7 +151,7 @@ This data will be fed as associated data to AEAD encryption algorithm and theref
 
 Putting this all together, the resulting JWE object will looks like this:
 
-```
+```javascript
 {
   "protected": "eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0",
   "recipients":[
