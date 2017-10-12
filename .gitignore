@@ -30,3 +30,7 @@ nbactions.xml
 # OSX junk
 ._*
 
+# IntelliJ files
+.idea
+*.iml
+
