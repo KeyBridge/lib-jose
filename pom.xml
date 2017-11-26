@@ -9,12 +9,13 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <bouncycastle.version>1.53</bouncycastle.version>
   </properties>
   <name>jose</name>
   <description>               JSON Object Signing and Encryption (JOSE)
 
     A clean-room implementation of the JSON Object Signing
-    and Encryption (JOSE) specifications. Inlcudes
+    and Encryption (JOSE) specifications. Includes
     RFC 7515 JSON Web Signature (JWS),
     RFC 7516 JSON Web Encryption (JWE),
     RFC 7517 JSON Web Key (JWK),
@@ -26,4 +27,27 @@
 
     v0.0.1 - new project
   </description>
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.moxy</artifactId>
+      <version>2.5.2</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>1.58</version>
+    </dependency>
+    <dependency>
+      <groupId>keybridge.lib</groupId>
+      <artifactId>xml-adapter</artifactId>
+      <version>1.0.3</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -56,7 +56,7 @@ eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLm
 NvbS9pc19yb290Ijp0cnVlfQ
 ```
 
-Additional parameters are associated with each payload. Required parameter is "alg", which denotes the algorithm used for generating a signature (one of the possible values is "none" for unprotected messages). The parameters are included in final JWS in either protected or unprotected header. The data in protected header is integrity protected and base64url encoded, whereas unprotected header human readable associated data.
+Additional parameters are associated with each payload. Required parameter is "alg", which denotes the algorithm used for generating a signature (one of the possible values is "none" for unprotected messages). The parameters are included in final JWS in either protected or unprotected header. The data in protected unprotectedHeader is integrity protected and base64url encoded, whereas unprotected unprotectedHeader human readable associated data.
 
 As example, the protected header will contain following data:
 
@@ -102,17 +102,17 @@ JSON Web Encryption follows the same logic as JWS with a few differences:
   *  by default, for each message new content encryption key (CEK) should be generated. This key is used to encrypt the plaintext and is attached to the final message. Public key of recipient or a shared key is used only to encrypt the CEK (unless direct encryption is used, see below).
   *  only AEAD (Authenticated Encryption with Associated Data) algorithms are defined in the standard, so users do not have to think about how to combine JWE with JWS.
 
-Just like with JWS, header data of JWE object can be transmitted in either integrity protected, unprotected or per-recipient unprotected header. The final JSON serialized output then has the following structure:
+Just like with JWS, header data of JWE object can be transmitted in either integrity protected, unprotected or per-recipient unprotected unprotectedHeader. The final JSON serialized output then has the following structure:
 
 ```
 {
   "protected": "<integrity-protected header contents>",
   "unprotected": <non-integrity-protected header contents>,
   "recipients": [
-    {"header": <per-recipient unprotected header 1 contents>,
+    {"header": <per-recipient unprotected unprotectedHeader 1 contents>,
      "encrypted_key": "<encrypted key 1 contents>"},
      ...
-    {"header": <per-recipient unprotected header N contents>,
+    {"header": <per-recipient unprotected unprotectedHeader N contents>,
      "encrypted_key": "<encrypted key N contents>"}],
   "aad":"<additional authenticated data contents>",
   "iv":"<initialization vector contents>",
@@ -123,7 +123,7 @@ Just like with JWS, header data of JWE object can be transmitted in either integ
 
 The CEK is encrypted for each recipient separately, using different algorithms. This gives us ability to encrypt a message to recipients with different keys, e.g. RSA, shared symmetric and EC key.
 
-The two used algorithms need to be specified as a header parameters. "alg" parameter specified the algorithm used to protect the CEK, while "enc" parameter specifies the algorithm used to encrypt the plaintext using CEK as key. Needless to say, "alg" can have a value of "dir", which marks direct usage of the key, instead of using CEK.
+The two used algorithms need to be specified as a header parameters. "alg" parameter specified the algorithm used to protect the CEK, while "enc" parameter specifies the algorithm used to encrypt the plaintext using CEK as key. Needless to say, "joseAlgorithmName" can have a value of "dir", which marks direct usage of the key, instead of using CEK.
 
 As example, assume we have RSA public key of the first recipient and share a symmetric key with second recipient. The "alg" parameter for the first recipient will have value "RSA1_5" denoting RSAES-PKCS1-V1_5 algorithm and "A128KW" denoting AES 128 Keywrap for the second recipient, along with key IDs:
 
@@ -176,7 +176,7 @@ Putting this all together, the resulting JWE object will looks like this:
 
 ## JWA - JSON Web Algorithms
 
-JSON Web Algorithms defines algorithms and their identifiers to be used in JWS and JWE. The three parameters that specify algorithms are "alg" for JWS, "alg" and "enc" for JWE.
+JSON Web Algorithms defines algorithms and their identifiers to be used in JWS and JWE. The three parameters that specify algorithms are "alg" for JWS, "joseAlgorithmName" and "enc" for JWE.
 
  * **enc**  
       A128CBC-HS256, A192CBC-HS384, A256CBC-HS512 (AES in CBC with HMAC), 
