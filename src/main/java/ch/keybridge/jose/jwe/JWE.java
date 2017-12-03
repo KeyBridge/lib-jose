@@ -2,11 +2,9 @@ package ch.keybridge.jose.jwe;
 
 
 import ch.keybridge.jose.JoseHeader;
-import ch.keybridge.jose.MarshallerSingleton;
 import ch.keybridge.jose.adapter.XmlAdapterByteArrayBase64Url;
-import ch.keybridge.jose.algorithm.EContentEncyptionAlgorithm;
+import ch.keybridge.jose.algorithm.EContentEncryptionAlgorithm;
 import ch.keybridge.jose.algorithm.EKeyManagementAlgorithm;
-import ch.keybridge.jose.util.EncodingUtility;
 import ch.keybridge.jose.util.CryptographyUtility;
 import ch.keybridge.jose.util.SecureRandomUtility;
 
@@ -18,16 +16,17 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import java.security.*;
+import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
-import static ch.keybridge.jose.util.EncodingUtility.decodeBase64Url;
-import static ch.keybridge.jose.util.EncodingUtility.decodeBase64UrlToString;
-import static ch.keybridge.jose.util.EncodingUtility.encodeBase64Url;
+import static ch.keybridge.jose.util.Base64Utility.*;
+import static ch.keybridge.jose.util.JsonMarshaller.fromJson;
+import static ch.keybridge.jose.util.JsonMarshaller.toJson;
+import static java.nio.charset.StandardCharsets.US_ASCII;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JWE {
@@ -56,32 +55,10 @@ public class JWE {
   private byte[] additionalAuthenticationData;
 
   /**
-   * Converts a JWE instance into a single URL-safe string
-   *
-   * In the JWE Compact Serialization, no JWE Shared Unprotected Header or
-   * JWE Per-Recipient Unprotected Header are used.  In this case, the
-   * JOSE Header and the JWE Protected Header are the same.
-   * In the JWE Compact Serialization, a JWE is represented as the
-   * concatenation:
-   * <pre>
-   * BASE64URL(UTF8(JWE Protected Header)) || ’.’ ||
-   * BASE64URL(JWE Encrypted Key) || ’.’ ||
-   * BASE64URL(JWE Initialization Vector) || ’.’ ||
-   * BASE64URL(JWE Ciphertext) || ’.’ ||
-   * BASE64URL(JWE Authentication Tag)
-   * </pre>
-   * See RFC 7516 Section 7.1 for more information about the JWE Compact
-   * Serialization.
-   *
-   * @return non-null string
+   * Default algorithms
    */
-  public String getCompactForm() throws JAXBException {
-    return EncodingUtility.encodeBase64Url(MarshallerSingleton.getInstance().getJweHeaderJsonUtility().toJson(protectedHeader)) + '.'
-        + encodeBase64Url(encryptedKey) + '.'
-        + encodeBase64Url(initializationVector) + '.'
-        + encodeBase64Url(ciphertext) + '.'
-        + encodeBase64Url(authenticationTag);
-  }
+  private static final EContentEncryptionAlgorithm CONTENT_ENC_ALGO = EContentEncryptionAlgorithm.A256GCM;
+  private static final EKeyManagementAlgorithm KEY_MGMT_ALGO = EKeyManagementAlgorithm.RSA_OAEP;
 
   /**
    *
@@ -106,28 +83,22 @@ public class JWE {
    * @return non-null JWE instance
    * @throws IllegalArgumentException if the provided input is not a valid compact JWE string
    */
-  public static JWE getInstanceFromCompactForm(String text) throws JAXBException {
+  public static JWE fromCompactForm(String text) throws JAXBException {
     StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
     if (tokenizer.countTokens() != 5) {
       throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string " +
           "has " + tokenizer.countTokens() + ".");
     }
     JWE jwe = new JWE();
-    String protectedHeaderJson = decodeBase64UrlToString(tokenizer.nextToken());
-    jwe.protectedHeader = MarshallerSingleton.getInstance().getJweHeaderJsonUtility().fromJson(protectedHeaderJson);
-    jwe.encryptedKey = decodeBase64Url(tokenizer.nextToken());
-    jwe.initializationVector = decodeBase64Url(tokenizer.nextToken());
-    jwe.ciphertext = decodeBase64Url(tokenizer.nextToken());
-    jwe.authenticationTag = decodeBase64Url(tokenizer.nextToken());
-    jwe.additionalAuthenticationData = EncodingUtility.encodeBase64UrlAscii(protectedHeaderJson);
+    String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
+    jwe.protectedHeader = fromJson(protectedHeaderJson, JweJoseHeader.class);
+    jwe.encryptedKey = fromBase64Url(tokenizer.nextToken());
+    jwe.initializationVector = fromBase64Url(tokenizer.nextToken());
+    jwe.ciphertext = fromBase64Url(tokenizer.nextToken());
+    jwe.authenticationTag = fromBase64Url(tokenizer.nextToken());
+    jwe.additionalAuthenticationData = toBase64Url(protectedHeaderJson).getBytes(US_ASCII);
     return jwe;
   }
-
-  /**
-   * Default algorithms
-   */
-  public static final EContentEncyptionAlgorithm CONTENT_ENCYPTION_ALGORITHM = EContentEncyptionAlgorithm.A256GCM;
-  public static final EKeyManagementAlgorithm KEY_MANAGEMENT_ALGORITHM = EKeyManagementAlgorithm.RSA_OAEP;
 
   /**
    * Creates a JWE instance for the payload using the provided public key
@@ -137,53 +108,109 @@ public class JWE {
    * @throws GeneralSecurityException thrown if requested algorithms are not available
    */
   public static JWE getInstance(byte[] payload, Key publicKey) throws JAXBException, GeneralSecurityException {
-    return getInstance(payload, CONTENT_ENCYPTION_ALGORITHM, KEY_MANAGEMENT_ALGORITHM, publicKey);
+    return getInstance(payload, CONTENT_ENC_ALGO, KEY_MGMT_ALGO, publicKey);
+  }
+
+  /**
+   * Creates a JWE instance for the payload using the provided public key
+   *
+   * @param payload   data that is to be JWE-encrypted
+   * @param publicKey a Key instance which is used to encrypt the random data encryption key
+   * @return a valid JWE instance
+   * @throws GeneralSecurityException thrown if requested algorithms are not available
+   */
+  public static JWE getInstance(String payload, Key publicKey) throws JAXBException, GeneralSecurityException {
+    return getInstance(toBase64Url(payload).getBytes(US_ASCII), CONTENT_ENC_ALGO, KEY_MGMT_ALGO, publicKey);
   }
 
   /**
    *
    * Creates a JWE instance for the payload using the provided public key
    * @param payload byte array representing the data that is to be JWE-encrypted
-   * @param contentEncyptionAlgorithm Content encryption algorithm
-   * @param keyManagementAlgorithm key management algorithm
+   * @param contentEnc Content encryption algorithm
+   * @param keyMgmt key management algorithm
    * @param publicKey a Key instance which is used to encrypt the random data encryption key
    * @return a valid JWE instance
    * @throws GeneralSecurityException thrown if requested algorithms are not available
    */
-  public static JWE getInstance(byte[] payload, EContentEncyptionAlgorithm contentEncyptionAlgorithm, EKeyManagementAlgorithm keyManagementAlgorithm, Key publicKey) throws JAXBException, GeneralSecurityException {
+  public static JWE getInstance(final byte[] payload, final EContentEncryptionAlgorithm contentEnc,
+                                EKeyManagementAlgorithm keyMgmt, Key publicKey) throws JAXBException,
+      GeneralSecurityException {
     JWE jwe = new JWE();
     // Populate the protected header with mandatory information on how the content and the content encryption key are encrypted
     JweJoseHeader joseHeader = new JweJoseHeader();
-    joseHeader.setAlg(keyManagementAlgorithm.getJoseAlgorithmName());
-    joseHeader.setContentEncryptionAlgorithm(contentEncyptionAlgorithm);
+    joseHeader.setAlg(keyMgmt.getJoseAlgorithmName());
+    joseHeader.setContentEncryptionAlgorithm(contentEnc);
 
     jwe.protectedHeader = joseHeader;
 
-//    final byte[] contentEncryptionKeyBytes = SecureRandomUtility.generate(contentEncyptionAlgorithm.getEncryptionKeyBits());
-//    content
-
-    KeyGenerator generator = KeyGenerator.getInstance(contentEncyptionAlgorithm.getSecretKeyAlgorithm());
-    generator.init(contentEncyptionAlgorithm.getEncryptionKeyBits());
-    SecretKey contentEncryptionKey = generator.generateKey(); //todo
-    jwe.encryptedKey = CryptographyUtility.encrypt(contentEncryptionKey.getEncoded(), publicKey, keyManagementAlgorithm.getJavaAlgorithm());
-    jwe.initializationVector = SecureRandomUtility.generate(contentEncyptionAlgorithm.getInitVectorBits());
+    KeyGenerator generator = KeyGenerator.getInstance(contentEnc.getSecretKeyAlgorithm());
+    generator.init(contentEnc.getEncryptionKeyBits());
+    SecretKey contentEncryptionKey = generator.generateKey();
+    jwe.encryptedKey = CryptographyUtility.encrypt(contentEncryptionKey.getEncoded(), publicKey, keyMgmt
+        .getJavaAlgorithm());
+    jwe.initializationVector = SecureRandomUtility.generate(contentEnc.getInitVectorBits());
     /**
      * The default Additional Authentication Data can be the protected header
      */
-    String headerJson = MarshallerSingleton.getInstance().getJweHeaderJsonUtility().toJson(joseHeader);
-    jwe.additionalAuthenticationData = EncodingUtility.encodeBase64UrlAscii(headerJson);
-//    Key contentEncryptionKey = new SecretKeySpec(contentEncryptionKey.getEncoded(), );
-    int cypherLen = payload.length;
-    byte[] cypherAndAuthTag = CryptographyUtility.encrypt(payload, contentEncryptionKey, contentEncyptionAlgorithm
+    String headerJson = toJson(joseHeader, JweJoseHeader.class);
+    jwe.additionalAuthenticationData = toBase64Url(headerJson).getBytes(US_ASCII);
+    byte[] cypherAndAuthTag = CryptographyUtility.encrypt(payload, contentEncryptionKey, contentEnc
             .getJavaAlgorithmName(),
-        contentEncyptionAlgorithm.getAdditionalParameterGenerator() == null ? null : contentEncyptionAlgorithm
-            .getAdditionalParameterGenerator().generateSpec(jwe.initializationVector), jwe.additionalAuthenticationData);
-    jwe.ciphertext = Arrays.copyOf(cypherAndAuthTag, cypherLen);
-    jwe.authenticationTag = Arrays.copyOfRange(cypherAndAuthTag, cypherLen, cypherAndAuthTag.length);
+        contentEnc.getAdditionalParameterGenerator() == null ? null : contentEnc
+            .getAdditionalParameterGenerator().generateSpec(jwe.initializationVector), jwe
+            .additionalAuthenticationData);
+    jwe.ciphertext = Arrays.copyOf(cypherAndAuthTag, payload.length);
+    jwe.authenticationTag = Arrays.copyOfRange(cypherAndAuthTag, payload.length, cypherAndAuthTag.length);
     return jwe;
   }
 
-  public byte[] decryptPayload(Key privateKey) throws Exception {
+  /**
+   * A utility method for array concatenation. Used to concatenate the ciphertext and authentication tag bytes
+   * before decrypting.
+   *
+   * @param array1 first byte array
+   * @param array2 second byte array
+   * @return byte array with all elements from the first array, the those of the second array
+   */
+  private static byte[] concatenateArrays(byte[] array1, byte[] array2) {
+    if (array1 == null || array1.length == 0) return array2;
+    if (array2 == null || array2.length == 0) return array1;
+    byte[] merged = new byte[array1.length + array2.length];
+    System.arraycopy(array1, 0, merged, 0, array1.length);
+    System.arraycopy(array2, 0, merged, array1.length, array2.length);
+    return merged;
+  }
+
+  /**
+   * Converts a JWE instance into a single URL-safe string
+   * <p>
+   * In the JWE Compact Serialization, no JWE Shared Unprotected Header or
+   * JWE Per-Recipient Unprotected Header are used.  In this case, the
+   * JOSE Header and the JWE Protected Header are the same.
+   * In the JWE Compact Serialization, a JWE is represented as the
+   * concatenation:
+   * <pre>
+   * BASE64URL(UTF8(JWE Protected Header)) || ’.’ ||
+   * BASE64URL(JWE Encrypted Key) || ’.’ ||
+   * BASE64URL(JWE Initialization Vector) || ’.’ ||
+   * BASE64URL(JWE Ciphertext) || ’.’ ||
+   * BASE64URL(JWE Authentication Tag)
+   * </pre>
+   * See RFC 7516 Section 7.1 for more information about the JWE Compact
+   * Serialization.
+   *
+   * @return non-null string
+   */
+  public String toCompactForm() throws JAXBException {
+    return toBase64Url(toJson(protectedHeader, JweJoseHeader.class)) + '.'
+        + toBase64Url(encryptedKey) + '.'
+        + toBase64Url(initializationVector) + '.'
+        + toBase64Url(ciphertext) + '.'
+        + toBase64Url(authenticationTag);
+  }
+
+  public byte[] decryptPayload(Key privateKey) throws GeneralSecurityException {
     final EKeyManagementAlgorithm keyManagementAlgorithm = EKeyManagementAlgorithm.resolveAlgorithm(protectedHeader.getAlg());
     final byte[] contentEncryptionKey = CryptographyUtility.decrypt(encryptedKey, privateKey, keyManagementAlgorithm
         .getJavaAlgorithm());
@@ -199,11 +226,9 @@ public class JWE {
         .getContentEncryptionAlgorithm().getJavaAlgorithmName(), spec, additionalAuthenticationData);
   }
 
-  private static byte[] concatenateArrays(byte[] array1, byte[] array2) {
-    byte[] merged = new byte[array1.length + array2.length];
-    System.arraycopy(array1, 0, merged, 0, array1.length);
-    System.arraycopy(array2, 0, merged, array1.length, array2.length);
-    return merged;
+  public String decryptAsString(Key key) throws GeneralSecurityException {
+    byte[] bytes = decryptPayload(key);
+    return fromBase64UrlToString(new String(bytes, US_ASCII));
   }
 
   @Override
@@ -245,11 +270,11 @@ public class JWE {
         "protectedHeader=" + protectedHeader +
         ", uprotected=" + uprotected +
         ", perRecipientUprotected=" + perRecipientUprotected +
-        ", encryptedKey=" + Arrays.toString(encryptedKey) +
-        ", initializationVector=" + Arrays.toString(initializationVector) +
-        ", ciphertext=" + Arrays.toString(ciphertext) +
-        ", authenticationTag=" + Arrays.toString(authenticationTag) +
-        ", additionalAuthenticationData=" + Arrays.toString(additionalAuthenticationData) +
+        ", encryptedKey=" + toBase64Url(encryptedKey) +
+        ", initializationVector=" + toBase64Url(initializationVector) +
+        ", ciphertext=" + toBase64Url(ciphertext) +
+        ", authenticationTag=" + toBase64Url(authenticationTag) +
+        ", additionalAuthenticationData=" + toBase64Url(additionalAuthenticationData) +
         '}';
   }
 }

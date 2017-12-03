@@ -1,15 +1,19 @@
 package ch.keybridge.jose.jws;
 
-import ch.keybridge.jose.util.EncodingUtility;
-import ch.keybridge.jose.util.CryptographyUtility;
 import ch.keybridge.jose.JoseHeader;
+import ch.keybridge.jose.adapter.XmlAdapterByteArrayBase64Url;
 import ch.keybridge.jose.algorithm.ESignatureAlgorithm;
-import ch.keybridge.jose.io.JsonUtility;
 import ch.keybridge.jose.jwk.JWK;
+import ch.keybridge.jose.util.Base64Utility;
+import ch.keybridge.jose.util.CryptographyUtility;
+import ch.keybridge.jose.util.JsonMarshaller;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * RFC 7515 § 7.2.1
@@ -39,7 +43,8 @@ public class JwsSignature {
   private JoseHeader protectedHeader;
   @XmlElement(name = "header")
   private JoseHeader unprotectedheader;
-  private String signature;
+  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
+  private byte[] signature;
 
   public JoseHeader getProtectedHeader() {
     return protectedHeader;
@@ -49,28 +54,24 @@ public class JwsSignature {
     return unprotectedheader;
   }
 
-  public String getSignature() {
-    return signature;
-  }
-
   public static JwsSignature getInstance(String payload, JWK key, ESignatureAlgorithm algorithm) throws Exception {
     JwsSignature signature = new JwsSignature();
     JoseHeader ph = new JoseHeader();
     ph.setAlg(key.getAlg());
-//    ph.setCty();
     ph.setX5c(key.getX5c());
     ph.setX5t(key.getX5t());
     ph.setX5tS256(key.getX5tS256());
     ph.setX5u(key.getX5u());
-    //todo other fields
+    ph.setKid(key.getKid());
     signature.protectedHeader = ph;
 
-    JsonUtility<JoseHeader> readerWriter = new JsonUtility<>(JoseHeader.class);
-    String protectedHeaderJson = readerWriter.toJson(signature.protectedHeader);
-    String fullPayload = EncodingUtility.encodeBase64Url(protectedHeaderJson) + '.' + payload;
-    byte[] payloadBytes = fullPayload.getBytes(EncodingUtility.UTF8);
-    byte[] signatureBytes = CryptographyUtility.sign(payloadBytes, key, algorithm);
-    signature.signature = EncodingUtility.encodeBase64Url(signatureBytes);
+    String protectedHeaderJson = JsonMarshaller.toJson(signature.protectedHeader, JoseHeader.class);
+    String fullPayload = Base64Utility.toBase64Url(protectedHeaderJson) + '.' + payload;
+    signature.signature = CryptographyUtility.sign(fullPayload.getBytes(UTF_8), key, algorithm);
+    return signature;
+  }
+
+  public byte[] getSignature() {
     return signature;
   }
 

@@ -1,17 +1,12 @@
 package ch.keybridge.jose.jwt;
 
-import ch.keybridge.jose.MarshallerSingleton;
 import ch.keybridge.jose.adapter.XmlAdapterInstantLong;
-import ch.keybridge.jose.io.JsonUtility;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 
 /**
  * RFC 7519 § 4. JWT Claims
@@ -135,22 +130,60 @@ public class JwtClaim {
   @XmlElement(name = "jti")
   private String jwtId;
 
+  public String getIssuer() {
+    return issuer;
+  }
 
-  public static void main(String[] args) throws Exception {
-    JwtClaim claim = new JwtClaim();
-    claim.audience = "someAudience";
-    claim.issuedAt = ZonedDateTime.now(ZoneId.systemDefault()).toInstant();
-    claim.notBefore = ZonedDateTime.now(ZoneId.systemDefault()).plusHours(1).toInstant();
-    claim.expirationTime = ZonedDateTime.now(ZoneId.systemDefault()).plusHours(2).toInstant();
+  public void setIssuer(String issuer) {
+    this.issuer = issuer;
+  }
 
-    JsonUtility<JwtClaim> utility = MarshallerSingleton.getInstance().getJwtClaimJsonUtility();
+  public String getSubject() {
+    return subject;
+  }
 
-    String json = utility.toJson(claim);
-    System.out.println(json);
+  public void setSubject(String subject) {
+    this.subject = subject;
+  }
 
-    JwtClaim unserialized = utility.fromJson(json);
+  public String getAudience() {
+    return audience;
+  }
 
-    System.out.println(claim.equals(unserialized));
+  public void setAudience(String audience) {
+    this.audience = audience;
+  }
+
+  public Instant getExpirationTime() {
+    return expirationTime;
+  }
+
+  public void setExpirationTime(Instant expirationTime) {
+    this.expirationTime = expirationTime;
+  }
+
+  public Instant getNotBefore() {
+    return notBefore;
+  }
+
+  public void setNotBefore(Instant notBefore) {
+    this.notBefore = notBefore;
+  }
+
+  public Instant getIssuedAt() {
+    return issuedAt;
+  }
+
+  public void setIssuedAt(Instant issuedAt) {
+    this.issuedAt = issuedAt;
+  }
+
+  public String getJwtId() {
+    return jwtId;
+  }
+
+  public void setJwtId(String jwtId) {
+    this.jwtId = jwtId;
   }
 
   @Override

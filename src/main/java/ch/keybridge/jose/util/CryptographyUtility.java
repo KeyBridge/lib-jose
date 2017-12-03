@@ -8,9 +8,14 @@ import ch.keybridge.jose.jwk.JwkSymmetricKey;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.*;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
 
 public class CryptographyUtility {
   static {
@@ -61,5 +66,20 @@ public class CryptographyUtility {
     }
     //todo process algorithm NONE
     return null;
+  }
+
+  public static boolean validateSignature(byte[] signature, byte[] payload, Key key, String algorithm) throws
+      GeneralSecurityException {
+    if (key instanceof SecretKey) {
+      Mac mac = Mac.getInstance(algorithm);
+      mac.init(key);
+      byte[] computedMac = mac.doFinal(payload);
+      return Arrays.equals(signature, computedMac);
+    } else if (key instanceof PublicKey) {
+      Signature sig = Signature.getInstance(algorithm);
+      sig.initVerify((PublicKey) key);
+      return sig.verify(signature);
+    }
+    return false;
   }
 }

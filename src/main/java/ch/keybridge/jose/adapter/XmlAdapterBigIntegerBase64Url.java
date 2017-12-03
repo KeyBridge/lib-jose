@@ -15,7 +15,7 @@
  */
 package ch.keybridge.jose.adapter;
 
-import ch.keybridge.jose.util.EncodingUtility;
+import ch.keybridge.jose.util.Base64Utility;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.math.BigInteger;
@@ -24,17 +24,6 @@ import java.math.BigInteger;
  * Converts BigInteger instances into Base64URL-encoded strings and vice versa
  */
 public class XmlAdapterBigIntegerBase64Url extends XmlAdapter<String, BigInteger> {
-
-  @Override
-  public String marshal(BigInteger v) throws Exception {
-    return EncodingUtility.encodeBase64Url(toBytesUnsigned(v));
-  }
-
-  @Override
-  public BigInteger unmarshal(String v) throws Exception {
-    return new BigInteger(1, EncodingUtility.decodeBase64Url(v));
-  }
-
 
   /**
    * Returns a byte array representation of the specified big integer
@@ -48,7 +37,7 @@ public class XmlAdapterBigIntegerBase64Url extends XmlAdapter<String, BigInteger
    * @return A byte array representation of the big integer, without the
    *         sign bit.
    */
-  public static byte[] toBytesUnsigned(final BigInteger bigInt) {
+  private static byte[] toBytesUnsigned(final BigInteger bigInt) {
     // Copied from Apache Commons Codec 1.8
     int bitlen = bigInt.bitLength();
     // round bitlen
@@ -72,5 +61,15 @@ public class XmlAdapterBigIntegerBase64Url extends XmlAdapter<String, BigInteger
     final byte[] resizedBytes = new byte[bitlen / 8];
     System.arraycopy(bigBytes, startSrc, resizedBytes, startDst, len);
     return resizedBytes;
+  }
+
+  @Override
+  public String marshal(BigInteger v) {
+    return Base64Utility.toBase64Url(toBytesUnsigned(v));
+  }
+
+  @Override
+  public BigInteger unmarshal(String v) {
+    return new BigInteger(1, Base64Utility.fromBase64Url(v));
   }
 }

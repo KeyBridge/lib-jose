@@ -15,7 +15,7 @@
  */
 package ch.keybridge.jose.adapter;
 
-import ch.keybridge.jose.util.EncodingUtility;
+import ch.keybridge.jose.util.Base64Utility;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -25,12 +25,12 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 public class XmlAdapterByteArrayBase64Url extends XmlAdapter<String, byte[]> {
 
   @Override
-  public String marshal(byte[] v) throws Exception {
-    return EncodingUtility.encodeBase64Url(v);
+  public String marshal(byte[] v) {
+    return Base64Utility.toBase64Url(v);
   }
 
   @Override
-  public byte[] unmarshal(String v) throws Exception {
-    return EncodingUtility.decodeBase64Url(v);
+  public byte[] unmarshal(String v) {
+    return Base64Utility.fromBase64Url(v);
   }
 }

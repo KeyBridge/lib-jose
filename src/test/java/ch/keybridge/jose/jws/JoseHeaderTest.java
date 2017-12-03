@@ -1,9 +1,8 @@
 package ch.keybridge.jose.jws;
 
-import ch.keybridge.jose.JoseHeader;
 import ch.keybridge.TestFileReader;
-import ch.keybridge.jose.io.JsonUtility;
-import org.junit.Before;
+import ch.keybridge.jose.JoseHeader;
+import ch.keybridge.jose.util.JsonMarshaller;
 import org.junit.Test;
 
 import javax.xml.bind.JAXBException;
@@ -11,16 +10,11 @@ import javax.xml.bind.JAXBException;
 import static org.junit.Assert.assertEquals;
 
 public class JoseHeaderTest {
-  private JsonUtility<JoseHeader> readerWriter;
-  @Before
-  public void setUp() throws Exception {
-    readerWriter = new JsonUtility<>(JoseHeader.class);
-  }
 
   @Test
   public void critFieldTest() throws JAXBException {
     String json = TestFileReader.getTestCase("/rfc7515/section4-jose-header/jose-header-crit-field-example.json");
-    JoseHeader header = readerWriter.fromJson(json);
+    JoseHeader header = JsonMarshaller.fromJson(json, JoseHeader.class);
     /**
      * {
      *  "alg":"ES256",

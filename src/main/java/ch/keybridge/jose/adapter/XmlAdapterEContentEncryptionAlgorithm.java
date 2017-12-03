@@ -15,22 +15,22 @@
  */
 package ch.keybridge.jose.adapter;
 
-import ch.keybridge.jose.algorithm.EContentEncyptionAlgorithm;
+import ch.keybridge.jose.algorithm.EContentEncryptionAlgorithm;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * Converts EContentEncyptionAlgorithm enum values into Base64URL-encoded strings and vice versa
  */
-public class XmlAdapterEContentEncryptionAlgorithm extends XmlAdapter<String, EContentEncyptionAlgorithm> {
+public class XmlAdapterEContentEncryptionAlgorithm extends XmlAdapter<String, EContentEncryptionAlgorithm> {
 
   @Override
-  public String marshal(EContentEncyptionAlgorithm v) throws Exception {
+  public String marshal(EContentEncryptionAlgorithm v) {
     return v.getJoseAlgorithmName();
   }
 
   @Override
-  public EContentEncyptionAlgorithm unmarshal(String v) throws Exception {
-    return EContentEncyptionAlgorithm.resolveAlgorithm(v);
+  public EContentEncryptionAlgorithm unmarshal(String v) {
+    return EContentEncryptionAlgorithm.resolveAlgorithm(v);
   }
 }

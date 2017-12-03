@@ -1,23 +1,22 @@
 package ch.keybridge.jose.jws;
 
-import ch.keybridge.jose.util.EncodingUtility;
-import ch.keybridge.jose.util.CryptographyUtility;
 import ch.keybridge.TestFileReader;
 import ch.keybridge.jose.algorithm.ESignatureAlgorithm;
-import ch.keybridge.jose.io.JsonUtility;
-import ch.keybridge.jose.jwk.JWK;
 import ch.keybridge.jose.jwk.JwkRsaKey;
+import ch.keybridge.jose.util.CryptographyUtility;
+import ch.keybridge.jose.util.JsonMarshaller;
 import org.junit.Test;
 
-import java.nio.charset.Charset;
-import java.security.*;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.Signature;
 import java.security.spec.RSAPrivateKeySpec;
 
+import static ch.keybridge.jose.util.Base64Utility.toBase64Url;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 
 public class JwsExamplesTest {
-
-  private static final Charset UTF8 = Charset.forName("UTF-8");
 
   private static byte[] convertToSignedBytes(int[] unsignedBytes) {
     byte[] bytes = new byte[unsignedBytes.length];
@@ -36,30 +35,28 @@ public class JwsExamplesTest {
     "to.";
     assertEquals
         ("SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4",
-        EncodingUtility.encodeBase64Url(payload));
+            toBase64Url(payload));
 
     final String fullPayload = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZXhhbXBsZSJ9" +
-        '.' + EncodingUtility.encodeBase64Url(payload);
-
-
+        '.' + toBase64Url(payload);
 
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    JwkRsaKey key = (JwkRsaKey)new JsonUtility<>(JWK.class).fromJson(json);
+    JwkRsaKey key = JsonMarshaller.fromJson(json, JwkRsaKey.class);
 
     KeyFactory kf = KeyFactory.getInstance("RSA");
     RSAPrivateKeySpec spec = new RSAPrivateKeySpec(key.getModulus(), key.getPrivateExponent());
     PrivateKey pk = kf.generatePrivate(spec);
     Signature signer = Signature.getInstance("SHA256withRSA");
     signer.initSign(pk);
-    signer.update(fullPayload.getBytes(UTF8));
+    signer.update(fullPayload.getBytes(UTF_8));
     byte[] signatureBytes = signer.sign();
     final String expectedSignature = "MRjdkly7_-oTPTS3AXP41iQIGKa80A0ZmTuV5MEaHoxnW2e5CZ5NlKtainoFmKZopdHM1O2U4mwzJdQx996ivp83xuglII7PNDi84wnB-BDkoBwA78185hX-Es4JIwmDLJK3lfWRa-XtL0RnltuYv746iYTh_qHRD68BNt1uSNCrUCTJDt5aAE6x8wW1Kt9eRo4QPocSadnHXFxnt8Is9UzpERV0ePPQdLuW3IS_de3xyIrDaLGdjluPxUAhb6L2aXic1U12podGU0KLUQSE_oI-ZnmKJ3F4uOZDnd6QZWJushZ41Axf_fcIe8u9ipH84ogoree7vjbU5y18kDquDg";
-    assertEquals(expectedSignature, EncodingUtility.encodeBase64Url(signatureBytes));
+    assertEquals(expectedSignature, toBase64Url(signatureBytes));
     /**
      * Check whether the EncryptionUtility returns the same result
      */
-    byte[] signatureUtility = CryptographyUtility.sign(fullPayload.getBytes(UTF8), key, ESignatureAlgorithm.RS256);
-    assertEquals(expectedSignature, EncodingUtility.encodeBase64Url(signatureUtility));
+    byte[] signatureUtility = CryptographyUtility.sign(fullPayload.getBytes(UTF_8), key, ESignatureAlgorithm.RS256);
+    assertEquals(expectedSignature, toBase64Url(signatureUtility));
   }
 
 }

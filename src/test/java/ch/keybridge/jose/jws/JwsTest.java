@@ -1,19 +1,17 @@
 package ch.keybridge.jose.jws;
 
-import ch.keybridge.jose.util.EncodingUtility;
-import ch.keybridge.jose.util.CryptographyUtility;
 import ch.keybridge.TestUtil;
 import ch.keybridge.jose.algorithm.ESignatureAlgorithm;
-import ch.keybridge.jose.io.JsonUtility;
-import ch.keybridge.jose.jwk.JWK;
 import ch.keybridge.jose.jwk.JwkSymmetricKey;
+import ch.keybridge.jose.util.CryptographyUtility;
 import org.junit.Test;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.Charset;
-import java.util.Base64;
 
+import static ch.keybridge.jose.util.Base64Utility.toBase64Url;
+import static ch.keybridge.jose.util.JsonMarshaller.fromJson;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -47,7 +45,7 @@ public class JwsTest {
      the last line does not have a terminating line break.)
      */
     final String jwsProtectedHeader = "{\"typ\":\"JWT\",\r\n \"alg\":\"HS256\"}";
-    final byte[] jwsProtectedHeaderBytesUTF8 = jwsProtectedHeader.getBytes(Charset.forName("UTF-8"));
+    final byte[] jwsProtectedHeaderBytesUTF8 = jwsProtectedHeader.getBytes(UTF_8);
     /**
      * The octets representing UTF8(JWS Protected Header) in this example (using JSON
      array notation) are:
@@ -61,8 +59,7 @@ public class JwsTest {
      Header)) gives this value:
      eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9
      */
-    final String jwsProtectedHeaderEncoded = Base64.getUrlEncoder().withoutPadding().encodeToString
-        (jwsProtectedHeaderBytesUTF8);
+    final String jwsProtectedHeaderEncoded = toBase64Url(jwsProtectedHeaderBytesUTF8);
     assertEquals("eyJ0eXAiOiJKV1QiLA0KICJhbGciOiJIUzI1NiJ9", jwsProtectedHeaderEncoded);
 
     /**
@@ -87,7 +84,7 @@ public class JwsTest {
      111, 116, 34, 58, 116, 114, 117, 101, 125]
 
      */
-    final byte[] jwsPayloadBytesUTF8 = jwsPayload.getBytes(Charset.forName("UTF-8"));
+    final byte[] jwsPayloadBytesUTF8 = jwsPayload.getBytes(UTF_8);
     assertArrayEquals(new byte[]{123, 34, 105, 115, 115, 34, 58, 34, 106, 111, 101, 34, 44, 13, 10,
         32, 34, 101, 120, 112, 34, 58, 49, 51, 48, 48, 56, 49, 57, 51, 56,
         48, 44, 13, 10, 32, 34, 104, 116, 116, 112, 58, 47, 47, 101, 120, 97,
@@ -99,7 +96,7 @@ public class JwsTest {
      eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFt
      cGxlLmNvbS9pc19yb290Ijp0cnVlfQ
      */
-    final String jwsPayloadEncoded = Base64.getUrlEncoder().withoutPadding().encodeToString(jwsPayloadBytesUTF8);
+    final String jwsPayloadEncoded = toBase64Url(jwsPayloadBytesUTF8);
     assertEquals("eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ",
         jwsPayloadEncoded);
 
@@ -137,7 +134,7 @@ public class JwsTest {
         107, 122, 79, 68, 65, 115, 68, 81, 111, 103, 73, 109, 104, 48, 100,
         72, 65, 54, 76, 121, 57, 108, 101, 71, 70, 116, 99, 71, 120, 108, 76,
         109, 78, 118, 98, 83, 57, 112, 99, 49, 57, 121, 98, 50, 57, 48, 73,
-        106, 112, 48, 99, 110, 86, 108, 102, 81}, jwsSigningInput.getBytes(Charset.forName("UTF-8")));
+        106, 112, 48, 99, 110, 86, 108, 102, 81}, jwsSigningInput.getBytes(UTF_8));
 
     /**
      * HMACs are generated using keys.  This example uses the symmetric key
@@ -148,15 +145,15 @@ public class JwsTest {
      aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"
      }
      */
-    JsonUtility<JWK> readerWriter = new JsonUtility<>(JWK.class);
-    JwkSymmetricKey key = (JwkSymmetricKey) readerWriter.fromJson("{\"kty\":\"oct\",\n" +
-        "\"k\":\"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow\"}");
+    JwkSymmetricKey key = fromJson("{\"kty\":\"oct\",\n" +
+            "\"k\":\"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow\"}",
+        JwkSymmetricKey.class);
 
     Mac mac = Mac.getInstance("HmacSHA256");
     SecretKeySpec secretKeySpec = new SecretKeySpec(key.getK(), "HmacSHA256");
     mac.init(secretKeySpec);
 
-    byte[] hmac = mac.doFinal(jwsSigningInput.getBytes(Charset.forName("UTF-8")));
+    byte[] hmac = mac.doFinal(jwsSigningInput.getBytes(UTF_8));
     /**
      * Running the HMAC SHA-256 algorithm on the JWS Signing Input with this
      key yields this JWS Signature octet sequence:
@@ -176,12 +173,12 @@ public class JwsTest {
      dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
      */
     final String expectedSignature = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
-    assertEquals(expectedSignature, EncodingUtility.encodeBase64Url(hmac));
+    assertEquals(expectedSignature, toBase64Url(hmac));
     /**
      * Check whether the EncryptionUtility returns the same result
      */
-    byte[] signatureUtility = CryptographyUtility.sign(jwsSigningInput.getBytes(EncodingUtility.UTF8), key, ESignatureAlgorithm.HS256);
-    assertEquals(expectedSignature, EncodingUtility.encodeBase64Url(signatureUtility));
+    byte[] signatureUtility = CryptographyUtility.sign(jwsSigningInput.getBytes(UTF_8), key, ESignatureAlgorithm.HS256);
+    assertEquals(expectedSignature, toBase64Url(signatureUtility));
   }
 
 }

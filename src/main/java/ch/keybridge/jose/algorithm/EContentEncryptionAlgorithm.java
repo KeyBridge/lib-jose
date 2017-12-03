@@ -13,7 +13,7 @@ import java.security.spec.AlgorithmParameterSpec;
  * All also use a JWE Initialization Vector value and produce JWE
  * Ciphertext and JWE Authentication Tag values.
  */
-public enum EContentEncyptionAlgorithm {
+public enum EContentEncryptionAlgorithm {
   /**
    * AES_128_CBC_HMAC_SHA_256 authenticated encryption algorithm, as defined in RFC 7518 Section 5.2.3
    */
@@ -103,9 +103,9 @@ public enum EContentEncyptionAlgorithm {
    */
   private final AlgorithmParameterSpecGenerator additionalParameterGenerator;
 
-  EContentEncyptionAlgorithm(String joseAlgorithmName, String javaAlgorithmName, int encryptionKeyBits, int
+  EContentEncryptionAlgorithm(String joseAlgorithmName, String javaAlgorithmName, int encryptionKeyBits, int
       initializationVectorBits, int authenticationTagBits, String secretKeySpecificationAlgorithm,
-                             AlgorithmParameterSpecGenerator
+                              AlgorithmParameterSpecGenerator
 
                                  additionalParameterGenerator) {
     this.joseAlgorithmName = joseAlgorithmName;
@@ -117,11 +117,11 @@ public enum EContentEncyptionAlgorithm {
     this.additionalParameterGenerator = additionalParameterGenerator;
   }
 
-  public static EContentEncyptionAlgorithm resolveAlgorithm(String alg) {
+  public static EContentEncryptionAlgorithm resolveAlgorithm(String alg) {
     if (alg == null || alg.isEmpty()) {
       return UNKNOWN;
     }
-    for (EContentEncyptionAlgorithm algorithm : EContentEncyptionAlgorithm.values()) {
+    for (EContentEncryptionAlgorithm algorithm : EContentEncryptionAlgorithm.values()) {
       if (alg.equals(algorithm.joseAlgorithmName)) {
         return algorithm;
       }

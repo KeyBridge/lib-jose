@@ -1,12 +1,14 @@
 package ch.keybridge.jose.jws;
 
-import ch.keybridge.jose.util.EncodingUtility;
 import ch.keybridge.jose.JoseHeader;
-import ch.keybridge.jose.io.JsonUtility;
+import ch.keybridge.jose.adapter.XmlAdapterByteArrayBase64Url;
+import ch.keybridge.jose.util.Base64Utility;
+import ch.keybridge.jose.util.JsonMarshaller;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * 7.2.2.  Flattened JWS JSON Serialization Syntax
@@ -41,22 +43,26 @@ import javax.xml.bind.annotation.XmlElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JwsJsonFlattened {
   @XmlElement(name = "protected")
-  private final String protectedHeader;
+  private String protectedHeader;
   @XmlElement(name = "header")
-  private final JoseHeader unprotectedHeader;
-  private final String payload;
-  private final String signature;
+  private JoseHeader unprotectedHeader;
+  private String payload;
+  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
+  private byte[] signature;
 
-  public JwsJsonFlattened(JoseHeader protectedHeader, JoseHeader unprotectedHeader, String payload, String signature) throws Exception {
-    JsonUtility<JoseHeader> readerWriter = new JsonUtility<>(JoseHeader.class);
-    this.protectedHeader = EncodingUtility.encodeBase64Url(readerWriter.toJson(protectedHeader));
+  private JwsJsonFlattened() {
+  }
+
+  public JwsJsonFlattened(JoseHeader protectedHeader, JoseHeader unprotectedHeader, String payload, byte[] signature)
+      throws Exception {
+    this.protectedHeader = Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader, JoseHeader.class));
     this.unprotectedHeader = unprotectedHeader;
-    this.payload = payload;
+    this.payload = Base64Utility.toBase64Url(payload);
     this.signature = signature;
   }
 
-  public String getProtectedHeader() {
-    return protectedHeader;
+  public JoseHeader getProtectedHeader() throws Exception {
+    return JsonMarshaller.fromJson(Base64Utility.fromBase64UrlToString(protectedHeader), JoseHeader.class);
   }
 
   public JoseHeader getUnprotectedHeader() {
@@ -64,10 +70,10 @@ public class JwsJsonFlattened {
   }
 
   public String getPayload() {
-    return payload;
+    return Base64Utility.fromBase64UrlToString(payload);
   }
 
-  public String getSignature() {
+  public byte[] getSignature() {
     return signature;
   }
 
@@ -85,9 +91,9 @@ public class JwsJsonFlattened {
    * and it provides no syntax to represent a JWS Unprotected Header
    * value.
    *
-   * @return
+   * @return this JWS object encoded in compact serialization
    */
   public String getCompactForm() {
-    return protectedHeader + '.' + payload + '.' + signature;
+    return protectedHeader + '.' + payload + '.' + Base64Utility.toBase64Url(signature);
   }
 }

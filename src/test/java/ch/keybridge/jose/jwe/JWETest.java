@@ -1,33 +1,37 @@
 package ch.keybridge.jose.jwe;
 
-import ch.keybridge.jose.util.EncodingUtility;
 import ch.keybridge.TestFileReader;
 import ch.keybridge.TestUtil;
-import ch.keybridge.jose.algorithm.EContentEncyptionAlgorithm;
+import ch.keybridge.jose.algorithm.EContentEncryptionAlgorithm;
 import ch.keybridge.jose.algorithm.EKeyManagementAlgorithm;
-import ch.keybridge.jose.io.JsonUtility;
 import ch.keybridge.jose.jwk.JwkRsaKey;
 import org.junit.Test;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.*;
-import java.security.*;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.Security;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 
-import static ch.keybridge.jose.util.EncodingUtility.getUtf8Bytes;
+import static ch.keybridge.jose.util.Base64Utility.toBase64Url;
+import static ch.keybridge.jose.util.JsonMarshaller.fromJson;
+import static ch.keybridge.jose.util.JsonMarshaller.toJson;
+import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class JWETest {
-  @Test
-  public void getInstanceFromCompactForm() throws Exception {
-  }
 
   @Test
   public void decryptPayload() throws Exception {
     String payloadString = "some text to test with";
-    byte[] payload = EncodingUtility.getUtf8Bytes(payloadString);
+    byte[] payload = payloadString.getBytes(UTF_8);
 
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
     generator.initialize(2048);
@@ -40,10 +44,10 @@ public class JWETest {
 
     JWE jwe = JWE.getInstance(payload, pair.getPublic());
 
-    String compactForm = jwe.getCompactForm();
+    String compactForm = jwe.toCompactForm();
 
     System.out.println(compactForm);
-    JWE fromCompact = JWE.getInstanceFromCompactForm(compactForm);
+    JWE fromCompact = JWE.fromCompactForm(compactForm);
 
     assertEquals(jwe, fromCompact);
 
@@ -55,7 +59,7 @@ public class JWETest {
   @Test
   public void decryptPayload2() throws Exception {
     String payloadString = "some text to test with";
-    byte[] payload = EncodingUtility.getUtf8Bytes(payloadString);
+    byte[] payload = payloadString.getBytes(UTF_8);
 
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
     generator.initialize(1024);
@@ -92,7 +96,7 @@ public class JWETest {
         111, 102, 32, 105, 110, 116, 101, 108, 108, 105, 103, 101, 110, 99,
         101, 32, 105, 115, 32, 110, 111, 116, 32, 107, 110, 111, 119, 108,
         101, 100, 103, 101, 32, 98, 117, 116, 32, 105, 109, 97, 103, 105,
-        110, 97, 116, 105, 111, 110, 46}, getUtf8Bytes(plaintext));
+        110, 97, 116, 105, 111, 110, 46}, plaintext.getBytes(UTF_8));
     /**
      * A.1.1.  JOSE Header
      The following example JWE Protected Header declares that:
@@ -105,17 +109,16 @@ public class JWETest {
      */
     JweJoseHeader joseHeader = new JweJoseHeader();
     joseHeader.setAlg("RSA-OAEP");
-    joseHeader.setContentEncryptionAlgorithm(EContentEncyptionAlgorithm.A256GCM);
+    joseHeader.setContentEncryptionAlgorithm(EContentEncryptionAlgorithm.A256GCM);
 
-    JsonUtility<JweJoseHeader> joseHeaderMarshaller = new JsonUtility<>(JweJoseHeader.class);
-    String joseHeaderJson = joseHeaderMarshaller.toJson(joseHeader);
+    String joseHeaderJson = toJson(joseHeader, JweJoseHeader.class);
     System.out.println(joseHeaderJson);
     /**
      * Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
      Header)) gives this value:
      eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ
      */
-    assertEquals("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ", EncodingUtility.encodeBase64Url(joseHeaderJson));
+    assertEquals("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ", toBase64Url(joseHeaderJson));
 
     /**
      * A.1.2.  Content Encryption Key (CEK)
@@ -142,8 +145,7 @@ public class JWETest {
      */
     final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/rsa-private-key.json");
 
-    JsonUtility<JwkRsaKey> jwkMarshaller = new JsonUtility<>(JwkRsaKey.class, true);
-    JwkRsaKey key = jwkMarshaller.fromJson(jwkJson);
+    JwkRsaKey key = fromJson(jwkJson, JwkRsaKey.class);
     Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
     cipher.init(Cipher.ENCRYPT_MODE, key.getPublicKey());
     byte[] encryptedKey = cipher.doFinal(cekBytes);
@@ -206,7 +208,7 @@ public class JWETest {
 
     final byte[] initVector = TestUtil.convertUnsignedIntsToBytes(new int[]{227, 197, 117, 252, 2, 219, 233, 68, 180,
         225, 77, 219});
-    final String initVectorBase64 = EncodingUtility.encodeBase64Url(initVector);
+    final String initVectorBase64 = toBase64Url(initVector);
     assertEquals("48V1_ALb6US04U3b", initVectorBase64);
 
     /**
@@ -239,8 +241,8 @@ public class JWETest {
     Key aesKey = new SecretKeySpec(cekBytes, "AES");
     cipher1.init(Cipher.ENCRYPT_MODE, aesKey, myParams);
     cipher1.updateAAD(aad);
-    int cypherLen = getUtf8Bytes(plaintext).length; // cipher1.getOutputSize(plaintext.length());
-    byte[] cypherAndAuthTag = cipher1.doFinal(getUtf8Bytes(plaintext));
+    int cypherLen = plaintext.getBytes(UTF_8).length;
+    byte[] cypherAndAuthTag = cipher1.doFinal(plaintext.getBytes(UTF_8));
     byte[] cypher = Arrays.copyOf(cypherAndAuthTag, cypherLen);
     byte[] authTag = Arrays.copyOfRange(cypherAndAuthTag, cypherLen, cypherAndAuthTag.length);
     assertArrayEquals(new int[]{229, 236, 166, 241, 53, 191, 115, 196, 174, 43, 73, 109, 39, 122,
@@ -265,7 +267,7 @@ public class JWETest {
      */
     final String plaintext = "Live long and prosper.";
     assertArrayEquals(new byte[]{76, 105, 118, 101, 32, 108, 111, 110, 103, 32, 97, 110, 100, 32,
-        112, 114, 111, 115, 112, 101, 114, 46}, getUtf8Bytes(plaintext));
+        112, 114, 111, 115, 112, 101, 114, 46}, plaintext.getBytes(UTF_8));
     /**
      * A.2.1.  JOSE Header
      The following example JWE Protected Header declares that:
@@ -279,20 +281,19 @@ public class JWETest {
      {"alg":"RSA1_5","enc":"A128CBC-HS256"}
      */
     final EKeyManagementAlgorithm keyManagementAlgorithm = EKeyManagementAlgorithm.RSA1_5;
-    final EContentEncyptionAlgorithm contentEncyptionAlgorithm = EContentEncyptionAlgorithm.A128CBC_HS256;
+    final EContentEncryptionAlgorithm contentEncyptionAlgorithm = EContentEncryptionAlgorithm.A128CBC_HS256;
     JweJoseHeader joseHeader = new JweJoseHeader();
     joseHeader.setAlg(keyManagementAlgorithm.getJoseAlgorithmName());
     joseHeader.setContentEncryptionAlgorithm(contentEncyptionAlgorithm);
 
-    JsonUtility<JweJoseHeader> joseHeaderMarshaller = new JsonUtility<>(JweJoseHeader.class);
-    String joseHeaderJson = joseHeaderMarshaller.toJson(joseHeader);
+    String joseHeaderJson = toJson(joseHeader, JweJoseHeader.class);
     System.out.println(joseHeaderJson);
     /**
      * Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
      Header)) gives this value:
      eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0
      */
-    assertEquals("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", EncodingUtility.encodeBase64Url(joseHeaderJson));
+    assertEquals("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", toBase64Url(joseHeaderJson));
 
     /**
      * A.1.2.  Content Encryption Key (CEK)
@@ -318,8 +319,7 @@ public class JWETest {
      */
     final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/rsa-private-key-appendix-a2.json");
 
-    JsonUtility<JwkRsaKey> jwkMarshaller = new JsonUtility<>(JwkRsaKey.class, true);
-    JwkRsaKey key = jwkMarshaller.fromJson(jwkJson);
+    JwkRsaKey key = fromJson(jwkJson, JwkRsaKey.class);
 
     Cipher cipher = Cipher.getInstance(keyManagementAlgorithm.getJavaAlgorithm());
     cipher.init(Cipher.ENCRYPT_MODE, key.getPublicKey());
@@ -381,7 +381,7 @@ public class JWETest {
 
     final byte[] initVector = TestUtil.convertUnsignedIntsToBytes(new int[]{3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104,
         101});
-    assertEquals("AxY8DCtDaGlsbGljb3RoZQ", EncodingUtility.encodeBase64Url(initVector));
+    assertEquals("AxY8DCtDaGlsbGljb3RoZQ", toBase64Url(initVector));
 
     /**
      A.2.5.  Additional Authenticated Data
@@ -397,7 +397,7 @@ public class JWETest {
         120, 88, 122, 85, 105, 76, 67, 74, 108, 98, 109, 77, 105, 79, 105,
         74, 66, 77, 84, 73, 52, 81, 48, 74, 68, 76, 85, 104, 84, 77, 106, 85,
         50, 73, 110, 48});
-    assertArrayEquals(aad, EncodingUtility.encodeBase64UrlAscii(joseHeaderJson));
+    assertArrayEquals(aad, toBase64Url(joseHeaderJson).getBytes(US_ASCII));
     /**
      A.2.6.  Content Encryption
      Perform authenticated encryption on the plaintext with the
