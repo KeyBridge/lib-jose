@@ -1,4 +1,4 @@
-package ch.keybridge.jose.algorithm;
+package ch.keybridge.jose.jwe.keymgmt;
 
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;

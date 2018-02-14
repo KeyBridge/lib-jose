@@ -14,7 +14,7 @@ public class Base64Utility {
    */
   private static final Base64.Encoder URL_ENCODER = Base64.getUrlEncoder().withoutPadding();
   private static final Base64.Decoder URL_DECODER = Base64.getUrlDecoder();
-  private static final Charset DEFAULT_CHARSET = UTF_8;
+  public static final Charset DEFAULT_CHARSET = UTF_8;
 
   /**
    * Convert any string to base64Url

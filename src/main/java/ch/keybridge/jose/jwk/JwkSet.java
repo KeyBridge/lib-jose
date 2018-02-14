@@ -30,7 +30,7 @@ import java.util.List;
  * ranges.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JWKSet {
+public class JwkSet {
   /**
    * 5.1.  "keys" Parameter
    * <p>
@@ -41,7 +41,7 @@ public class JWKSet {
    * desired.
    */
   @XmlElement(required = true)
-  List<? extends JWK> keys;
+  List<? extends JsonWebKey> keys;
 
   @Override
   public String toString() {
@@ -55,7 +55,7 @@ public class JWKSet {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    JWKSet jwkSet = (JWKSet) o;
+    JwkSet jwkSet = (JwkSet) o;
 
     return keys != null ? keys.equals(jwkSet.keys) : jwkSet.keys == null;
   }

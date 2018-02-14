@@ -3,9 +3,15 @@ package ch.keybridge.jose.jwk;
 import ch.keybridge.TestFileReader;
 import ch.keybridge.jose.util.Base64Utility;
 import ch.keybridge.jose.util.JsonMarshaller;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import org.junit.Test;
 
-import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.math.BigInteger;
 
 import static org.junit.Assert.assertEquals;
@@ -14,10 +20,46 @@ import static org.junit.Assert.assertTrue;
 public class JwkTest {
 
   @Test
-  public void ecPublicKeyTest() throws JAXBException {
+  public void blah() throws Exception {
+    JsonWebKey key = new JwkRsaPrivateKey();
+    key.setAlg("a");
+//    key.kty = "RSA";
+//    key.setKty()
+
+//    ObjectMapper objectMapper = new CustomObjectMapper(ENTITY_WITH_ID_DESERIALIZER);
+
+    AnnotationIntrospector primary = new JacksonAnnotationIntrospector();
+//    AnnotationIntrospector secondary = new JaxbAnnotationIntrospector();
+//    AnnotationIntrospector pair = new AnnotationIntrospector.Pair(primary, secondary);
+
+//    objectMapper.setAnnotationIntrospector(pair);
+
+
+//    objectMapper.configure(DeserializationConfig.Feature.USE_ANNOTATIONS, true);
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+    mapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector());
+
+//    mapper.registerModule(new JacksonAnnotationIntrospector());
+    mapper.registerModule(new JaxbAnnotationModule());
+    StringWriter w = new StringWriter();
+    System.out.println(mapper.writeValueAsString(key));
+//    mapper.writerWithDefaultPrettyPrinter().forType(JWK.class).writeValue(w, key);
+//    System.out.println(w.toString());
+
+    JsonWebKey read = mapper.readValue(JwkTest.class.getResourceAsStream
+        ("/rfc7520/section3-jwk-examples/ec-public-key.json"), JsonWebKey.class);
+
+    System.out.println(read);
+  }
+
+  @Test
+  public void ecPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-public-key.json");
     System.out.println(json);
-    JWK key = JsonMarshaller.fromJson(json, JWK.class);
+    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
     assertTrue(key instanceof JwkEcKey);
     JwkEcKey ecKey = (JwkEcKey)key;
     assertEquals("P-521", ecKey.getCrv());
@@ -29,15 +71,15 @@ public class JwkTest {
         ("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1")), ecKey.getY());
     assertEquals(null, ecKey.getD());
 
-    JwkEcKey keyReconverted = (JwkEcKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(ecKey, JWK.class), JWK.class);
+    JwkEcKey keyReconverted = (JwkEcKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(ecKey), JsonWebKey.class);
     assertEquals(ecKey, keyReconverted);
   }
 
   @Test
-  public void ecPrivateKeyTest() throws JAXBException {
+  public void ecPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-private-key.json");
     System.out.println(json);
-    JWK key = JsonMarshaller.fromJson(json, JWK.class);
+    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
     assertTrue(key instanceof JwkEcKey);
     JwkEcKey ecKey = (JwkEcKey)key;
     assertEquals("P-521", ecKey.getCrv());
@@ -50,17 +92,17 @@ public class JwkTest {
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url
         ("AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zbKipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt")), ecKey.getD());
 
-    JwkEcKey keyReconverted = (JwkEcKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(ecKey, JWK.class), JWK.class);
+    JwkEcKey keyReconverted = (JwkEcKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(ecKey), JsonWebKey.class);
     assertEquals(ecKey, keyReconverted);
   }
 
   @Test
-  public void rsaPublicKeyTest() throws JAXBException {
+  public void rsaPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-public-key.json");
     System.out.println(json);
-    JWK key = JsonMarshaller.fromJson(json, JWK.class);
-    assertTrue(key instanceof JwkRsaKey);
-    JwkRsaKey rsaKey = (JwkRsaKey) key;
+    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
+    assertTrue(key instanceof JwkRsaPrivateKey);
+    JwkRsaPrivateKey rsaKey = (JwkRsaPrivateKey) key;
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url
         ("n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O" +
             "-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqVwGU_NsYOYL" +
@@ -72,17 +114,17 @@ public class JwkTest {
     assertEquals("sig", rsaKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", rsaKey.getKid());
 
-    JwkRsaKey keyReconverted = (JwkRsaKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(rsaKey, JWK.class), JWK.class);
+    JwkRsaPrivateKey keyReconverted = (JwkRsaPrivateKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(rsaKey), JsonWebKey.class);
     assertEquals(rsaKey, keyReconverted);
   }
 
   @Test
-  public void rsaPrivateKeyTest() throws JAXBException {
+  public void rsaPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
     System.out.println(json);
-    JWK key = JsonMarshaller.fromJson(json, JWK.class);
-    assertTrue(key instanceof JwkRsaKey);
-    JwkRsaKey rsaKey = (JwkRsaKey) key;
+    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
+    assertTrue(key instanceof JwkRsaPrivateKey);
+    JwkRsaPrivateKey rsaKey = (JwkRsaPrivateKey) key;
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url
         ("n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O" +
             "-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqVwGU_NsYOYL" +
@@ -100,15 +142,15 @@ public class JwkTest {
     assertEquals("sig", rsaKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", rsaKey.getKid());
 
-    JwkRsaKey keyReconverted = (JwkRsaKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(rsaKey, JWK.class), JWK.class);
+    JwkRsaPrivateKey keyReconverted = (JwkRsaPrivateKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(rsaKey), JsonWebKey.class);
     assertEquals(rsaKey, keyReconverted);
   }
 
   @Test
-  public void jwkPublicKeySetTest() throws JAXBException {
+  public void jwkPublicKeySetTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7517/appendix-a/public-keys.json");
     System.out.println(json);
-    JWKSet deserialized = JsonMarshaller.fromJson(json, JWKSet.class);
+    JwkSet deserialized = JsonMarshaller.fromJson(json, JwkSet.class);
     assertEquals(2, deserialized.keys.size());
     assertTrue(deserialized.keys.get(0) instanceof JwkEcKey);
     JwkEcKey ecKey = (JwkEcKey)deserialized.keys.get(0);
@@ -120,23 +162,23 @@ public class JwkTest {
     assertEquals("enc", ecKey.getUse());
     assertEquals("1", ecKey.getKid());
 
-    assertTrue(deserialized.keys.get(1) instanceof JwkRsaKey);
-    JwkRsaKey rsaKey = (JwkRsaKey) deserialized.keys.get(1);
+    assertTrue(deserialized.keys.get(1) instanceof JwkRsaPrivateKey);
+    JwkRsaPrivateKey rsaKey = (JwkRsaPrivateKey) deserialized.keys.get(1);
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url
         ("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw")), rsaKey.getModulus());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AQAB")), rsaKey.getPublicExponent());
     assertEquals("RS256", rsaKey.getAlg());
     assertEquals("2011-04-29", rsaKey.getKid());
 
-    JWKSet reconverted = JsonMarshaller.fromJson(JsonMarshaller.toJson(deserialized, JWKSet.class), JWKSet.class);
+    JwkSet reconverted = JsonMarshaller.fromJson(JsonMarshaller.toJson(deserialized), JwkSet.class);
     assertEquals(deserialized, reconverted);
   }
 
   @Test
-  public void jwkPrivateKeySetTest() throws JAXBException {
+  public void jwkPrivateKeySetTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7517/appendix-a/private-keys.json");
     System.out.println(json);
-    JWKSet deserialized = JsonMarshaller.fromJson(json, JWKSet.class);
+    JwkSet deserialized = JsonMarshaller.fromJson(json, JwkSet.class);
     assertEquals(2, deserialized.keys.size());
     assertTrue(deserialized.keys.get(0) instanceof JwkEcKey);
     JwkEcKey ecKey = (JwkEcKey)deserialized.keys.get(0);
@@ -150,8 +192,8 @@ public class JwkTest {
     assertEquals("enc", ecKey.getUse());
     assertEquals("1", ecKey.getKid());
 
-    assertTrue(deserialized.keys.get(1) instanceof JwkRsaKey);
-    JwkRsaKey rsaKey = (JwkRsaKey) deserialized.keys.get(1);
+    assertTrue(deserialized.keys.get(1) instanceof JwkRsaPrivateKey);
+    JwkRsaPrivateKey rsaKey = (JwkRsaPrivateKey) deserialized.keys.get(1);
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url
         ("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw")), rsaKey.getModulus());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AQAB")), rsaKey.getPublicExponent());
@@ -174,7 +216,7 @@ public class JwkTest {
     assertEquals("RS256", rsaKey.getAlg());
     assertEquals("2011-04-29", rsaKey.getKid());
 
-    JWKSet reconverted = JsonMarshaller.fromJson(JsonMarshaller.toJson(deserialized, JWKSet.class), JWKSet.class);
+    JwkSet reconverted = JsonMarshaller.fromJson(JsonMarshaller.toJson(deserialized), JwkSet.class);
     assertEquals(deserialized, reconverted);
   }
 }

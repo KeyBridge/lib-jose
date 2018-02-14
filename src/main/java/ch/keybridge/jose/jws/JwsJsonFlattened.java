@@ -1,6 +1,7 @@
 package ch.keybridge.jose.jws;
 
-import ch.keybridge.jose.JoseHeader;
+import ch.keybridge.jose.JoseBase;
+import ch.keybridge.jose.JoseCryptoHeader;
 import ch.keybridge.jose.adapter.XmlAdapterByteArrayBase64Url;
 import ch.keybridge.jose.util.Base64Utility;
 import ch.keybridge.jose.util.JsonMarshaller;
@@ -9,6 +10,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.IOException;
 
 /**
  * 7.2.2.  Flattened JWS JSON Serialization Syntax
@@ -41,40 +43,43 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JwsJsonFlattened {
+public class JwsJsonFlattened extends JwsJsonBase {
   @XmlElement(name = "protected")
-  private String protectedHeader;
+  private JoseCryptoHeader protectedHeader;
   @XmlElement(name = "header")
-  private JoseHeader unprotectedHeader;
-  private String payload;
+  private JoseCryptoHeader unprotectedHeader;
   @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] signature;
 
   private JwsJsonFlattened() {
   }
 
-  public JwsJsonFlattened(JoseHeader protectedHeader, JoseHeader unprotectedHeader, String payload, byte[] signature)
-      throws Exception {
-    this.protectedHeader = Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader, JoseHeader.class));
+  public JwsJsonFlattened(JoseCryptoHeader protectedHeader, JoseCryptoHeader unprotectedHeader, byte[] payload,
+                          byte[] signature) {
+    this.protectedHeader = protectedHeader;
     this.unprotectedHeader = unprotectedHeader;
-    this.payload = Base64Utility.toBase64Url(payload);
+    this.payload = payload;
     this.signature = signature;
   }
 
-  public JoseHeader getProtectedHeader() throws Exception {
-    return JsonMarshaller.fromJson(Base64Utility.fromBase64UrlToString(protectedHeader), JoseHeader.class);
+  public static JwsJsonFlattened fromJson(String json) throws IOException {
+    return JsonMarshaller.fromJson(json, JwsJsonFlattened.class);
   }
 
-  public JoseHeader getUnprotectedHeader() {
+  public JoseBase getProtectedHeader() {
+    return protectedHeader;
+  }
+
+  public JoseBase getUnprotectedHeader() {
     return unprotectedHeader;
   }
 
-  public String getPayload() {
-    return Base64Utility.fromBase64UrlToString(payload);
+  public byte[] getSignatureBytes() {
+    return signature;
   }
 
-  public byte[] getSignature() {
-    return signature;
+  public JwsSignature getJwsSignature() {
+    return JwsSignature.getInstance(protectedHeader, unprotectedHeader, signature);
   }
 
   /**
@@ -93,7 +98,12 @@ public class JwsJsonFlattened {
    *
    * @return this JWS object encoded in compact serialization
    */
-  public String getCompactForm() {
-    return protectedHeader + '.' + payload + '.' + Base64Utility.toBase64Url(signature);
+  public String getCompactForm() throws IOException {
+    return Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader)) + '.' +
+        Base64Utility.toBase64Url(payload) + '.' + Base64Utility.toBase64Url(signature);
+  }
+
+  public String toJson() throws IOException {
+    return JsonMarshaller.toJson(this);
   }
 }

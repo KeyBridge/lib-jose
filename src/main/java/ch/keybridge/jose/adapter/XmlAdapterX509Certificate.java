@@ -26,12 +26,12 @@ import java.util.Base64;
 public class XmlAdapterX509Certificate extends XmlAdapter<String, WktX509Certificate> {
 
   @Override
-  public String marshal(WktX509Certificate v) throws Exception {
+  public String marshal(WktX509Certificate v) {
     return v.toString();
   }
 
   @Override
-  public WktX509Certificate unmarshal(String v) throws Exception {
+  public WktX509Certificate unmarshal(String v) {
     WktX509Certificate certificate = new WktX509Certificate();
     certificate.data = Base64.getDecoder().decode(v);
     return certificate;

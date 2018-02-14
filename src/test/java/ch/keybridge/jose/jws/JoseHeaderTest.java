@@ -1,20 +1,20 @@
 package ch.keybridge.jose.jws;
 
 import ch.keybridge.TestFileReader;
-import ch.keybridge.jose.JoseHeader;
+import ch.keybridge.jose.JoseCryptoHeader;
 import ch.keybridge.jose.util.JsonMarshaller;
 import org.junit.Test;
 
-import javax.xml.bind.JAXBException;
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
 public class JoseHeaderTest {
 
   @Test
-  public void critFieldTest() throws JAXBException {
+  public void critFieldTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7515/section4-jose-header/jose-header-crit-field-example.json");
-    JoseHeader header = JsonMarshaller.fromJson(json, JoseHeader.class);
+    JoseCryptoHeader header = JsonMarshaller.fromJson(json, JoseCryptoHeader.class);
     /**
      * {
      *  "alg":"ES256",

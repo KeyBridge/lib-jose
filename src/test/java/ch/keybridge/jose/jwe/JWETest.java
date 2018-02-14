@@ -2,20 +2,26 @@ package ch.keybridge.jose.jwe;
 
 import ch.keybridge.TestFileReader;
 import ch.keybridge.TestUtil;
-import ch.keybridge.jose.algorithm.EContentEncryptionAlgorithm;
-import ch.keybridge.jose.algorithm.EKeyManagementAlgorithm;
-import ch.keybridge.jose.jwk.JwkRsaKey;
+import ch.keybridge.jose.jwe.encryption.AesCbcHmacSha2Encrypter;
+import ch.keybridge.jose.jwe.encryption.EEncryptionAlgo;
+import ch.keybridge.jose.jwe.encryption.Encrypter;
+import ch.keybridge.jose.jwe.encryption.EncryptionResult;
+import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
+import ch.keybridge.jose.jwk.JwkRsaPrivateKey;
+import ch.keybridge.jose.jwk.JwkSymmetricKey;
 import org.junit.Test;
 
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.Security;
-import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 
 import static ch.keybridge.jose.util.Base64Utility.toBase64Url;
@@ -23,13 +29,27 @@ import static ch.keybridge.jose.util.JsonMarshaller.fromJson;
 import static ch.keybridge.jose.util.JsonMarshaller.toJson;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class JWETest {
 
+  private static byte[] concatenate(byte[] aad, byte[] iv, byte[] ciphertext, byte[] a) {
+    byte[] output = new byte[aad.length + iv.length + ciphertext.length + a.length];
+    int idx = 0;
+    System.arraycopy(aad, 0, output, idx, aad.length);
+    idx += aad.length;
+    System.arraycopy(iv, 0, output, idx, iv.length);
+    idx += iv.length;
+    System.arraycopy(ciphertext, 0, output, idx, ciphertext.length);
+    idx += ciphertext.length;
+    System.arraycopy(a, 0, output, idx, a.length);
+    return output;
+  }
+
   @Test
-  public void decryptPayload() throws Exception {
+  public void encryptDecryptRsa2048Test() throws Exception {
     String payloadString = "some text to test with";
     byte[] payload = payloadString.getBytes(UTF_8);
 
@@ -42,12 +62,12 @@ public class JWETest {
     System.out.println(pair.getPublic().getAlgorithm());
     System.out.println(pair.getPublic().getFormat());
 
-    JWE jwe = JWE.getInstance(payload, pair.getPublic());
+    JweJsonFlattened jwe = JweJsonFlattened.getInstance(payload, pair.getPublic());
 
     String compactForm = jwe.toCompactForm();
 
     System.out.println(compactForm);
-    JWE fromCompact = JWE.fromCompactForm(compactForm);
+    JweJsonFlattened fromCompact = JweJsonFlattened.fromCompactForm(compactForm);
 
     assertEquals(jwe, fromCompact);
 
@@ -57,7 +77,7 @@ public class JWETest {
   }
 
   @Test
-  public void decryptPayload2() throws Exception {
+  public void encryptDecryptRsa1024Test() throws Exception {
     String payloadString = "some text to test with";
     byte[] payload = payloadString.getBytes(UTF_8);
 
@@ -65,11 +85,27 @@ public class JWETest {
     generator.initialize(1024);
     KeyPair pair = generator.generateKeyPair();
 
-    JWE jwe = JWE.getInstance(payload, pair.getPublic());
+    JweJsonFlattened jwe = JweJsonFlattened.getInstance(payload, pair.getPublic());
 
     byte[] decrypted = jwe.decryptPayload(pair.getPrivate());
 
     assertArrayEquals(payload, decrypted);
+  }
+
+  @Test
+  public void encryptDecryptStringTest() throws Exception {
+    String payloadString = "some text to test with";
+    byte[] payload = payloadString.getBytes(UTF_8);
+
+    KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+    generator.initialize(1024);
+    KeyPair pair = generator.generateKeyPair();
+
+    JweJsonFlattened jwe = JweJsonFlattened.getInstance(payloadString, pair.getPublic());
+
+    String decrypted = jwe.decryptAsString(pair.getPrivate());
+
+    assertEquals(payloadString, decrypted);
   }
 
   @Test
@@ -109,9 +145,9 @@ public class JWETest {
      */
     JweJoseHeader joseHeader = new JweJoseHeader();
     joseHeader.setAlg("RSA-OAEP");
-    joseHeader.setContentEncryptionAlgorithm(EContentEncryptionAlgorithm.A256GCM);
+    joseHeader.setContentEncryptionAlgorithm(EEncryptionAlgo.A256GCM);
 
-    String joseHeaderJson = toJson(joseHeader, JweJoseHeader.class);
+    String joseHeaderJson = toJson(joseHeader);
     System.out.println(joseHeaderJson);
     /**
      * Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
@@ -145,7 +181,7 @@ public class JWETest {
      */
     final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/rsa-private-key.json");
 
-    JwkRsaKey key = fromJson(jwkJson, JwkRsaKey.class);
+    JwkRsaPrivateKey key = fromJson(jwkJson, JwkRsaPrivateKey.class);
     Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
     cipher.init(Cipher.ENCRYPT_MODE, key.getPublicKey());
     byte[] encryptedKey = cipher.doFinal(cekBytes);
@@ -254,7 +290,6 @@ public class JWETest {
         210, 145}, TestUtil.toUnsignedInt(authTag));
   }
 
-
   @Test
   public void appendixA2Test() throws Exception {
     /**
@@ -281,12 +316,12 @@ public class JWETest {
      {"alg":"RSA1_5","enc":"A128CBC-HS256"}
      */
     final EKeyManagementAlgorithm keyManagementAlgorithm = EKeyManagementAlgorithm.RSA1_5;
-    final EContentEncryptionAlgorithm contentEncyptionAlgorithm = EContentEncryptionAlgorithm.A128CBC_HS256;
+    final EEncryptionAlgo contentEncyptionAlgorithm = EEncryptionAlgo.A128CBC_HS256;
     JweJoseHeader joseHeader = new JweJoseHeader();
     joseHeader.setAlg(keyManagementAlgorithm.getJoseAlgorithmName());
     joseHeader.setContentEncryptionAlgorithm(contentEncyptionAlgorithm);
 
-    String joseHeaderJson = toJson(joseHeader, JweJoseHeader.class);
+    String joseHeaderJson = toJson(joseHeader);
     System.out.println(joseHeaderJson);
     /**
      * Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
@@ -319,7 +354,7 @@ public class JWETest {
      */
     final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/rsa-private-key-appendix-a2.json");
 
-    JwkRsaKey key = fromJson(jwkJson, JwkRsaKey.class);
+    JwkRsaPrivateKey key = fromJson(jwkJson, JwkRsaPrivateKey.class);
 
     Cipher cipher = Cipher.getInstance(keyManagementAlgorithm.getJavaAlgorithm());
     cipher.init(Cipher.ENCRYPT_MODE, key.getPublicKey());
@@ -379,7 +414,8 @@ public class JWETest {
      AxY8DCtDaGlsbGljb3RoZQ
      */
 
-    final byte[] initVector = TestUtil.convertUnsignedIntsToBytes(new int[]{3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104,
+    final byte[] initVector = TestUtil.convertUnsignedIntsToBytes(new int[]{3, 22, 60, 12, 43, 67, 104, 105, 108,
+        108, 105, 99, 111, 116, 104,
         101});
     assertEquals("AxY8DCtDaGlsbGljb3RoZQ", toBase64Url(initVector));
 
@@ -408,9 +444,9 @@ public class JWETest {
      is:
      */
 
-    Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-    Cipher cipher1 = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
-    AlgorithmParameterSpec spec = new IvParameterSpec(initVector);//  System.out.println(cekBytes.length);
+//    Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+//    Cipher cipher1 = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
+//    AlgorithmParameterSpec spec = new IvParameterSpec(initVector);//  System.out.println(cekBytes.length);
     /**
      * Developer note:
      * Additional files may need to be downloaded and copied into the Java installation security directory
@@ -429,7 +465,267 @@ public class JWETest {
 //    assertArrayEquals(new int[]{40, 57, 83, 181, 119, 33, 133, 148, 198, 185, 243, 24, 152, 230, 6,
 //        75, 129, 223, 127, 19, 210, 82, 183, 230, 168, 33, 215, 104, 143,
 //        112, 56, 102}, TestUtil.toUnsignedInt(cypher));
-//    assertArrayEquals(new int[]{246, 17, 244, 190, 4, 95, 98, 3, 231, 0, 115, 157, 242, 203, 100, 191}, TestUtil.toUnsignedInt(authTag));
+//    assertArrayEquals(new int[]{246, 17, 244, 190, 4, 95, 98, 3, 231, 0, 115, 157, 242, 203, 100, 191}, TestUtil
+// .toUnsignedInt(authTag));
+  }
+
+  @Test
+  public void appendixA3Test() throws Exception {
+    /**
+     A.3.  Example JWE Using AES Key Wrap and AES_128_CBC_HMAC_SHA_256
+
+     This example encrypts the plaintext "Live long and prosper." to the
+     recipient using AES Key Wrap for key encryption and
+     AES_128_CBC_HMAC_SHA_256 for content encryption.  The representation
+     of this plaintext (using JSON array notation) is:
+     */
+    final String plaintext = "Live long and prosper.";
+    final byte[] plaintextBytes = plaintext.getBytes(US_ASCII);
+    assertArrayEquals(new byte[]{76, 105, 118, 101, 32, 108, 111, 110, 103, 32, 97, 110, 100, 32,
+        112, 114, 111, 115, 112, 101, 114, 46}, plaintextBytes);
+    /**
+     * A.3.1.  JOSE Header
+
+     The following example JWE Protected Header declares that:
+
+     o  The Content Encryption Key is encrypted to the recipient using the
+     AES Key Wrap algorithm with a 128-bit key to produce the JWE
+     Encrypted Key.
+     o  Authenticated encryption is performed on the plaintext using the
+     AES_128_CBC_HMAC_SHA_256 algorithm to produce the ciphertext and
+     the Authentication Tag.
+
+     {"alg":"A128KW","enc":"A128CBC-HS256"}
+     */
+    final EKeyManagementAlgorithm keyManagementAlgorithm = EKeyManagementAlgorithm.A128KW;
+    final EEncryptionAlgo contentEncyptionAlgorithm = EEncryptionAlgo.A128CBC_HS256;
+    JweJoseHeader joseHeader = new JweJoseHeader();
+    joseHeader.setAlg(keyManagementAlgorithm.getJoseAlgorithmName());
+    joseHeader.setContentEncryptionAlgorithm(contentEncyptionAlgorithm);
+
+    final String joseHeaderJson = toJson(joseHeader);
+    System.out.println(joseHeaderJson);
+    /**
+     * Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
+     Header)) gives this value:
+     eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0
+     */
+    assertEquals("eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", toBase64Url(joseHeaderJson));
+
+    /**
+     * A.3.2.  Content Encryption Key (CEK)
+
+     Generate a 256-bit random CEK.  In this example, the value is:
+
+     [4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106,
+     206, 107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156,
+     44, 207]
+     */
+    final int[] cek = new int[]{
+        4, 211, 31, 197, 84, 157, 252, 254, 11, 100, 157, 250, 63, 170, 106,
+        206, 107, 124, 212, 45, 111, 107, 9, 219, 200, 177, 0, 240, 143, 156,
+        44, 207
+    };
+    final byte[] cekBytes = TestUtil.convertUnsignedIntsToBytes(cek);
+    assertArrayEquals(cek, TestUtil.toUnsignedInt(cekBytes)); // sanity check
+    SecretKey cekKey = new SecretKeySpec(cekBytes, "AES");
+    /**
+     * A.3.3.  Key Encryption
+
+     Encrypt the CEK with the shared symmetric key using the AES Key Wrap
+     algorithm to produce the JWE Encrypted Key.  This example uses the
+     symmetric key represented in JSON Web Key [JWK] format below:
+     */
+    final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/symmetric-key-appendix-a3.json");
+
+    JwkSymmetricKey key = fromJson(jwkJson, JwkSymmetricKey.class);
+
+    SecretKey secretKey = new SecretKeySpec(key.getK(), "AES");
+
+    Cipher cipher = Cipher.getInstance(keyManagementAlgorithm.getJavaAlgorithm());
+    cipher.init(Cipher.WRAP_MODE, secretKey);
+    byte[] enc = cipher.wrap(cekKey);
+
+//    Cipher cipher2 = Cipher.getInstance(keyManagementAlgorithm.getJavaAlgorithm());
+    cipher.init(Cipher.UNWRAP_MODE, secretKey);
+    SecretKey unwrapped = (SecretKey) cipher.unwrap(enc, "AES", Cipher.SECRET_KEY);
+
+    assertEquals(unwrapped, cekKey);
+
+    /**
+     The resulting JWE Encrypted Key value is:
+     */
+    int[] encExpected = new int[]{
+        232, 160, 123, 211, 183, 76, 245, 132, 200, 128, 123, 75, 190, 216,
+        22, 67, 201, 138, 193, 186, 9, 91, 122, 31, 246, 90, 28, 139, 57, 3,
+        76, 124, 193, 11, 98, 37, 173, 61, 104, 57
+    };
+    assertEquals(encExpected.length, enc.length);
+    assertArrayEquals(TestUtil.convertUnsignedIntsToBytes(encExpected), enc);
+    /**
+     * Encoding this JWE Encrypted Key as BASE64URL(JWE Encrypted Key) gives
+     this value:
+
+     6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ
+     */
+    assertEquals("6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ",
+        toBase64Url(enc));
+
+    /**
+     * A.3.4.  Initialization Vector
+
+     Generate a random 128-bit JWE Initialization Vector.  In this
+     example, the value is:
+
+     [3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104,
+     101]
+
+     Encoding this JWE Initialization Vector as BASE64URL(JWE
+     Initialization Vector) gives this value:
+
+     AxY8DCtDaGlsbGljb3RoZQ
+     */
+
+    final byte[] initVector = TestUtil.convertUnsignedIntsToBytes(new int[]{
+        3, 22, 60, 12, 43, 67, 104, 105, 108, 108, 105, 99, 111, 116, 104,
+        101});
+    assertEquals("AxY8DCtDaGlsbGljb3RoZQ", toBase64Url(initVector));
+
+    /**
+     A.3.5.  Additional Authenticated Data
+
+     Let the Additional Authenticated Data encryption parameter be
+     ASCII(BASE64URL(UTF8(JWE Protected Header))).  This value is:
+
+     [101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 66, 77, 84, 73, 52,
+     83, 49, 99, 105, 76, 67, 74, 108, 98, 109, 77, 105, 79, 105, 74, 66,
+     77, 84, 73, 52, 81, 48, 74, 68, 76, 85, 104, 84, 77, 106, 85, 50, 73,
+     110, 48]
+     */
+    final byte[] aad = TestUtil.convertUnsignedIntsToBytes(new int[]{
+        101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 66, 77, 84, 73, 52,
+        83, 49, 99, 105, 76, 67, 74, 108, 98, 109, 77, 105, 79, 105, 74, 66,
+        77, 84, 73, 52, 81, 48, 74, 68, 76, 85, 104, 84, 77, 106, 85, 50, 73,
+        110, 48});
+    assertArrayEquals(aad, toBase64Url(joseHeaderJson).getBytes(US_ASCII));
+    /**
+     A.3.6.  Content Encryption
+
+     Perform authenticated encryption on the plaintext with the
+     AES_128_CBC_HMAC_SHA_256 algorithm using the CEK as the encryption
+     key, the JWE Initialization Vector, and the Additional Authenticated
+     Data value above.  The steps for doing this using the values from
+     this example are detailed in Appendix B.  The resulting ciphertext
+     is:
+
+     [40, 57, 83, 181, 119, 33, 133, 148, 198, 185, 243, 24, 152, 230, 6,
+     75, 129, 223, 127, 19, 210, 82, 183, 230, 168, 33, 215, 104, 143,
+     112, 56, 102]
+
+     The resulting Authentication Tag value is:
+
+     [83, 73, 191, 98, 104, 205, 211, 128, 201, 189, 199, 133, 32, 38,
+     194, 85]
+     */
+    final byte[] ciphertext = TestUtil.convertUnsignedIntsToBytes(new int[]{
+        40, 57, 83, 181, 119, 33, 133, 148, 198, 185, 243, 24, 152, 230, 6,
+        75, 129, 223, 127, 19, 210, 82, 183, 230, 168, 33, 215, 104, 143,
+        112, 56, 102});
+    final byte[] authTag = TestUtil.convertUnsignedIntsToBytes(new int[]{
+        83, 73, 191, 98, 104, 205, 211, 128, 201, 189, 199, 133, 32, 38,
+        194, 85});
+    /**
+     *    Encoding this JWE Ciphertext as BASE64URL(JWE Ciphertext) gives this
+     value:
+
+     KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY
+
+     Encoding this JWE Authentication Tag as BASE64URL(JWE Authentication
+     Tag) gives this value:
+
+     U0m_YmjN04DJvceFICbCVQ
+     */
+    assertEquals("KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY", toBase64Url(ciphertext));
+    assertEquals("U0m_YmjN04DJvceFICbCVQ", toBase64Url(authTag));
+
+
+    byte[] secondHalf = Arrays.copyOfRange(cekBytes, cekBytes.length / 2, cekBytes.length);
+
+    SecretKey cekKeyHalf = new SecretKeySpec(secondHalf, "AES");
+
+    cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+    cipher.init(Cipher.ENCRYPT_MODE, cekKeyHalf, new IvParameterSpec(initVector));
+    byte[] calculatedCiphertext = cipher.doFinal(plaintext.getBytes(StandardCharsets.US_ASCII));
+
+    assertEquals(ciphertext.length, calculatedCiphertext.length);
+    assertArrayEquals(ciphertext, calculatedCiphertext);
+
+    long l = aad.length * 8;
+    byte[] al = new byte[8];
+    for (int i = 7; i >= 0; i--) {
+      al[i] = (byte) (l & 0xFF);
+      l >>= 8;
+    }
+
+    byte[] macInput = concatenate(aad, initVector, ciphertext, al);
+    Key macKey = new SecretKeySpec(Arrays.copyOf(cekBytes, cekBytes.length / 2), "AES");
+    Mac mac = Mac.getInstance("HmacSHA256");
+    mac.init(macKey);
+
+    byte[] hmac = mac.doFinal(macInput);
+    byte[] calculatedAuthTag = Arrays.copyOf(hmac, 16);
+
+    assertEquals(authTag.length, calculatedAuthTag.length);
+    assertArrayEquals(authTag, calculatedAuthTag);
+
+    Encrypter encrypter = new AesCbcHmacSha2Encrypter(AesCbcHmacSha2Encrypter.Configuration.AES_128_CBC_HMAC_SHA_256);
+    EncryptionResult encryptionResult = encrypter.encrypt(plaintextBytes, initVector, aad, new SecretKeySpec
+        (cekBytes, "AES"));
+
+    assertArrayEquals(aad, encryptionResult.getAad());
+    assertArrayEquals(initVector, encryptionResult.getIv());
+    assertArrayEquals(ciphertext, encryptionResult.getCiphertext());
+    assertArrayEquals(authTag, encryptionResult.getAuthTag());
+
+    byte[] decrypted = encrypter.decrypt(ciphertext, initVector, aad, authTag, new SecretKeySpec(cekBytes, "AES"));
+
+    assertArrayEquals(plaintextBytes, decrypted);
+  }
+
+  @Test
+  public void testAllAlgorithms() {
+    byte[] plaintext = TestUtil.createRandomString(100).getBytes();
+    byte[] aad = TestUtil.createRandomString(20).getBytes();
+
+    for (EEncryptionAlgo eEncryptionAlgo : EEncryptionAlgo.values()) {
+      if (eEncryptionAlgo == EEncryptionAlgo.UNKNOWN) continue;
+      System.out.println(eEncryptionAlgo);
+      final Encrypter encrypter = eEncryptionAlgo.getEncrypter();
+      try {
+        Key key = encrypter.generateKey();
+        EncryptionResult result = eEncryptionAlgo.getEncrypter().encrypt(plaintext, null, aad, key);
+        byte[] decrypted = encrypter.decrypt(result.getCiphertext(), result.getIv(), aad, result.getAuthTag(), key);
+        assertArrayEquals(plaintext, decrypted);
+
+        for (int i = 0; i < 100; i++) {
+          /**
+           * Check if changing the AAD makes decryption unsuccessful, i.e. result is null.
+           */
+          assertEquals(null, encrypter.decrypt(result.getCiphertext(), result.getIv(), TestUtil.getAlteredBytes(aad),
+              result.getAuthTag(), key));
+          /**
+           * Check if changing the key makes decryption unsuccessful, i.e. result is null.
+           */
+          Key fakeKey = new SecretKeySpec(TestUtil.getAlteredBytes(key.getEncoded()), "AES");
+          assertEquals(null, encrypter.decrypt(result.getCiphertext(), result.getIv(), aad, result.getAuthTag(),
+              fakeKey));
+        }
+      } catch (GeneralSecurityException e) {
+        e.printStackTrace();
+        fail();
+      }
+    }
+
   }
 
 }

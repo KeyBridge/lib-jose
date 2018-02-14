@@ -1,6 +1,6 @@
 package ch.keybridge.jose.io;
 
-import ch.keybridge.jose.jwe.JWE;
+import ch.keybridge.jose.jwe.JweJsonFlattened;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -21,13 +21,16 @@ public class JsonMarshallerTest {
   @Test
   public void jsonMarshallUnmarshall() {
     try {
-      KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
-      JWE original = JWE.getInstance("somePayload".getBytes(StandardCharsets.UTF_8), keyPair.getPublic());
-      JWE unmarshalled = fromJson(toJson(original, JWE.class), JWE.class);
+      KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+      generator.initialize(2048);
+      KeyPair keyPair = generator.generateKeyPair();
+      JweJsonFlattened original = JweJsonFlattened.getInstance("somePayload".getBytes(StandardCharsets.UTF_8),
+          keyPair.getPublic());
+      JweJsonFlattened unmarshalled = fromJson(toJson(original), JweJsonFlattened.class);
       assertEquals(original, unmarshalled);
     } catch (Exception e) {
-      fail("Unexpected exception thrown in test");
       e.printStackTrace();
+      fail("Unexpected exception thrown in test");
     }
   }
 }

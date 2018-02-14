@@ -1,17 +1,14 @@
 package ch.keybridge.jose.jwk;
 
 import ch.keybridge.jose.adapter.XmlAdapterBigIntegerBase64Url;
-import org.eclipse.persistence.oxm.annotations.XmlDiscriminatorValue;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.math.BigInteger;
 
-
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlDiscriminatorValue("EC")
-public class JwkEcKey extends JWK {
+public class JwkEcKey extends JsonWebKey {
   private String crv;
   @XmlJavaTypeAdapter(type=BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger x;
@@ -58,11 +55,12 @@ public class JwkEcKey extends JWK {
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
 
-    JwkEcKey that = (JwkEcKey) o;
+    JwkEcKey jwkEcKey = (JwkEcKey) o;
 
-    if (crv != null ? !crv.equals(that.crv) : that.crv != null) return false;
-    if (x != null ? !x.equals(that.x) : that.x != null) return false;
-    return y != null ? y.equals(that.y) : that.y == null;
+    if (crv != null ? !crv.equals(jwkEcKey.crv) : jwkEcKey.crv != null) return false;
+    if (x != null ? !x.equals(jwkEcKey.x) : jwkEcKey.x != null) return false;
+    if (y != null ? !y.equals(jwkEcKey.y) : jwkEcKey.y != null) return false;
+    return d != null ? d.equals(jwkEcKey.d) : jwkEcKey.d == null;
   }
 
   @Override
@@ -71,6 +69,7 @@ public class JwkEcKey extends JWK {
     result = 31 * result + (crv != null ? crv.hashCode() : 0);
     result = 31 * result + (x != null ? x.hashCode() : 0);
     result = 31 * result + (y != null ? y.hashCode() : 0);
+    result = 31 * result + (d != null ? d.hashCode() : 0);
     return result;
   }
 

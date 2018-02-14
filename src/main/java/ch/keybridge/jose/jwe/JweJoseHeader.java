@@ -1,22 +1,18 @@
 package ch.keybridge.jose.jwe;
 
 
-import ch.keybridge.jose.JoseHeader;
+import ch.keybridge.jose.JoseBase;
 import ch.keybridge.jose.adapter.XmlAdapterEContentEncryptionAlgorithm;
-import ch.keybridge.jose.algorithm.EContentEncryptionAlgorithm;
+import ch.keybridge.jose.jwe.encryption.EEncryptionAlgo;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
-// omit the automatically added 'type' field in JSON output https://stackoverflow
-// .com/questions/21091188/remove-type-from-json-output-jersey-moxy
-public class JweJoseHeader extends JoseHeader {
+public class JweJoseHeader extends JoseBase {
   /**
    * 4.1.2.  "enc" (Encryption Algorithm) Header Parameter
    * <p>
@@ -38,17 +34,36 @@ public class JweJoseHeader extends JoseHeader {
    * defined in Section 5.1 of [JWA].
    */
   @XmlElement(name = "enc")
-  @XmlJavaTypeAdapter(type = EContentEncryptionAlgorithm.class, value = XmlAdapterEContentEncryptionAlgorithm.class)
-  private EContentEncryptionAlgorithm contentEncryptionAlgorithm;
+  @XmlJavaTypeAdapter(type = EEncryptionAlgo.class, value = XmlAdapterEContentEncryptionAlgorithm.class)
+  private EEncryptionAlgo contentEncryptionAlgorithm;
 
+  /**
+   * 4.1.3.  "zip" (Compression Algorithm) Header Parameter
+   * <p>
+   * The "zip" (compression algorithm) applied to the plaintext before
+   * encryption, if any.  The "zip" value defined by this specification
+   * is:
+   * <p>
+   * o  "DEF" - Compression with the DEFLATE [RFC1951] algorithm
+   * <p>
+   * Other values MAY be used.  Compression algorithm values can be
+   * registered in the IANA "JSON Web Encryption Compression Algorithms"
+   * registry established by [JWA].  The "zip" value is a case-sensitive
+   * string.  If no "zip" parameter is present, no compression is applied
+   * to the plaintext before encryption.  When used, this Header Parameter
+   * MUST be integrity protected; therefore, it MUST occur only within the
+   * JWE Protected Header.  Use of this Header Parameter is OPTIONAL.
+   * This Header Parameter MUST be understood and processed by
+   * implementations.
+   */
   @XmlElement(name = "zip")
   private String compressionAlgorithm;
 
-  public EContentEncryptionAlgorithm getContentEncryptionAlgorithm() {
+  public EEncryptionAlgo getContentEncryptionAlgorithm() {
     return contentEncryptionAlgorithm;
   }
 
-  public void setContentEncryptionAlgorithm(EContentEncryptionAlgorithm contentEncryptionAlgorithm) {
+  public void setContentEncryptionAlgorithm(EEncryptionAlgo contentEncryptionAlgorithm) {
     this.contentEncryptionAlgorithm = contentEncryptionAlgorithm;
   }
 

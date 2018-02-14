@@ -1,11 +1,13 @@
 package ch.keybridge.jose;
 
-import ch.keybridge.jose.jwk.JWK;
+import ch.keybridge.jose.adapter.XmlAdapterX509Certificate;
 import ch.keybridge.jose.jwk.WktX509Certificate;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.net.URI;
 import java.util.List;
 
@@ -49,7 +51,11 @@ import java.util.List;
  * specifications.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JoseHeader {
+/**
+ * Developer note: t
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class JoseBase {
   /**
    * 4.1.1.  "alg" (Algorithm) Header Parameter
    * <p>
@@ -71,30 +77,6 @@ public class JoseHeader {
    * defined in Section 3.1 of [JWA].
    */
   protected String alg;
-  /**
-   * 4.1.2.  "jku" (JWK Set URL) Header Parameter
-   * <p>
-   * The "jku" (JWK Set URL) Header Parameter is a URI [RFC3986] that
-   * refers to a resource for a set of JSON-encoded public keys, one of
-   * which corresponds to the key used to digitally sign the JWS.  The
-   * keys MUST be encoded as a JWK Set [JWK].  The protocol used to
-   * acquire the resource MUST provide integrity protection; an HTTP GET
-   * request to retrieve the JWK Set MUST use Transport Layer Security
-   * (TLS) [RFC2818] [RFC5246]; and the identity of the server MUST be
-   * validated, as per Section 6 of RFC 6125 [RFC6125].  Also, see
-   * Section 8 on TLS requirements.  Use of this Header Parameter is
-   * OPTIONAL.
-   */
-  protected URI jku;
-  /**
-   * 4.1.3.  "jwk" (JSON Web Key) Header Parameter
-   * <p>
-   * The "jwk" (JSON Web Key) Header Parameter is the public key that
-   * corresponds to the key used to digitally sign the JWS.  This key is
-   * represented as a JSON Web Key [JWK].  Use of this Header Parameter is
-   * OPTIONAL.
-   */
-  protected JWK jwk;
   /**
    * 4.1.4.  "kid" (Key ID) Header Parameter
    * <p>
@@ -146,6 +128,7 @@ public class JoseHeader {
    * the certificate or certificate chain to be invalid if any validation
    * failure occurs.  Use of this Header Parameter is OPTIONAL.
    */
+  @XmlJavaTypeAdapter(type = WktX509Certificate.class, value = XmlAdapterX509Certificate.class)
   protected List<WktX509Certificate> x5c;
   /**
    * 4.1.7.  "x5t" (X.509 Certificate SHA-1 Thumbprint) Header Parameter
@@ -159,69 +142,6 @@ public class JoseHeader {
    */
   protected String x5t;
   /**
-   * 4.1.9.  "typ" (Type) Header Parameter
-   * <p>
-   * The "typ" (type) Header Parameter is used by JWS applications to
-   * declare the media type [IANA.MediaTypes] of this complete JWS.  This
-   * is intended for use by the application when more than one kind of
-   * object could be present in an application data structure that can
-   * contain a JWS; the application can use this value to disambiguate
-   * among the different kinds of objects that might be present.  It will
-   * typically not be used by applications when the kind of object is
-   * already known.  This parameter is ignored by JWS implementations; any
-   * processing of this parameter is performed by the JWS application.
-   * Use of this Header Parameter is OPTIONAL.
-   * <p>
-   * Per RFC 2045 [RFC2045], all media type values, subtype values, and
-   * parameter names are case insensitive.  However, parameter values are
-   * case sensitive unless otherwise specified for the specific parameter.
-   * To keep messages compact in common situations, it is RECOMMENDED that
-   * producers omit an "application/" prefix of a media type value in a
-   * "typ" Header Parameter when no other ’/’ appears in the media type
-   * value.  A recipient using the media type value MUST treat it as if
-   * "application/" were prepended to any "typ" value not containing a
-   * ’/’.  For instance, a "typ" value of "example" SHOULD be used to
-   * represent the "application/example" media type, whereas the media
-   * type "application/example;part="1/2"" cannot be shortened to
-   * "example;part="1/2"".
-   * <p>
-   * The "typ" value "JOSE" can be used by applications to indicate that
-   * this object is a JWS or JWE using the JWS Compact Serialization or
-   * the JWE Compact Serialization.  The "typ" value "JOSE+JSON" can be
-   * used by applications to indicate that this object is a JWS or JWE
-   * using the JWS JSON Serialization or the JWE JSON Serialization.
-   * Other type values can also be used by applications.
-   */
-  protected String typ;
-  /**
-   * 4.1.10.  "cty" (Content Type) Header Parameter
-   * <p>
-   * The "cty" (content type) Header Parameter is used by JWS applications
-   * to declare the media type [IANA.MediaTypes] of the secured content
-   * (the payload).  This is intended for use by the application when more
-   * than one kind of object could be present in the JWS Payload; the
-   * application can use this value to disambiguate among the different
-   * kinds of objects that might be present.  It will typically not be
-   * used by applications when the kind of object is already known.  This
-   * parameter is ignored by JWS implementations; any processing of this
-   * parameter is performed by the JWS application.  Use of this Header
-   * Parameter is OPTIONAL.
-   * <p>
-   * Per RFC 2045 [RFC2045], all media type values, subtype values, and
-   * parameter names are case insensitive.  However, parameter values are
-   * case sensitive unless otherwise specified for the specific parameter.
-   * To keep messages compact in common situations, it is RECOMMENDED that
-   * producers omit an "application/" prefix of a media type value in a
-   * "cty" Header Parameter when no other ’/’ appears in the media type
-   * value.  A recipient using the media type value MUST treat it as if
-   * "application/" were prepended to any "cty" value not containing a
-   * ’/’.  For instance, a "cty" value of "example" SHOULD be used to
-   * represent the "application/example" media type, whereas the media
-   * type "application/example;part="1/2"" cannot be shortened to
-   * "example;part="1/2"".
-   */
-  protected String cty;
-  /**
    * 4.1.8.  "x5t#S256" (X.509 Certificate SHA-256 Thumbprint) Header
    * Parameter
    * <p>
@@ -233,39 +153,7 @@ public class JoseHeader {
    * Use of this Header Parameter is OPTIONAL.
    */
   @XmlElement(name = "x5t#S256")
-  String x5tS256;
-  /**
-   * 4.1.11.  "crit" (Critical) Header Parameter
-   *
-   The "crit" (critical) Header Parameter indicates that extensions to
-   this specification and/or [JWA] are being used that MUST be
-   understood and processed.  Its value is an array listing the Header
-   Parameter names present in the JOSE Header that use those extensions.
-   If any of the listed extension Header Parameters are not understood
-   and supported by the recipient, then the JWS is invalid.  Producers
-   MUST NOT include Header Parameter names defined by this specification
-   or [JWA] for use with JWS, duplicate names, or names that do not
-   occur as Header Parameter names within the JOSE Header in the "crit"
-   list.  Producers MUST NOT use the empty list "[]" as the "crit"
-   value.  Recipients MAY consider the JWS to be invalid if the critical
-   list contains any Header Parameter names defined by this
-   specification or [JWA] for use with JWS or if any other constraints
-   on its use are violated.  When used, this Header Parameter MUST be
-   integrity protected; therefore, it MUST occur only within the JWS
-   Protected Header.  Use of this Header Parameter is OPTIONAL.  This
-   Header Parameter MUST be understood and processed by implementations.
-
-   An example use, along with a hypothetical "exp" (expiration time)
-   field is:
-   <pre>
-   {
-   "alg":"ES256",
-   "crit":["exp"],
-   "exp":1363284000
-   }
-   </pre>
-   */
-  protected List<String> crit;
+  protected String x5tS256;
 
   public String getAlg() {
     return alg;
@@ -273,22 +161,6 @@ public class JoseHeader {
 
   public void setAlg(String alg) {
     this.alg = alg;
-  }
-
-  public URI getJku() {
-    return jku;
-  }
-
-  public void setJku(URI jku) {
-    this.jku = jku;
-  }
-
-  public JWK getJwk() {
-    return jwk;
-  }
-
-  public void setJwk(JWK jwk) {
-    this.jwk = jwk;
   }
 
   public String getKid() {
@@ -323,22 +195,6 @@ public class JoseHeader {
     this.x5t = x5t;
   }
 
-  public String getTyp() {
-    return typ;
-  }
-
-  public void setTyp(String typ) {
-    this.typ = typ;
-  }
-
-  public String getCty() {
-    return cty;
-  }
-
-  public void setCty(String cty) {
-    this.cty = cty;
-  }
-
   public String getX5tS256() {
     return x5tS256;
   }
@@ -347,64 +203,29 @@ public class JoseHeader {
     this.x5tS256 = x5tS256;
   }
 
-  public List<String> getCrit() {
-    return crit;
-  }
-
-  public void setCrit(List<String> crit) {
-    this.crit = crit;
-  }
-
-  @Override
-  public String toString() {
-    return "JOSEHeader{" +
-        "alg='" + alg + '\'' +
-        ", jku=" + jku +
-        ", jwk=" + jwk +
-        ", kid='" + kid + '\'' +
-        ", x5u=" + x5u +
-        ", x5c=" + x5c +
-        ", x5t='" + x5t + '\'' +
-        ", typ='" + typ + '\'' +
-        ", cty='" + cty + '\'' +
-        ", x5tS256='" + x5tS256 + '\'' +
-        ", crit=" + crit +
-        '}';
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    JoseHeader that = (JoseHeader) o;
+    JoseBase that = (JoseBase) o;
 
     if (alg != null ? !alg.equals(that.alg) : that.alg != null) return false;
-    if (jku != null ? !jku.equals(that.jku) : that.jku != null) return false;
-    if (jwk != null ? !jwk.equals(that.jwk) : that.jwk != null) return false;
     if (kid != null ? !kid.equals(that.kid) : that.kid != null) return false;
     if (x5u != null ? !x5u.equals(that.x5u) : that.x5u != null) return false;
     if (x5c != null ? !x5c.equals(that.x5c) : that.x5c != null) return false;
     if (x5t != null ? !x5t.equals(that.x5t) : that.x5t != null) return false;
-    if (typ != null ? !typ.equals(that.typ) : that.typ != null) return false;
-    if (cty != null ? !cty.equals(that.cty) : that.cty != null) return false;
-    if (x5tS256 != null ? !x5tS256.equals(that.x5tS256) : that.x5tS256 != null) return false;
-    return crit != null ? crit.equals(that.crit) : that.crit == null;
+    return x5tS256 != null ? x5tS256.equals(that.x5tS256) : that.x5tS256 == null;
   }
 
   @Override
   public int hashCode() {
     int result = alg != null ? alg.hashCode() : 0;
-    result = 31 * result + (jku != null ? jku.hashCode() : 0);
-    result = 31 * result + (jwk != null ? jwk.hashCode() : 0);
     result = 31 * result + (kid != null ? kid.hashCode() : 0);
     result = 31 * result + (x5u != null ? x5u.hashCode() : 0);
     result = 31 * result + (x5c != null ? x5c.hashCode() : 0);
     result = 31 * result + (x5t != null ? x5t.hashCode() : 0);
-    result = 31 * result + (typ != null ? typ.hashCode() : 0);
-    result = 31 * result + (cty != null ? cty.hashCode() : 0);
     result = 31 * result + (x5tS256 != null ? x5tS256.hashCode() : 0);
-    result = 31 * result + (crit != null ? crit.hashCode() : 0);
     return result;
   }
 }

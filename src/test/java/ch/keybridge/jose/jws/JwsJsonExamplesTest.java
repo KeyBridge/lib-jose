@@ -1,8 +1,7 @@
 package ch.keybridge.jose.jws;
 
 import ch.keybridge.TestFileReader;
-import ch.keybridge.jose.algorithm.ESignatureAlgorithm;
-import ch.keybridge.jose.jwk.JwkRsaKey;
+import ch.keybridge.jose.jwk.JwkRsaPrivateKey;
 import ch.keybridge.jose.util.CryptographyUtility;
 import ch.keybridge.jose.util.JsonMarshaller;
 import org.junit.Test;
@@ -16,7 +15,7 @@ import static ch.keybridge.jose.util.Base64Utility.toBase64Url;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 
-public class JwsExamplesTest {
+public class JwsJsonExamplesTest {
 
   private static byte[] convertToSignedBytes(int[] unsignedBytes) {
     byte[] bytes = new byte[unsignedBytes.length];
@@ -41,7 +40,7 @@ public class JwsExamplesTest {
         '.' + toBase64Url(payload);
 
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    JwkRsaKey key = JsonMarshaller.fromJson(json, JwkRsaKey.class);
+    JwkRsaPrivateKey key = JsonMarshaller.fromJson(json, JwkRsaPrivateKey.class);
 
     KeyFactory kf = KeyFactory.getInstance("RSA");
     RSAPrivateKeySpec spec = new RSAPrivateKeySpec(key.getModulus(), key.getPrivateExponent());
@@ -52,10 +51,11 @@ public class JwsExamplesTest {
     byte[] signatureBytes = signer.sign();
     final String expectedSignature = "MRjdkly7_-oTPTS3AXP41iQIGKa80A0ZmTuV5MEaHoxnW2e5CZ5NlKtainoFmKZopdHM1O2U4mwzJdQx996ivp83xuglII7PNDi84wnB-BDkoBwA78185hX-Es4JIwmDLJK3lfWRa-XtL0RnltuYv746iYTh_qHRD68BNt1uSNCrUCTJDt5aAE6x8wW1Kt9eRo4QPocSadnHXFxnt8Is9UzpERV0ePPQdLuW3IS_de3xyIrDaLGdjluPxUAhb6L2aXic1U12podGU0KLUQSE_oI-ZnmKJ3F4uOZDnd6QZWJushZ41Axf_fcIe8u9ipH84ogoree7vjbU5y18kDquDg";
     assertEquals(expectedSignature, toBase64Url(signatureBytes));
+    key.setAlg(ESignatureAlgorithm.RS256.getJoseAlgorithmName());
     /**
      * Check whether the EncryptionUtility returns the same result
      */
-    byte[] signatureUtility = CryptographyUtility.sign(fullPayload.getBytes(UTF_8), key, ESignatureAlgorithm.RS256);
+    byte[] signatureUtility = CryptographyUtility.sign(fullPayload.getBytes(UTF_8), key);
     assertEquals(expectedSignature, toBase64Url(signatureUtility));
   }
 

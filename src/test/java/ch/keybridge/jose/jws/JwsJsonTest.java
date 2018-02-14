@@ -1,7 +1,6 @@
 package ch.keybridge.jose.jws;
 
 import ch.keybridge.TestUtil;
-import ch.keybridge.jose.algorithm.ESignatureAlgorithm;
 import ch.keybridge.jose.jwk.JwkSymmetricKey;
 import ch.keybridge.jose.util.CryptographyUtility;
 import org.junit.Test;
@@ -15,7 +14,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-public class JwsTest {
+public class JwsJsonTest {
 
 
   @Test
@@ -174,10 +173,11 @@ public class JwsTest {
      */
     final String expectedSignature = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
     assertEquals(expectedSignature, toBase64Url(hmac));
+    key.setAlg(ESignatureAlgorithm.HS256.getJoseAlgorithmName());
     /**
      * Check whether the EncryptionUtility returns the same result
      */
-    byte[] signatureUtility = CryptographyUtility.sign(jwsSigningInput.getBytes(UTF_8), key, ESignatureAlgorithm.HS256);
+    byte[] signatureUtility = CryptographyUtility.sign(jwsSigningInput.getBytes(UTF_8), key);
     assertEquals(expectedSignature, toBase64Url(signatureUtility));
   }
 

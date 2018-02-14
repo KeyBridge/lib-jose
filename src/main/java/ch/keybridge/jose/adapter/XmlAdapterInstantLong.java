@@ -5,12 +5,12 @@ import java.time.Instant;
 
 public class XmlAdapterInstantLong extends XmlAdapter<Long, Instant> {
   @Override
-  public Instant unmarshal(Long v) throws Exception {
+  public Instant unmarshal(Long v) {
     return Instant.ofEpochMilli(v);
   }
 
   @Override
-  public Long marshal(Instant v) throws Exception {
+  public Long marshal(Instant v) {
     return v.toEpochMilli();
   }
 }

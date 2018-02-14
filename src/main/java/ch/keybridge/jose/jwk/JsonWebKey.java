@@ -1,14 +1,11 @@
 package ch.keybridge.jose.jwk;
 
-import ch.keybridge.jose.adapter.XmlAdapterX509Certificate;
-import org.eclipse.persistence.oxm.annotations.XmlDiscriminatorNode;
+import ch.keybridge.jose.JoseBase;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -26,11 +23,6 @@ import java.util.List;
  * common to many keys.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-/**
- * Developer note: all sub-classes, which need to be the output of
- * unmarshalling a JWK JSON string, must be listed here.
- */
-@XmlSeeAlso({JwkRsaKey.class, JwkEcKey.class, JwkSymmetricKey.class})
 /**
  * 4.1.  "kty" (Key Type) Parameter
  * <p>
@@ -53,8 +45,17 @@ import java.util.List;
  * Developer note: the kty field is used by JAXB to determine which sub-class
  * to unmarshal to.
  */
-@XmlDiscriminatorNode("@kty")
-public abstract class JWK {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kty")
+/**
+ * Developer note: all sub-classes, which need to be the output of
+ * unmarshalling a JWK JSON string, must be listed here.
+ */
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = JwkEcKey.class, name = "EC"),
+    @JsonSubTypes.Type(value = JwkRsaPrivateKey.class, name = "RSA"),
+    @JsonSubTypes.Type(value = JwkSymmetricKey.class, name = "oct")}
+)
+public abstract class JsonWebKey extends JoseBase {
   /**
    * 4.2.  "use" (Public Key Use) Parameter
    * <p>
@@ -145,8 +146,9 @@ public abstract class JWK {
    * established by [JWA] or be a value that contains a Collision-
    * Resistant Name.  The "alg" value is a case-sensitive ASCII string.
    * Use of this member is OPTIONAL.
+   *
+   * Developer note: inherited from JoseHeader
    */
-  private String alg;
   /**
    * 4.5.  "kid" (Key ID) Parameter
    * <p>
@@ -161,8 +163,9 @@ public abstract class JWK {
    * value is a case-sensitive string.  Use of this member is OPTIONAL.
    * When used with JWS or JWE, the "kid" value is used to match a JWS or
    * JWE "kid" Header Parameter value.
+   *
+   * Developer note: inherited from JoseHeader
    */
-  private String kid;
   /**
    * 4.6.  "x5u" (X.509 URL) Parameter
    * <p>
@@ -190,8 +193,9 @@ public abstract class JWK {
    * when it includes this information.  Similarly, if the "alg" member is
    * present, it MUST correspond to the algorithm specified in the
    * certificate.
+   *
+   * Developer note: inherited from JoseHeader
    */
-  private URI x5u;
   /**
    * 4.7.  "x5c" (X.509 Certificate Chain) Parameter
    * <p>
@@ -213,9 +217,9 @@ public abstract class JWK {
    * members MUST be semantically consistent with the related fields in
    * the first certificate.  See the last paragraph of Section 4.6 for
    * additional guidance on this.
+   *
+   * Developer note: inherited from JoseHeader
    */
-  @XmlJavaTypeAdapter(type = WktX509Certificate.class, value = XmlAdapterX509Certificate.class)
-  private List<WktX509Certificate> x5c;
   /**
    * 4.8.  "x5t" (X.509 Certificate SHA-1 Thumbprint) Parameter
    * <p>
@@ -232,8 +236,12 @@ public abstract class JWK {
    * members MUST be semantically consistent with the related fields in
    * the referenced certificate.  See the last paragraph of Section 4.6
    * for additional guidance on this.
+   * <p>
+   * Developer note: inherited from JoseHeader
    */
-  private String x5t;
+  public JsonWebKey() {
+  }
+
   /**
    * 4.9.  "x5t#S256" (X.509 Certificate SHA-256 Thumbprint) Parameter
    * <p>
@@ -250,9 +258,9 @@ public abstract class JWK {
    * contents of those members MUST be semantically consistent with the
    * related fields in the referenced certificate.  See the last paragraph
    * of Section 4.6 for additional guidance on this.
+   * <p>
+   * Developer note: inherited from JoseHeader
    */
-  @XmlElement(name = "x5t#S256")
-  private String x5tS256;
 
   public String getUse() {
     return use;
@@ -266,99 +274,23 @@ public abstract class JWK {
     return key_ops;
   }
 
-  public void setKey_ops(List<String> key_ops) {
-    this.key_ops = key_ops;
-  }
-
-  public String getAlg() {
-    return alg;
-  }
-
-  public void setAlg(String alg) {
-    this.alg = alg;
-  }
-
-  public String getKid() {
-    return kid;
-  }
-
-  public void setKid(String kid) {
-    this.kid = kid;
-  }
-
-  public URI getX5u() {
-    return x5u;
-  }
-
-  public void setX5u(URI x5u) {
-    this.x5u = x5u;
-  }
-
-  public List<WktX509Certificate> getX5c() {
-    return x5c;
-  }
-
-  public void setX5c(List<WktX509Certificate> x5c) {
-    this.x5c = x5c;
-  }
-
-  public String getX5t() {
-    return x5t;
-  }
-
-  public void setX5t(String x5t) {
-    this.x5t = x5t;
-  }
-
-  public String getX5tS256() {
-    return x5tS256;
-  }
-
-  public void setX5tS256(String x5tS256) {
-    this.x5tS256 = x5tS256;
-  }
-
-  @Override
-  public String toString() {
-    return "JWK{" +
-        "use='" + use + '\'' +
-        ", key_ops=" + key_ops +
-        ", alg='" + alg + '\'' +
-        ", kid='" + kid + '\'' +
-        ", x5u=" + x5u +
-        ", x5c=" + x5c +
-        ", x5t='" + x5t + '\'' +
-        ", x5tS256='" + x5tS256 + '\'' +
-        '}';
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
 
-    JWK jwk = (JWK) o;
+    JsonWebKey jwk = (JsonWebKey) o;
 
     if (use != null ? !use.equals(jwk.use) : jwk.use != null) return false;
-    if (key_ops != null ? !key_ops.equals(jwk.key_ops) : jwk.key_ops != null) return false;
-    if (alg != null ? !alg.equals(jwk.alg) : jwk.alg != null) return false;
-    if (kid != null ? !kid.equals(jwk.kid) : jwk.kid != null) return false;
-    if (x5u != null ? !x5u.equals(jwk.x5u) : jwk.x5u != null) return false;
-    if (x5c != null ? !x5c.equals(jwk.x5c) : jwk.x5c != null) return false;
-    if (x5t != null ? !x5t.equals(jwk.x5t) : jwk.x5t != null) return false;
-    return x5tS256 != null ? x5tS256.equals(jwk.x5tS256) : jwk.x5tS256 == null;
+    return key_ops != null ? key_ops.equals(jwk.key_ops) : jwk.key_ops == null;
   }
 
   @Override
   public int hashCode() {
-    int result = use != null ? use.hashCode() : 0;
+    int result = super.hashCode();
+    result = 31 * result + (use != null ? use.hashCode() : 0);
     result = 31 * result + (key_ops != null ? key_ops.hashCode() : 0);
-    result = 31 * result + (alg != null ? alg.hashCode() : 0);
-    result = 31 * result + (kid != null ? kid.hashCode() : 0);
-    result = 31 * result + (x5u != null ? x5u.hashCode() : 0);
-    result = 31 * result + (x5c != null ? x5c.hashCode() : 0);
-    result = 31 * result + (x5t != null ? x5t.hashCode() : 0);
-    result = 31 * result + (x5tS256 != null ? x5tS256.hashCode() : 0);
     return result;
   }
 }

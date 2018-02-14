@@ -1,4 +1,4 @@
-package ch.keybridge.jose.algorithm;
+package ch.keybridge.jose.jws;
 
 /**
  * RFC 7518 § 3.1. "alg" (Algorithm) Header Parameter Values for JWS

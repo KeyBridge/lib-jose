@@ -1,18 +1,30 @@
 package ch.keybridge.jose.jwk;
 
 import ch.keybridge.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.eclipse.persistence.oxm.annotations.XmlDiscriminatorValue;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Arrays;
 
+/**
+ * RFC-7518 § 6.4.  Parameters for Symmetric Keys
+ * <p>
+ * When the JWK "kty" member value is "oct" (octet sequence), the member
+ * "k" (see Section 6.4.1) is used to represent a symmetric key (or
+ * another key whose value is a single octet sequence).  An "alg" member
+ * SHOULD also be present to identify the algorithm intended to be used
+ * with the key, unless the application uses another means or convention
+ * to determine the algorithm used.
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlDiscriminatorValue("oct")
-public class JwkSymmetricKey extends JWK {
-
-  @XmlJavaTypeAdapter(type=byte[].class, value = XmlAdapterByteArrayBase64Url.class)
+public class JwkSymmetricKey extends JsonWebKey {
+  /**
+   * The "k" (key value) parameter contains the value of the symmetric (or
+   * other single-valued) key.  It is represented as the base64url
+   * encoding of the octet sequence containing the key value.
+   */
+  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] k;
 
   public byte[] getK() {
