@@ -1,7 +1,7 @@
 package ch.keybridge;
 
-import ch.keybridge.jose.algorithm.EKeyManagementAlgorithm;
-import ch.keybridge.jose.jwk.JwkRsaKey;
+import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
+import ch.keybridge.jose.jwk.JwkRsaPrivateKey;
 import ch.keybridge.jose.util.CryptographyUtility;
 import ch.keybridge.jose.util.JsonMarshaller;
 import org.junit.Test;
@@ -15,7 +15,7 @@ public class CryptographyUtilityTest {
   public void encryptAndDecrypt() throws Exception {
     final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/rsa-private-key.json");
 
-    JwkRsaKey key = JsonMarshaller.fromJson(jwkJson, JwkRsaKey.class);
+    JwkRsaPrivateKey key = JsonMarshaller.fromJson(jwkJson, JwkRsaPrivateKey.class);
 
     String algorithm = EKeyManagementAlgorithm.RSA_OAEP.getJavaAlgorithm();
 
