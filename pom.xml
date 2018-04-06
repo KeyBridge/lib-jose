@@ -27,6 +27,8 @@
     History:
 
     v0.0.1 - new project
+    v0.1.0 - core functionality implemented
+    v0.1.1 - API improvements
   </description>
   <dependencies>
     <dependency>
