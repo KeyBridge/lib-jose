@@ -48,10 +48,14 @@ public class JwsJsonFlattened extends JwsJsonBase {
   private JoseCryptoHeader protectedHeader;
   @XmlElement(name = "header")
   private JoseCryptoHeader unprotectedHeader;
+  @XmlElement(name = "signature")
   @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] signature;
 
-  private JwsJsonFlattened() {
+  /**
+   * Default constructor; required for JSON/XML serializers
+   */
+  public JwsJsonFlattened() {
   }
 
   public JwsJsonFlattened(JoseCryptoHeader protectedHeader, JoseCryptoHeader unprotectedHeader, byte[] payload,
@@ -60,10 +64,6 @@ public class JwsJsonFlattened extends JwsJsonBase {
     this.unprotectedHeader = unprotectedHeader;
     this.payload = payload;
     this.signature = signature;
-  }
-
-  public static JwsJsonFlattened fromJson(String json) throws IOException {
-    return JsonMarshaller.fromJson(json, JwsJsonFlattened.class);
   }
 
   public JoseBase getProtectedHeader() {
@@ -101,6 +101,10 @@ public class JwsJsonFlattened extends JwsJsonBase {
   public String getCompactForm() throws IOException {
     return Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader)) + '.' +
         Base64Utility.toBase64Url(payload) + '.' + Base64Utility.toBase64Url(signature);
+  }
+
+  public static JwsJsonFlattened fromJson(String json) throws IOException {
+    return JsonMarshaller.fromJson(json, JwsJsonFlattened.class);
   }
 
   public String toJson() throws IOException {

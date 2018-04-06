@@ -27,7 +27,7 @@ public class JwsJsonSignatureTest {
     try {
       JoseCryptoHeader header = new JoseCryptoHeader();
       header.setAlg(alg.getJoseAlgorithmName());
-      JwsJson jws = new JwsBuilder().withPayload(payload).sign(privateKey, alg).buildJson();
+      JwsJson jws = JwsBuilder.getInstance().withBinaryPayload(payload).sign(privateKey, alg).buildJson();
       JwsSignature signature = jws.getSignatures().get(0); //JwsSignature.getInstance(payload, privateKey, header);
       assertTrue(signature.isValidSignature(payload, publicKey));
       wrongPublicKeys.forEach(key -> {
@@ -48,7 +48,7 @@ public class JwsJsonSignatureTest {
     try {
       JoseCryptoHeader header = new JoseCryptoHeader();
       header.setAlg(alg.getJoseAlgorithmName());
-      JwsJson jws = new JwsBuilder().withPayload(payload).sign(secret, alg).buildJson();
+      JwsJson jws = JwsBuilder.getInstance().withBinaryPayload(payload).sign(secret, alg).buildJson();
       JwsSignature signature = jws.getSignatures().get(0); //JwsSignature.getInstance(payload, privateKey, header);
       assertTrue(signature.isValidSignature(payload, secret));
 
@@ -76,12 +76,12 @@ public class JwsJsonSignatureTest {
     JwsSignature signature = JwsSignature.getInstance("sign this".getBytes(), keyOne);
     JwsSignature signature2 = JwsSignature.getInstance("sign this".getBytes(), keyTwo);
 
-    System.out.println(Base64Utility.toBase64Url(signature.getSignature()));
-    System.out.println(Base64Utility.toBase64Url(signature2.getSignature()));
+    System.out.println(Base64Utility.toBase64Url(signature.getSignatureBytes()));
+    System.out.println(Base64Utility.toBase64Url(signature2.getSignatureBytes()));
 
     String longString = createRandomString(10000);
     JwsSignature signature3 = JwsSignature.getInstance(longString.getBytes(), keyTwo);
-    System.out.println(Base64Utility.toBase64Url(signature3.getSignature()));
+    System.out.println(Base64Utility.toBase64Url(signature3.getSignatureBytes()));
   }
 
   @Test

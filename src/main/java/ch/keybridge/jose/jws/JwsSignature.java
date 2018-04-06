@@ -144,7 +144,7 @@ public class JwsSignature {
         .getJavaAlgorithmName());
   }
 
-  public byte[] getSignature() {
+  public byte[] getSignatureBytes() {
     return signature;
   }
 

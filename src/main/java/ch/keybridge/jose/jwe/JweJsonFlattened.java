@@ -5,6 +5,7 @@ import ch.keybridge.jose.jwe.encryption.EEncryptionAlgo;
 import ch.keybridge.jose.jwe.encryption.EncryptionResult;
 import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
 import ch.keybridge.jose.util.CryptographyUtility;
+import ch.keybridge.jose.util.JsonMarshaller;
 
 import javax.crypto.SecretKey;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -20,7 +21,6 @@ import java.util.StringTokenizer;
 
 import static ch.keybridge.jose.util.Base64Utility.*;
 import static ch.keybridge.jose.util.JsonMarshaller.fromJson;
-import static ch.keybridge.jose.util.JsonMarshaller.toJson;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -40,6 +40,7 @@ public class JweJsonFlattened {
   @XmlJavaTypeAdapter(type=byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] initializationVector;
 
+  @XmlElement(name = "ciphertext")
   @XmlJavaTypeAdapter(type=byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] ciphertext;
 
@@ -52,6 +53,9 @@ public class JweJsonFlattened {
   private byte[] additionalAuthenticationData;
   private JweJoseHeader uprotected;
   private static final EKeyManagementAlgorithm KEY_MGMT_ALGO = EKeyManagementAlgorithm.RSA_OAEP;
+
+  public JweJsonFlattened() {
+  }
 
   /**
    *
@@ -152,7 +156,7 @@ public class JweJsonFlattened {
     /**
      * The default Additional Authentication Data can be the protected header
      */
-    String headerJson = toJson(protectedHeader);
+    String headerJson = JsonMarshaller.toJson(protectedHeader);
     jwe.additionalAuthenticationData = toBase64Url(headerJson).getBytes(US_ASCII);
     EncryptionResult encryptionResult = contentEnc.getEncrypter().encrypt(payload, null, jwe
         .additionalAuthenticationData, contentEncryptionKey);
@@ -191,7 +195,7 @@ public class JweJsonFlattened {
    * @return non-null string
    */
   public String toCompactForm() throws IOException {
-    return toBase64Url(toJson(protectedHeader)) + '.'
+    return toBase64Url(JsonMarshaller.toJson(protectedHeader)) + '.'
         + toBase64Url(encryptedKey) + '.'
         + toBase64Url(initializationVector) + '.'
         + toBase64Url(ciphertext) + '.'
@@ -251,6 +255,10 @@ public class JweJsonFlattened {
     result = 31 * result + Arrays.hashCode(authenticationTag);
     result = 31 * result + Arrays.hashCode(additionalAuthenticationData);
     return result;
+  }
+
+  public String toJson() throws IOException {
+    return JsonMarshaller.toJson(this);
   }
 
   @Override

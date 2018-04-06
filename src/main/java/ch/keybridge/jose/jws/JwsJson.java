@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * JSON Web Signature (JWS) represents content secured with digital
@@ -26,13 +25,13 @@ import java.util.logging.Logger;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JwsJson extends JwsJsonBase {
-  private static final Logger LOG = Logger.getLogger(JwsJson.class.getCanonicalName());
+//  private static final Logger LOG = Logger.getLogger(JwsJson.class.getCanonicalName());
   /**
    * The "signatures" member value MUST be an array of JSON objects.
    * Each object represents a signature or MAC over the JWS Payload and
    * the JWS Protected Header.
    */
-  private List<JwsSignature> signatures = new ArrayList<>();
+  private List<JwsSignature> signatures;
 
   public JwsJson() {
   }
@@ -51,14 +50,11 @@ public class JwsJson extends JwsJsonBase {
   }
 
   public JwsJsonFlattened toFlattened() {
-    if (signatures.isEmpty()) {
-      LOG.warning("No signatures");
-      return new JwsJsonFlattened(null, null, payload, null);
-    }
-    if (signatures.size() > 1) LOG.warning("Additional signatures will be discarded when flattened");
+    if (signatures.isEmpty()) throw new IllegalArgumentException("Must sign data!");
+    if (signatures.size() > 1) throw new IllegalArgumentException("JWS Flattened format support only one signature.");
     JwsSignature signature = signatures.get(0);
     return new JwsJsonFlattened(
-        signature.getProtectedHeader(), signature.getUnprotectedheader(), payload, signature.getSignature());
+        signature.getProtectedHeader(), signature.getUnprotectedheader(), payload, signature.getSignatureBytes());
   }
 
   public String toJson() throws IOException {

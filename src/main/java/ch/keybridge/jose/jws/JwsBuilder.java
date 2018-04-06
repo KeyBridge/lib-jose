@@ -12,16 +12,27 @@ import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Andrius Druzinis-Vitkus
+ * @since 0.0.1 created 14/02/2018
+ */
 public class JwsBuilder {
   private byte[] payload;
   private List<JwsSignature> signatures = new ArrayList<>();
 
-  public JwsBuilder withPayload(byte[] payload) {
+  private JwsBuilder() {
+  }
+
+  public static JwsBuilder getInstance() {
+    return new JwsBuilder();
+  }
+
+  public JwsBuilder withBinaryPayload(byte[] payload) {
     this.payload = payload;
     return this;
   }
 
-  public JwsBuilder withPayload(String payload) {
+  public JwsBuilder withStringPayload(String payload) {
     this.payload = payload.getBytes(Base64Utility.DEFAULT_CHARSET);
     return this;
   }
@@ -51,10 +62,7 @@ public class JwsBuilder {
   }
 
   public JwsJsonFlattened buildJsonFlattened() {
-    if (signatures.isEmpty()) throw new IllegalArgumentException("Must sign data!");
-    JwsSignature signature = signatures.get(0);
-    return new JwsJsonFlattened(signature.getProtectedHeader(), signature.getUnprotectedheader(), payload, signature
-        .getSignature());
+    return new JwsJson(payload, signatures).toFlattened();
   }
 
   public String buildCompact() throws IOException {
