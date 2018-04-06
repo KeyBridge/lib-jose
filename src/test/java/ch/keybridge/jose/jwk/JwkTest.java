@@ -3,57 +3,15 @@ package ch.keybridge.jose.jwk;
 import ch.keybridge.TestFileReader;
 import ch.keybridge.jose.util.Base64Utility;
 import ch.keybridge.jose.util.JsonMarshaller;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.math.BigInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class JwkTest {
-
-  @Test
-  public void blah() throws Exception {
-    JsonWebKey key = new JwkRsaPrivateKey();
-    key.setAlg("a");
-//    key.kty = "RSA";
-//    key.setKty()
-
-//    ObjectMapper objectMapper = new CustomObjectMapper(ENTITY_WITH_ID_DESERIALIZER);
-
-    AnnotationIntrospector primary = new JacksonAnnotationIntrospector();
-//    AnnotationIntrospector secondary = new JaxbAnnotationIntrospector();
-//    AnnotationIntrospector pair = new AnnotationIntrospector.Pair(primary, secondary);
-
-//    objectMapper.setAnnotationIntrospector(pair);
-
-
-//    objectMapper.configure(DeserializationConfig.Feature.USE_ANNOTATIONS, true);
-
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-    mapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector());
-
-//    mapper.registerModule(new JacksonAnnotationIntrospector());
-    mapper.registerModule(new JaxbAnnotationModule());
-    StringWriter w = new StringWriter();
-    System.out.println(mapper.writeValueAsString(key));
-//    mapper.writerWithDefaultPrettyPrinter().forType(JWK.class).writeValue(w, key);
-//    System.out.println(w.toString());
-
-    JsonWebKey read = mapper.readValue(JwkTest.class.getResourceAsStream
-        ("/rfc7520/section3-jwk-examples/ec-public-key.json"), JsonWebKey.class);
-
-    System.out.println(read);
-  }
 
   @Test
   public void ecPublicKeyTest() throws IOException {
