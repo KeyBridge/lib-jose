@@ -7,7 +7,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.math.BigInteger;
-import java.security.*;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -251,12 +254,6 @@ public class JwkRsaPrivateKey extends JwkRsaPublicKey {
     RSAPrivateKeySpec spec = new RSAPrivateKeySpec(getModulus(), getPrivateExponent());
 
     return kf.generatePrivate(spec);
-  }
-
-  public PublicKey getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
-    KeyFactory kf = KeyFactory.getInstance("RSA");
-    RSAPublicKeySpec spec = new RSAPublicKeySpec(getModulus(), getPublicExponent());
-    return kf.generatePublic(spec);
   }
 
   public KeyPair getKeyPair() throws NoSuchAlgorithmException, InvalidKeySpecException {

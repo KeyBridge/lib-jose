@@ -7,7 +7,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
 
 /**
  * RFC-7518 § 6.3.1.  Parameters for RSA Public Keys
@@ -68,6 +73,12 @@ public class JwkRsaPublicKey extends JsonWebKey {
 
   public void setPublicExponent(BigInteger publicExponent) {
     this.publicExponent = publicExponent;
+  }
+
+  public PublicKey getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
+    KeyFactory kf = KeyFactory.getInstance("RSA");
+    RSAPublicKeySpec spec = new RSAPublicKeySpec(getModulus(), getPublicExponent());
+    return kf.generatePublic(spec);
   }
 
   @Override
