@@ -19,6 +19,8 @@ import java.util.List;
 public class JwsBuilder {
   private byte[] payload;
   private List<JwsSignature> signatures = new ArrayList<>();
+  private JoseCryptoHeader protectedHeader;
+  private JoseCryptoHeader unprotectedHeader;
 
   private JwsBuilder() {
   }
@@ -37,23 +39,33 @@ public class JwsBuilder {
     return this;
   }
 
+  public JwsBuilder withProtectedHeader(JoseCryptoHeader header) {
+    protectedHeader = header;
+    return this;
+  }
+
+  public JwsBuilder withUnprotectedHeader(JoseCryptoHeader header) {
+    unprotectedHeader = header;
+    return this;
+  }
+
   public JwsBuilder sign(JsonWebKey key) throws IOException, GeneralSecurityException {
     signatures.add(JwsSignature.getInstance(payload, key));
     return this;
   }
 
   public JwsBuilder sign(Key key, ESignatureAlgorithm algorithm) throws IOException, GeneralSecurityException {
-    JoseCryptoHeader header = new JoseCryptoHeader();
-    header.setAlg(algorithm.getJoseAlgorithmName());
-    signatures.add(JwsSignature.getInstance(payload, key, header));
+    if (protectedHeader == null) protectedHeader = new JoseCryptoHeader();
+    protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
+    signatures.add(JwsSignature.getInstance(payload, key, protectedHeader));
     return this;
   }
 
   public JwsBuilder sign(String secret, ESignatureAlgorithm algorithm) throws IOException, GeneralSecurityException {
-    JoseCryptoHeader header = new JoseCryptoHeader();
-    header.setAlg(algorithm.getJoseAlgorithmName());
+    if (protectedHeader == null) protectedHeader = new JoseCryptoHeader();
+    protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
     SecretKey key = new SecretKeySpec(secret.getBytes(Base64Utility.DEFAULT_CHARSET), algorithm.getJavaAlgorithmName());
-    signatures.add(JwsSignature.getInstance(payload, key, header));
+    signatures.add(JwsSignature.getInstance(payload, key, protectedHeader));
     return this;
   }
 
