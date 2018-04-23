@@ -57,16 +57,13 @@ public class JwsBuilder {
   public JwsBuilder sign(Key key, ESignatureAlgorithm algorithm) throws IOException, GeneralSecurityException {
     if (protectedHeader == null) protectedHeader = new JoseCryptoHeader();
     protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
-    signatures.add(JwsSignature.getInstance(payload, key, protectedHeader));
+    signatures.add(JwsSignature.getInstance(payload, key, protectedHeader, unprotectedHeader));
     return this;
   }
 
   public JwsBuilder sign(String secret, ESignatureAlgorithm algorithm) throws IOException, GeneralSecurityException {
-    if (protectedHeader == null) protectedHeader = new JoseCryptoHeader();
-    protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
     SecretKey key = new SecretKeySpec(secret.getBytes(Base64Utility.DEFAULT_CHARSET), algorithm.getJavaAlgorithmName());
-    signatures.add(JwsSignature.getInstance(payload, key, protectedHeader));
-    return this;
+    return sign(key, algorithm);
   }
 
   public JwsJson buildJson() {
