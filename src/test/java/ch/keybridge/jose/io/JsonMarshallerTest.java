@@ -1,5 +1,6 @@
 package ch.keybridge.jose.io;
 
+import ch.keybridge.jose.jwe.JweBuilder;
 import ch.keybridge.jose.jwe.JweJsonFlattened;
 import org.junit.Test;
 
@@ -19,13 +20,15 @@ import static org.junit.Assert.fail;
 public class JsonMarshallerTest {
 
   @Test
-  public void jsonMarshallUnmarshall() {
+  public void jsonMarshalUnmarshal() {
     try {
       KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
       generator.initialize(2048);
       KeyPair keyPair = generator.generateKeyPair();
-      JweJsonFlattened original = JweJsonFlattened.getInstance("somePayload".getBytes(StandardCharsets.UTF_8),
-          keyPair.getPublic());
+      JweJsonFlattened original = JweBuilder.getInstance()
+          .withBinaryPayload("somePayload".getBytes(StandardCharsets.UTF_8))
+          .buildJweJsonFlattened(keyPair.getPublic());
+
       JweJsonFlattened unmarshalled = fromJson(toJson(original), JweJsonFlattened.class);
       assertEquals(original, unmarshalled);
     } catch (Exception e) {

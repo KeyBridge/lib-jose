@@ -61,7 +61,9 @@ public class JWETest {
     System.out.println(pair.getPublic().getAlgorithm());
     System.out.println(pair.getPublic().getFormat());
 
-    JweJsonFlattened jwe = JweJsonFlattened.getInstance(payload, pair.getPublic());
+    JweJsonFlattened jwe = JweBuilder.getInstance()
+        .withBinaryPayload(payload)
+        .buildJweJsonFlattened(pair.getPublic());
 
     String compactForm = jwe.toCompactForm();
 
@@ -84,7 +86,9 @@ public class JWETest {
     generator.initialize(1024);
     KeyPair pair = generator.generateKeyPair();
 
-    JweJsonFlattened jwe = JweJsonFlattened.getInstance(payload, pair.getPublic());
+    JweJsonFlattened jwe = JweBuilder.getInstance()
+        .withBinaryPayload(payload)
+        .buildJweJsonFlattened(pair.getPublic());
 
     byte[] decrypted = jwe.decryptPayload(pair.getPrivate());
 
@@ -94,13 +98,15 @@ public class JWETest {
   @Test
   public void encryptDecryptStringTest() throws Exception {
     String payloadString = "some text to test with";
-    byte[] payload = payloadString.getBytes(UTF_8);
+    byte[] payload = toBase64Url(payloadString).getBytes(US_ASCII);
 
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
     generator.initialize(1024);
     KeyPair pair = generator.generateKeyPair();
 
-    JweJsonFlattened jwe = JweJsonFlattened.getInstance(payloadString, pair.getPublic());
+    JweJsonFlattened jwe = JweBuilder.getInstance()
+        .withBinaryPayload(payload)
+        .buildJweJsonFlattened(pair.getPublic());
 
     String decrypted = jwe.decryptAsString(pair.getPrivate());
 

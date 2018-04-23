@@ -1,5 +1,6 @@
 package ch.keybridge.jose;
 
+import ch.keybridge.jose.jwe.JweBuilder;
 import ch.keybridge.jose.jwe.JweJsonFlattened;
 import ch.keybridge.jose.jws.ESignatureAlgorithm;
 import ch.keybridge.jose.jws.JwsBuilder;
@@ -8,7 +9,6 @@ import ch.keybridge.jose.util.JsonMarshaller;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.logging.Level;
@@ -25,6 +25,10 @@ public class JOSE {
     return JwsBuilder.getInstance();
   }
 
+  public static JweBuilder newJweFlattenedBuilder() {
+    return JweBuilder.getInstance();
+  }
+
   public static <T> T unpackSignedAndEncryptedJson(String json, Class<T> type, PrivateKey receiverKey, PublicKey
       senderKey) {
     try {
@@ -39,33 +43,13 @@ public class JOSE {
       }
       String mainPayload = jws.getStringPayload();
       return JsonMarshaller.fromJson(mainPayload, type);
-    } catch (IOException e) {
-      LOG.log(Level.SEVERE, null, e);
-    } catch (GeneralSecurityException e) {
+    } catch (IOException | GeneralSecurityException e) {
       LOG.log(Level.SEVERE, null, e);
     }
     return null;
   }
 
-  public static String signAndEncrypt(Object object, PrivateKey senderPrivateKey, Key receiverPublicKeyOrSecretKey) {
-    try {
-      String jsonPayload = JsonMarshaller.toJson(object);
-
-      JwsJsonFlattened jws = JwsBuilder.getInstance()
-          .withStringPayload(jsonPayload)
-          .sign(senderPrivateKey, ESignatureAlgorithm.RS256)
-          .buildJsonFlattened();
-
-      return JweJsonFlattened.getInstance(jws.toJson(), receiverPublicKeyOrSecretKey).toJson();
-    } catch (IOException e) {
-      LOG.log(Level.SEVERE, null, e);
-    } catch (GeneralSecurityException e) {
-      LOG.log(Level.SEVERE, null, e);
-    }
-    return null;
-  }
-
-  public static String signAndEncrypt(Object object, PrivateKey senderPrivateKey, Key receiverPublicKeyOrSecretKey,
+  public static String signAndEncrypt(Object object, PrivateKey senderPrivateKey, PublicKey publicKey,
                                       String senderId) {
     try {
       String jsonPayload = JsonMarshaller.toJson(object);
@@ -79,10 +63,34 @@ public class JOSE {
           .sign(senderPrivateKey, ESignatureAlgorithm.RS256)
           .buildJsonFlattened();
 
-      return JweJsonFlattened.getInstance(jws.toJson(), receiverPublicKeyOrSecretKey).toJson();
-    } catch (IOException e) {
+      return JweBuilder.getInstance()
+          .withStringPayload(jws.toJson())
+          .buildJweJsonFlattened(publicKey)
+          .toJson();
+    } catch (IOException | GeneralSecurityException e) {
       LOG.log(Level.SEVERE, null, e);
-    } catch (GeneralSecurityException e) {
+    }
+    return null;
+  }
+
+  public static String signAndEncrypt(Object object, String secret, String senderId) {
+    try {
+      String jsonPayload = JsonMarshaller.toJson(object);
+
+      JoseCryptoHeader header = new JoseCryptoHeader();
+      header.setKid(senderId);
+
+      JwsJsonFlattened jws = JwsBuilder.getInstance()
+          .withStringPayload(jsonPayload)
+          .withProtectedHeader(header)
+          .sign(secret, ESignatureAlgorithm.HS256)
+          .buildJsonFlattened();
+
+      return JweBuilder.getInstance()
+          .withStringPayload(jws.toJson())
+          .buildJweJsonFlattened(secret)
+          .toJson();
+    } catch (IOException | GeneralSecurityException e) {
       LOG.log(Level.SEVERE, null, e);
     }
     return null;

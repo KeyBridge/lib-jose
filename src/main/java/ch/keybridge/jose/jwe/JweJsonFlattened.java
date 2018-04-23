@@ -2,6 +2,7 @@ package ch.keybridge.jose.jwe;
 
 import ch.keybridge.jose.adapter.XmlAdapterByteArrayBase64Url;
 import ch.keybridge.jose.jwe.encryption.EEncryptionAlgo;
+import ch.keybridge.jose.jwe.encryption.Encrypter;
 import ch.keybridge.jose.jwe.encryption.EncryptionResult;
 import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
 import ch.keybridge.jose.util.CryptographyUtility;
@@ -15,7 +16,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
-import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.StringTokenizer;
@@ -26,12 +26,6 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JweJsonFlattened {
-  /**
-   * Default algorithms
-   */
-  private static final EEncryptionAlgo CONTENT_ENC_ALGO = EEncryptionAlgo.A256GCM;
-  private static final EKeyManagementAlgorithm KEY_MGMT_ALGO_SYMMETRIC = EKeyManagementAlgorithm.A192KW;
-  private static final EKeyManagementAlgorithm KEY_MGMT_ALGO_ASYM = EKeyManagementAlgorithm.RSA_OAEP;
 
   @XmlElement(name = "protected", required = true)
   private JweJoseHeader protectedHeader;
@@ -103,53 +97,18 @@ public class JweJsonFlattened {
   }
 
   /**
-   * Creates a JWE instance for the payload using the provided public key
-   * @param payload byte array representing the data that is to be JWE-encrypted
-   * @param key a Key instance which is used to encrypt the random data encryption key
-   * @return a valid JWE instance
-   * @throws GeneralSecurityException thrown if requested algorithms are not available
-   */
-  public static JweJsonFlattened getInstance(byte[] payload, Key key) throws IOException,
-      GeneralSecurityException {
-    return getInstance(payload, CONTENT_ENC_ALGO, key instanceof PublicKey ? KEY_MGMT_ALGO_ASYM :
-            KEY_MGMT_ALGO_SYMMETRIC,
-        key, new JweJoseHeader(), null);
-  }
-
-  /**
-   * Creates a JWE instance for the payload using the provided public key
-   *
-   * @param payload   data that is to be JWE-encrypted
-   * @param key a Key instance which is used to encrypt the random data encryption key
-   * @return a valid JWE instance
-   * @throws GeneralSecurityException thrown if requested algorithms are not available
-   */
-  public static JweJsonFlattened getInstance(String payload, Key key) throws IOException,
-      GeneralSecurityException {
-    return getInstance(toBase64Url(payload).getBytes(US_ASCII), CONTENT_ENC_ALGO,
-        key instanceof PublicKey ? KEY_MGMT_ALGO_ASYM : KEY_MGMT_ALGO_SYMMETRIC, key, new
-        JweJoseHeader(), null);
-  }
-
-  public static JweJsonFlattened getInstance(String payload, Key key, JweJoseHeader protectedHeader,
-                                             JweJoseHeader uprotected) throws IOException, GeneralSecurityException {
-    return getInstance(toBase64Url(payload).getBytes(US_ASCII), CONTENT_ENC_ALGO,
-        key instanceof PublicKey ? KEY_MGMT_ALGO_ASYM : KEY_MGMT_ALGO_SYMMETRIC, key,
-        protectedHeader, uprotected);
-  }
-
-  /**
    *
    * Creates a JWE instance for the payload using the provided public key
    * @param payload byte array representing the data that is to be JWE-encrypted
    * @param contentEnc Content encryption algorithm
    * @param keyMgmt key management algorithm
-   * @param publicKey a Key instance which is used to encrypt the random data encryption key
+   * @param key a Key instance which is used to encrypt the random data encryption key
    * @return a valid JWE instance
    * @throws GeneralSecurityException thrown if requested algorithms are not available
    */
   public static JweJsonFlattened getInstance(final byte[] payload, final EEncryptionAlgo contentEnc,
-                                             EKeyManagementAlgorithm keyMgmt, Key publicKey, JweJoseHeader protectedHeader, JweJoseHeader uprotected) throws IOException,
+                                             EKeyManagementAlgorithm keyMgmt, Key key, JweJoseHeader protectedHeader,
+                                             JweJoseHeader uprotected) throws IOException,
       GeneralSecurityException {
     JweJsonFlattened jwe = new JweJsonFlattened();
     // Populate the protected header with mandatory information on how the content and the content encryption key are
@@ -161,7 +120,7 @@ public class JweJsonFlattened {
     jwe.unprotected = uprotected;
 
     Key contentEncryptionKey = contentEnc.getEncrypter().generateKey();
-    jwe.encryptedKey = CryptographyUtility.wrapKey(contentEncryptionKey, publicKey, keyMgmt.getJavaAlgorithm());
+    jwe.encryptedKey = CryptographyUtility.wrapKey(contentEncryptionKey, key, keyMgmt.getJavaAlgorithm());
     /**
      * The default Additional Authentication Data can be the protected header
      */
@@ -221,15 +180,8 @@ public class JweJsonFlattened {
      * Additional files may need to be downloaded and copied into the Java installation security directory
      * https://stackoverflow.com/questions/6481627/java-security-illegal-key-size-or-default-parameters
      */
-//    Key aesKey = new SecretKeySpec(contentEncryptionKey, protectedHeader.getContentEncryptionAlgorithm()
-// .getSecretKeyAlgorithm());
-//    AlgorithmParameterSpec spec = protectedHeader.getContentEncryptionAlgorithm() == null
-//    ? null : protectedHeader.getContentEncryptionAlgorithm().getAdditionalParameterGenerator().generateSpec
-// (initializationVector);
-//    return CryptographyUtility.decrypt(concatenateArrays(ciphertext, authenticationTag), aesKey, protectedHeader
-//        .getContentEncryptionAlgorithm().getJavaAlgorithmName(), spec, additionalAuthenticationData);
-    return protectedHeader.getContentEncryptionAlgorithm().getEncrypter().decrypt(ciphertext, initializationVector,
-        additionalAuthenticationData, authenticationTag, aesKey);
+    Encrypter encrypter = protectedHeader.getContentEncryptionAlgorithm().getEncrypter();
+    return encrypter.decrypt(ciphertext, initializationVector, additionalAuthenticationData, authenticationTag, aesKey);
   }
 
   public String decryptAsString(Key key) throws GeneralSecurityException {
