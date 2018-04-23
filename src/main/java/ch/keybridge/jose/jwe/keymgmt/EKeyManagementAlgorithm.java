@@ -45,9 +45,7 @@ public enum EKeyManagementAlgorithm {
   }
 
   EKeyManagementAlgorithm(String joseAlgorithmName, String javaAlgorithmName) {
-    this.joseAlgorithmName = joseAlgorithmName;
-    this.javaAlgorithmName = javaAlgorithmName;
-    this.additionalParameters = null;
+    this(joseAlgorithmName, javaAlgorithmName, null);
   }
 
   public static EKeyManagementAlgorithm resolveAlgorithm(String alg) {
