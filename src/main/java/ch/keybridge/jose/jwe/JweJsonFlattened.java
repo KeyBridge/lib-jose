@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
+import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.StringTokenizer;
@@ -29,10 +30,16 @@ public class JweJsonFlattened {
    * Default algorithms
    */
   private static final EEncryptionAlgo CONTENT_ENC_ALGO = EEncryptionAlgo.A256GCM;
+  private static final EKeyManagementAlgorithm KEY_MGMT_ALGO_SYMMETRIC = EKeyManagementAlgorithm.A192KW;
+  private static final EKeyManagementAlgorithm KEY_MGMT_ALGO_ASYM = EKeyManagementAlgorithm.RSA_OAEP;
+
   @XmlElement(name = "protected", required = true)
   private JweJoseHeader protectedHeader;
 
-  @XmlElement(name = "encypted_key")
+  @XmlElement(name = "unprotected", required = true)
+  private JweJoseHeader unprotected;
+
+  @XmlElement(name = "encrypted_key")
   @XmlJavaTypeAdapter(type=byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] encryptedKey;
 
@@ -51,8 +58,6 @@ public class JweJsonFlattened {
   @XmlElement(name = "aad")
   @XmlJavaTypeAdapter(type=byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] additionalAuthenticationData;
-  private JweJoseHeader uprotected;
-  private static final EKeyManagementAlgorithm KEY_MGMT_ALGO = EKeyManagementAlgorithm.RSA_OAEP;
 
   public JweJsonFlattened() {
   }
@@ -100,32 +105,36 @@ public class JweJsonFlattened {
   /**
    * Creates a JWE instance for the payload using the provided public key
    * @param payload byte array representing the data that is to be JWE-encrypted
-   * @param publicKey a Key instance which is used to encrypt the random data encryption key
+   * @param key a Key instance which is used to encrypt the random data encryption key
    * @return a valid JWE instance
    * @throws GeneralSecurityException thrown if requested algorithms are not available
    */
-  public static JweJsonFlattened getInstance(byte[] payload, Key publicKey) throws IOException,
+  public static JweJsonFlattened getInstance(byte[] payload, Key key) throws IOException,
       GeneralSecurityException {
-    return getInstance(payload, CONTENT_ENC_ALGO, KEY_MGMT_ALGO, publicKey, new JweJoseHeader(), null);
+    return getInstance(payload, CONTENT_ENC_ALGO, key instanceof PublicKey ? KEY_MGMT_ALGO_ASYM :
+            KEY_MGMT_ALGO_SYMMETRIC,
+        key, new JweJoseHeader(), null);
   }
 
   /**
    * Creates a JWE instance for the payload using the provided public key
    *
    * @param payload   data that is to be JWE-encrypted
-   * @param publicKey a Key instance which is used to encrypt the random data encryption key
+   * @param key a Key instance which is used to encrypt the random data encryption key
    * @return a valid JWE instance
    * @throws GeneralSecurityException thrown if requested algorithms are not available
    */
-  public static JweJsonFlattened getInstance(String payload, Key publicKey) throws IOException,
+  public static JweJsonFlattened getInstance(String payload, Key key) throws IOException,
       GeneralSecurityException {
-    return getInstance(toBase64Url(payload).getBytes(US_ASCII), CONTENT_ENC_ALGO, KEY_MGMT_ALGO, publicKey, new
+    return getInstance(toBase64Url(payload).getBytes(US_ASCII), CONTENT_ENC_ALGO,
+        key instanceof PublicKey ? KEY_MGMT_ALGO_ASYM : KEY_MGMT_ALGO_SYMMETRIC, key, new
         JweJoseHeader(), null);
   }
 
-  public static JweJsonFlattened getInstance(String payload, Key publicKey, JweJoseHeader protectedHeader,
+  public static JweJsonFlattened getInstance(String payload, Key key, JweJoseHeader protectedHeader,
                                              JweJoseHeader uprotected) throws IOException, GeneralSecurityException {
-    return getInstance(toBase64Url(payload).getBytes(US_ASCII), CONTENT_ENC_ALGO, KEY_MGMT_ALGO, publicKey,
+    return getInstance(toBase64Url(payload).getBytes(US_ASCII), CONTENT_ENC_ALGO,
+        key instanceof PublicKey ? KEY_MGMT_ALGO_ASYM : KEY_MGMT_ALGO_SYMMETRIC, key,
         protectedHeader, uprotected);
   }
 
@@ -149,7 +158,7 @@ public class JweJsonFlattened {
     protectedHeader.setContentEncryptionAlgorithm(contentEnc);
     jwe.protectedHeader = protectedHeader;
 
-    jwe.uprotected = uprotected;
+    jwe.unprotected = uprotected;
 
     Key contentEncryptionKey = contentEnc.getEncrypter().generateKey();
     jwe.encryptedKey = CryptographyUtility.wrapKey(contentEncryptionKey, publicKey, keyMgmt.getJavaAlgorithm());
@@ -170,8 +179,8 @@ public class JweJsonFlattened {
     return protectedHeader;
   }
 
-  public JweJoseHeader getUprotected() {
-    return uprotected;
+  public JweJoseHeader getUnprotected() {
+    return unprotected;
   }
 
   /**
@@ -237,7 +246,7 @@ public class JweJsonFlattened {
 
     if (protectedHeader != null ? !protectedHeader.equals(that.protectedHeader) : that.protectedHeader != null)
       return false;
-    if (uprotected != null ? !uprotected.equals(that.uprotected) : that.uprotected != null) return false;
+    if (unprotected != null ? !unprotected.equals(that.unprotected) : that.unprotected != null) return false;
     if (!Arrays.equals(encryptedKey, that.encryptedKey)) return false;
     if (!Arrays.equals(initializationVector, that.initializationVector)) return false;
     if (!Arrays.equals(ciphertext, that.ciphertext)) return false;
@@ -248,7 +257,7 @@ public class JweJsonFlattened {
   @Override
   public int hashCode() {
     int result = protectedHeader != null ? protectedHeader.hashCode() : 0;
-    result = 31 * result + (uprotected != null ? uprotected.hashCode() : 0);
+    result = 31 * result + (unprotected != null ? unprotected.hashCode() : 0);
     result = 31 * result + Arrays.hashCode(encryptedKey);
     result = 31 * result + Arrays.hashCode(initializationVector);
     result = 31 * result + Arrays.hashCode(ciphertext);
@@ -265,7 +274,7 @@ public class JweJsonFlattened {
   public String toString() {
     return "JweJsonFlattened{" +
         "protectedHeader=" + protectedHeader +
-        ", uprotected=" + uprotected +
+        ", unprotected=" + unprotected +
         ", encryptedKey=" + Arrays.toString(encryptedKey) +
         ", initializationVector=" + Arrays.toString(initializationVector) +
         ", ciphertext=" + Arrays.toString(ciphertext) +
