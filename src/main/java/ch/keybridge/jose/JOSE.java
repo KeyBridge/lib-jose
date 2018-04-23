@@ -8,14 +8,19 @@ import ch.keybridge.jose.util.JsonMarshaller;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 14/02/2018
  */
 public class JOSE {
+  private final static Logger LOG = Logger.getLogger(JOSE.class.getCanonicalName());
+
   public static JwsBuilder newJwsBuilder() {
     return JwsBuilder.getInstance();
   }
@@ -35,14 +40,14 @@ public class JOSE {
       String mainPayload = jws.getStringPayload();
       return JsonMarshaller.fromJson(mainPayload, type);
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.log(Level.SEVERE, null, e);
     } catch (GeneralSecurityException e) {
-      e.printStackTrace();
+      LOG.log(Level.SEVERE, null, e);
     }
     return null;
   }
 
-  public static String signAndEncrypt(Object object, PrivateKey senderPrivateKey, PublicKey receiverPublicKey) {
+  public static String signAndEncrypt(Object object, PrivateKey senderPrivateKey, Key receiverPublicKeyOrSecretKey) {
     try {
       String jsonPayload = JsonMarshaller.toJson(object);
 
@@ -51,11 +56,34 @@ public class JOSE {
           .sign(senderPrivateKey, ESignatureAlgorithm.RS256)
           .buildJsonFlattened();
 
-      return JweJsonFlattened.getInstance(jws.toJson(), receiverPublicKey).toJson();
+      return JweJsonFlattened.getInstance(jws.toJson(), receiverPublicKeyOrSecretKey).toJson();
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.log(Level.SEVERE, null, e);
     } catch (GeneralSecurityException e) {
-      e.printStackTrace();
+      LOG.log(Level.SEVERE, null, e);
+    }
+    return null;
+  }
+
+  public static String signAndEncrypt(Object object, PrivateKey senderPrivateKey, Key receiverPublicKeyOrSecretKey,
+                                      String senderId) {
+    try {
+      String jsonPayload = JsonMarshaller.toJson(object);
+
+      JoseCryptoHeader header = new JoseCryptoHeader();
+      header.setKid(senderId);
+
+      JwsJsonFlattened jws = JwsBuilder.getInstance()
+          .withStringPayload(jsonPayload)
+          .withProtectedHeader(header)
+          .sign(senderPrivateKey, ESignatureAlgorithm.RS256)
+          .buildJsonFlattened();
+
+      return JweJsonFlattened.getInstance(jws.toJson(), receiverPublicKeyOrSecretKey).toJson();
+    } catch (IOException e) {
+      LOG.log(Level.SEVERE, null, e);
+    } catch (GeneralSecurityException e) {
+      LOG.log(Level.SEVERE, null, e);
     }
     return null;
   }
