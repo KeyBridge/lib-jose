@@ -14,7 +14,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 
@@ -139,7 +138,7 @@ public class JwsSignature {
     String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
     ESignatureAlgorithm algorithm = ESignatureAlgorithm.resolveAlgorithm(protectedHeader.getAlg());
 
-    SecretKey key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), algorithm.getJavaAlgorithmName());
+    SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(secret), algorithm.getJavaAlgorithmName());
     return CryptographyUtility.validateSignature(signature, fullPayload.getBytes(US_ASCII), key, algorithm
         .getJavaAlgorithmName());
   }

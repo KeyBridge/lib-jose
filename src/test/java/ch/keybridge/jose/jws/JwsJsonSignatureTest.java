@@ -1,12 +1,12 @@
 package ch.keybridge.jose.jws;
 
-import ch.keybridge.TestUtil;
 import ch.keybridge.jose.JoseCryptoHeader;
 import ch.keybridge.jose.jwk.JsonWebKey;
 import ch.keybridge.jose.jwk.JwkRsaPrivateKey;
 import ch.keybridge.jose.util.Base64Utility;
 import org.junit.Test;
 
+import javax.crypto.KeyGenerator;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -16,9 +16,12 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static ch.keybridge.TestUtil.createRandomString;
+import static ch.keybridge.TestUtil.getAlteredBytes;
 import static ch.keybridge.jose.jws.ESignatureAlgorithm.*;
+import static ch.keybridge.jose.util.Base64Utility.fromBase64Url;
+import static ch.keybridge.jose.util.Base64Utility.toBase64Url;
 import static java.util.Arrays.asList;
-import static junit.framework.TestCase.*;
+import static org.junit.Assert.*;
 
 public class JwsJsonSignatureTest {
   private static void testSingAndVerifyRSA(byte[] payload, PublicKey publicKey, PrivateKey privateKey,
@@ -53,7 +56,8 @@ public class JwsJsonSignatureTest {
       assertTrue(signature.isValidSignature(payload, secret));
 
       for (int i = 0; i < 100; i++) {
-        assertFalse(signature.isValidSignature(payload, TestUtil.getAlteredString(secret)));
+        String base64UrlEncodedWrongKey = toBase64Url(getAlteredBytes(fromBase64Url(secret)));
+        assertFalse(signature.isValidSignature(payload, base64UrlEncodedWrongKey));
       }
 
     } catch (Exception e) {
@@ -76,12 +80,12 @@ public class JwsJsonSignatureTest {
     JwsSignature signature = JwsSignature.getInstance("sign this".getBytes(), keyOne);
     JwsSignature signature2 = JwsSignature.getInstance("sign this".getBytes(), keyTwo);
 
-    System.out.println(Base64Utility.toBase64Url(signature.getSignatureBytes()));
-    System.out.println(Base64Utility.toBase64Url(signature2.getSignatureBytes()));
+    System.out.println(toBase64Url(signature.getSignatureBytes()));
+    System.out.println(toBase64Url(signature2.getSignatureBytes()));
 
     String longString = createRandomString(10000);
     JwsSignature signature3 = JwsSignature.getInstance(longString.getBytes(), keyTwo);
-    System.out.println(Base64Utility.toBase64Url(signature3.getSignatureBytes()));
+    System.out.println(toBase64Url(signature3.getSignatureBytes()));
   }
 
   @Test
@@ -124,7 +128,20 @@ public class JwsJsonSignatureTest {
     final byte[] payload = "sign this".getBytes();
     for (ESignatureAlgorithm algorithm : asList(HS256, HS384, HS512)) {
       System.out.println(algorithm.getJoseAlgorithmName());
-      testSingAndVerifySymmetric(payload, createRandomString(20), algorithm);
+      testSingAndVerifySymmetric(payload, toBase64Url(createRandomString(20)), algorithm);
     }
+  }
+
+  @Test
+  public void testSignatureFromBuilder() throws Exception {
+    final String payload = "payload";
+    final String secret = Base64Utility.toBase64Url(KeyGenerator.getInstance("HmacSHA256").generateKey().getEncoded());
+
+    JwsJsonFlattened jws = JwsBuilder.getInstance()
+        .withStringPayload(payload)
+        .sign(secret)
+        .buildJsonFlattened();
+
+    assertTrue(jws.isSignatureValid(secret));
   }
 }

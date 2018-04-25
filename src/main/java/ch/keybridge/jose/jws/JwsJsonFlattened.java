@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 /**
  * 7.2.2.  Flattened JWS JSON Serialization Syntax
@@ -101,6 +102,11 @@ public class JwsJsonFlattened extends JwsJsonBase {
   public String getCompactForm() throws IOException {
     return Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader)) + '.' +
         Base64Utility.toBase64Url(payload) + '.' + Base64Utility.toBase64Url(signature);
+  }
+
+  public boolean isSignatureValid(String secret) throws IOException, GeneralSecurityException {
+    JwsSignature signature = getJwsSignature();
+    return signature.isValidSignature(payload, secret);
   }
 
   public static JwsJsonFlattened fromJson(String json) throws IOException {

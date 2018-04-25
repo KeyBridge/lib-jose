@@ -62,7 +62,27 @@ public class JwsBuilder {
   }
 
   public JwsBuilder sign(String secret, ESignatureAlgorithm algorithm) throws IOException, GeneralSecurityException {
-    SecretKey key = new SecretKeySpec(secret.getBytes(Base64Utility.DEFAULT_CHARSET), algorithm.getJavaAlgorithmName());
+    SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(secret), algorithm.getJavaAlgorithmName());
+    return sign(key, algorithm);
+  }
+
+  public JwsBuilder sign(String secret) throws IOException, GeneralSecurityException {
+    byte[] keyBytes = Base64Utility.fromBase64Url(secret);
+    ESignatureAlgorithm algorithm;
+    switch (keyBytes.length) {
+      case 32:
+        algorithm = ESignatureAlgorithm.HS256;
+        break;
+      case 48:
+        algorithm = ESignatureAlgorithm.HS384;
+        break;
+      case 64:
+        algorithm = ESignatureAlgorithm.HS512;
+        break;
+      default:
+        throw new IllegalArgumentException("Unsupported key length: " + keyBytes.length);
+    }
+    SecretKey key = new SecretKeySpec(keyBytes, algorithm.getJavaAlgorithmName());
     return sign(key, algorithm);
   }
 
