@@ -49,6 +49,25 @@ public class JOSE {
     return null;
   }
 
+  public static <T> T unpackSignedAndEncryptedJson(String json, Class<T> type, String secret) {
+    try {
+      JweJsonFlattened jwe = JsonMarshaller.fromJson(json, JweJsonFlattened.class);
+      String payload = jwe.decryptAsString(JweBuilder.createSecretKey(secret));
+
+      JwsJsonFlattened jws = JsonMarshaller.fromJson(payload, JwsJsonFlattened.class);
+
+      boolean signatureValid = jws.isSignatureValid(secret);
+      if (!signatureValid) {
+        return null;
+      }
+      String mainPayload = jws.getStringPayload();
+      return JsonMarshaller.fromJson(mainPayload, type);
+    } catch (IOException | GeneralSecurityException e) {
+      LOG.log(Level.SEVERE, null, e);
+    }
+    return null;
+  }
+
   public static String signAndEncrypt(Object object, PrivateKey senderPrivateKey, PublicKey publicKey,
                                       String senderId) {
     try {
@@ -83,7 +102,7 @@ public class JOSE {
       JwsJsonFlattened jws = JwsBuilder.getInstance()
           .withStringPayload(jsonPayload)
           .withProtectedHeader(header)
-          .sign(secret, ESignatureAlgorithm.HS256)
+          .sign(secret)
           .buildJsonFlattened();
 
       return JweBuilder.getInstance()

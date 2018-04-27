@@ -18,15 +18,7 @@ public class JweBuilder {
    * Default algorithms
    */
   private static final EEncryptionAlgo CONTENT_ENC_ALGO = EEncryptionAlgo.A256GCM;
-  //  private static final EKeyManagementAlgorithm KEY_MGMT_ALGO_SYMMETRIC = EKeyManagementAlgorithm.A192KW;
   private static final EKeyManagementAlgorithm KEY_MGMT_ALGO_ASYM = EKeyManagementAlgorithm.RSA_OAEP;
-//  /**
-//   * Only a part of the Key Management algorithms support symmetric keys;
-//   * these are listed in this set.
-//   */
-//  private static final Set<EKeyManagementAlgorithm> SUPPORTED_ALGOS_FOR_SECRET_KEYS =
-//      Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-//          EKeyManagementAlgorithm.A128KW, EKeyManagementAlgorithm.A192KW, EKeyManagementAlgorithm.A256KW)));
 
   private EEncryptionAlgo encryptionAlgo = CONTENT_ENC_ALGO;
   /**
@@ -51,7 +43,7 @@ public class JweBuilder {
    * @param base64UrlEncodedSecret
    * @return
    */
-  private static SecretKey createSecretKey(String base64UrlEncodedSecret) {
+  public static SecretKey createSecretKey(String base64UrlEncodedSecret) {
     byte[] secretBytes = Base64Utility.fromBase64Url(base64UrlEncodedSecret);
     return new SecretKeySpec(secretBytes, "AES");
   }
