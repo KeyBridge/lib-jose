@@ -20,6 +20,23 @@ A number of examples are defined in:
  
  * [7520 JOSE](./doc/rfc7520.pdf)    Examples of Protecting Content Using JOSE
 
+## Installation
+
+Additional files may need to be downloaded and copied into the Java installation security directory. [Related StackOverflow thread](https://stackoverflow.com/questions/6481627/java-security-illegal-key-size-or-default-parameters).
+
+>  Most likely you don't have the unlimited strength file installed now.
+>
+>  You may need to download this file:
+> 
+>  [Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 6](http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html)
+>  
+>  [Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 7 Download](http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html)
+>  
+>  [Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files 8 Download](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
+>  
+>  Extract the jar files from the zip and save them in `${java.home}/jre/lib/security/`.
+
+
 ## JWK - JSON Web Key
 
 JSON Web Key is a data structure representing a cryptographic key with both the cryptographic data and other attributes, such as key usage.
