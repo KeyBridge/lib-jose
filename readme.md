@@ -22,9 +22,15 @@ A number of examples are defined in:
 
 ## Installation
 
-The default JDK supports encryption using up to 128 bit keys due to US export restrictions. To support larger encryption keys (e.g. 256 bit) you must update your JDK.
+**Note**: The following instructions are NOT necessary for Oracle JRE/JDK distributions in the US.
 
-For JDK versions less than 9 you must replace the files `local_policy.jar` and `US_export_policy.jar` to to suppport unlimited strength encryption. These are available for donwload from Oracle.
+For OpenJDK or for Non-US distributions: _Due to import control restrictions of some countries, the version of the JCE policy files that are bundled in the Java Runtime Environment allow "strong" but limited cryptography to be used. JCE has been through the U.S. export review process.  The JCE framework, along with the various JCE providers that come standard with it (SunJCE, SunEC, SunPKCS11, SunMSCAPI, etc), is exportable._
+
+Basically: The default JRE supports encryption using up to 128 bit keys due to some foreign jurisdiction import restrictions. To support larger encryption keys (e.g. 256 bit) you must update your JRE with a policy file for your jurisdiction.
+
+For JRE versions less than 9:
+
+You must add (or replace) the files `local_policy.jar` and `US_export_policy.jar` to to suppport unlimited strength encryption. These are available for donwload from Oracle.
 
 **Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files**
 
@@ -36,10 +42,12 @@ Extract the jar files from the zip archive and save them in `${java.home}/jre/li
 
 See the [StackOverflow thread](https://stackoverflow.com/questions/6481627/java-security-illegal-key-size-or-default-parameters) for additional narrative on this issue.
 
-For JDK versions 9 and above this is implemented using a configuration change. Either:
+For JDK versions 9 and above:
+
+This is implemented using a configuration change. Either:
+
   * Uncomment line `#crypto.policy=unlimited` in `lib\security\java.security`. [Release notes](http://oracle.com/technetwork/java/javase/8u151-relnotes-3850493.html)
   * Call `Security.setProperty("crypto.policy", "unlimited")` in your application.
-
 
 ## JWK - JSON Web Key
 
