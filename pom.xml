@@ -3,8 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>keybridge.lib</groupId>
   <artifactId>lib-jose</artifactId>
-  <version>0.2.2</version>
-  <packaging>bundle</packaging>
+  <version>0.3.0</version>
+  <packaging>jar</packaging>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -12,6 +13,7 @@
     <bouncycastle.version>1.59</bouncycastle.version>
     <jackson.version>2.9.3</jackson.version>
   </properties>
+
   <name>jose</name>
   <description>               JSON Object Signing and Encryption (JOSE)
 
@@ -32,7 +34,16 @@
     v0.2.0 - API improvements: added JWE Builder
     v0.2.1 - JwsJsonFlattened signature validation method added
     v0.2.2 - new method JOSE::unpackSignedAndEncryptedJson for use with a secret key
+    v0.3.0 - reconfigure as pojo library; prepare for release
+
   </description>
+
+
+  <organization>
+    <name>Key Bridge</name>
+    <url>http://keybridge.ch</url>
+  </organization>
+
   <dependencies>
     <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>
@@ -57,20 +68,12 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <version>3.4.0</version>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Embed-Dependency>*</Embed-Dependency>
-            <Embed-Transitive>true</Embed-Transitive>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+
+  <distributionManagement>
+    <repository>
+      <id>${repository.name}</id>
+      <url>${repository.url}</url>
+    </repository>
+  </distributionManagement>
+
 </project>
