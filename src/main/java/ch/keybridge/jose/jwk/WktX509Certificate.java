@@ -4,12 +4,17 @@ import java.util.Arrays;
 import java.util.Base64;
 
 public class WktX509Certificate {
+
   public byte[] data;
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     WktX509Certificate that = (WktX509Certificate) o;
 

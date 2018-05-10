@@ -5,6 +5,7 @@ package ch.keybridge.jose.jwe.encryption;
  * @since 0.0.1 created 03/01/2018
  */
 public class EncryptionResult {
+
   private final byte[] iv;
   private final byte[] aad;
   private final byte[] ciphertext;

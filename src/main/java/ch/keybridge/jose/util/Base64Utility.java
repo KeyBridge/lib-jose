@@ -6,9 +6,11 @@ import java.util.Base64;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * A Base64 and Base64URL encoding utility with defaults consistent with the JOSE family of formats.
+ * A Base64 and Base64URL encoding utility with defaults consistent with the
+ * JOSE family of formats.
  */
 public class Base64Utility {
+
   /**
    * JOSE family JSON objects require BASE64(URL)-encoded string to be unpadded.
    */

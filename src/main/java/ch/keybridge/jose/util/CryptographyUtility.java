@@ -5,17 +5,17 @@ import ch.keybridge.jose.jwk.JwkEcKey;
 import ch.keybridge.jose.jwk.JwkRsaPrivateKey;
 import ch.keybridge.jose.jwk.JwkSymmetricKey;
 import ch.keybridge.jose.jws.ESignatureAlgorithm;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
+import java.security.*;
+import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.*;
-import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class CryptographyUtility {
+
   static {
     Security.addProvider(new BouncyCastleProvider());
   }
@@ -36,6 +36,7 @@ public class CryptographyUtility {
     }
     return cipher.doFinal(payload);
   }
+
   public static byte[] decrypt(byte[] ciphertext, Key key, String algo, AlgorithmParameterSpec spec, byte[] additionalAUthenticationData) throws GeneralSecurityException {
     Cipher cipher = Cipher.getInstance(algo);
     cipher.init(Cipher.DECRYPT_MODE, key, spec);
@@ -58,9 +59,9 @@ public class CryptographyUtility {
   }
 
   public static byte[] sign(byte[] payload, Key key, String alg) throws GeneralSecurityException {
-    return key instanceof SecretKey ?
-        sign(payload, (SecretKey) key, alg) :
-        sign(payload, (PrivateKey) key, alg);
+    return key instanceof SecretKey
+           ? sign(payload, (SecretKey) key, alg)
+           : sign(payload, (PrivateKey) key, alg);
   }
 
   public static byte[] sign(byte[] payload, SecretKey key, String alg) throws GeneralSecurityException {
@@ -70,7 +71,7 @@ public class CryptographyUtility {
   }
 
   public static boolean validate(byte[] signature, byte[] payload, SecretKey key, String algorithm) throws
-      GeneralSecurityException {
+    GeneralSecurityException {
     Mac mac = Mac.getInstance(algorithm);
     mac.init(key);
     byte[] computedMac = mac.doFinal(payload);
@@ -85,7 +86,7 @@ public class CryptographyUtility {
   }
 
   public static boolean validate(byte[] signature, byte[] payload, PublicKey key, String algorithm) throws
-      GeneralSecurityException {
+    GeneralSecurityException {
     Signature sig = Signature.getInstance(algorithm);
     sig.initVerify(key);
     sig.update(payload);
@@ -97,7 +98,7 @@ public class CryptographyUtility {
     if (jwk instanceof JwkSymmetricKey) {
       JwkSymmetricKey symmetricKey = (JwkSymmetricKey) jwk;
       return sign(payloadBytes, new SecretKeySpec(symmetricKey.getK(), algorithm.getJavaAlgorithmName()), algorithm
-          .getJavaAlgorithmName());
+                  .getJavaAlgorithmName());
     } else if (jwk instanceof JwkRsaPrivateKey) {
       JwkRsaPrivateKey rsaKey = (JwkRsaPrivateKey) jwk;
       return sign(payloadBytes, rsaKey.getPrivateKey(), algorithm.getJavaAlgorithmName());
@@ -109,7 +110,7 @@ public class CryptographyUtility {
   }
 
   public static boolean validateSignature(byte[] signature, byte[] payload, Key key, String algorithm) throws
-      GeneralSecurityException {
+    GeneralSecurityException {
     if (key instanceof SecretKey) {
       return validate(signature, payload, (SecretKey) key, algorithm);
     } else if (key instanceof PublicKey) {

@@ -5,5 +5,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public enum EPublicKeyUse {
-  sig, enc
+  sig,
+  enc
 }

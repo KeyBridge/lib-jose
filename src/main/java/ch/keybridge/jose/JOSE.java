@@ -6,7 +6,6 @@ import ch.keybridge.jose.jws.ESignatureAlgorithm;
 import ch.keybridge.jose.jws.JwsBuilder;
 import ch.keybridge.jose.jws.JwsJsonFlattened;
 import ch.keybridge.jose.util.JsonMarshaller;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
@@ -19,6 +18,7 @@ import java.util.logging.Logger;
  * @since 0.0.1 created 14/02/2018
  */
 public class JOSE {
+
   private final static Logger LOG = Logger.getLogger(JOSE.class.getCanonicalName());
 
   public static JwsBuilder newJwsBuilder() {
@@ -29,8 +29,7 @@ public class JOSE {
     return JweBuilder.getInstance();
   }
 
-  public static <T> T unpackSignedAndEncryptedJson(String json, Class<T> type, PrivateKey receiverKey, PublicKey
-      senderKey) {
+  public static <T> T unpackSignedAndEncryptedJson(String json, Class<T> type, PrivateKey receiverKey, PublicKey senderKey) {
     try {
       JweJsonFlattened jwe = JsonMarshaller.fromJson(json, JweJsonFlattened.class);
       String payload = jwe.decryptAsString(receiverKey);
@@ -77,15 +76,15 @@ public class JOSE {
       header.setKid(senderId);
 
       JwsJsonFlattened jws = JwsBuilder.getInstance()
-          .withStringPayload(jsonPayload)
-          .withProtectedHeader(header)
-          .sign(senderPrivateKey, ESignatureAlgorithm.RS256)
-          .buildJsonFlattened();
+        .withStringPayload(jsonPayload)
+        .withProtectedHeader(header)
+        .sign(senderPrivateKey, ESignatureAlgorithm.RS256)
+        .buildJsonFlattened();
 
       return JweBuilder.getInstance()
-          .withStringPayload(jws.toJson())
-          .buildJweJsonFlattened(publicKey)
-          .toJson();
+        .withStringPayload(jws.toJson())
+        .buildJweJsonFlattened(publicKey)
+        .toJson();
     } catch (IOException | GeneralSecurityException e) {
       LOG.log(Level.SEVERE, null, e);
     }
@@ -100,15 +99,15 @@ public class JOSE {
       header.setKid(senderId);
 
       JwsJsonFlattened jws = JwsBuilder.getInstance()
-          .withStringPayload(jsonPayload)
-          .withProtectedHeader(header)
-          .sign(secret)
-          .buildJsonFlattened();
+        .withStringPayload(jsonPayload)
+        .withProtectedHeader(header)
+        .sign(secret)
+        .buildJsonFlattened();
 
       return JweBuilder.getInstance()
-          .withStringPayload(jws.toJson())
-          .buildJweJsonFlattened(secret)
-          .toJson();
+        .withStringPayload(jws.toJson())
+        .buildJweJsonFlattened(secret)
+        .toJson();
     } catch (IOException | GeneralSecurityException e) {
       LOG.log(Level.SEVERE, null, e);
     }

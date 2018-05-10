@@ -1,20 +1,20 @@
 package ch.keybridge.jose.jwk;
 
 import ch.keybridge.jose.adapter.XmlAdapterBigIntegerBase64Url;
-
+import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.math.BigInteger;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JwkEcKey extends JsonWebKey {
+
   private String crv;
-  @XmlJavaTypeAdapter(type=BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
+  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger x;
-  @XmlJavaTypeAdapter(type=BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
+  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger y;
-  @XmlJavaTypeAdapter(type=BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
+  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger d;
 
   public String getCrv() {
@@ -51,15 +51,27 @@ public class JwkEcKey extends JsonWebKey {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
 
     JwkEcKey jwkEcKey = (JwkEcKey) o;
 
-    if (crv != null ? !crv.equals(jwkEcKey.crv) : jwkEcKey.crv != null) return false;
-    if (x != null ? !x.equals(jwkEcKey.x) : jwkEcKey.x != null) return false;
-    if (y != null ? !y.equals(jwkEcKey.y) : jwkEcKey.y != null) return false;
+    if (crv != null ? !crv.equals(jwkEcKey.crv) : jwkEcKey.crv != null) {
+      return false;
+    }
+    if (x != null ? !x.equals(jwkEcKey.x) : jwkEcKey.x != null) {
+      return false;
+    }
+    if (y != null ? !y.equals(jwkEcKey.y) : jwkEcKey.y != null) {
+      return false;
+    }
     return d != null ? d.equals(jwkEcKey.d) : jwkEcKey.d == null;
   }
 
@@ -75,10 +87,10 @@ public class JwkEcKey extends JsonWebKey {
 
   @Override
   public String toString() {
-    return "JWKECPublicKey{" +
-        "crv='" + crv + '\'' +
-        ", x=" + x +
-        ", y=" + y +
-        "} " + super.toString();
+    return "JWKECPublicKey{"
+      + "crv='" + crv + '\''
+      + ", x=" + x
+      + ", y=" + y
+      + "} " + super.toString();
   }
 }

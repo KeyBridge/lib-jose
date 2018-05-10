@@ -3,20 +3,20 @@ package ch.keybridge.jose.jws;
 import ch.keybridge.jose.JoseCryptoHeader;
 import ch.keybridge.jose.jwk.JsonWebKey;
 import ch.keybridge.jose.util.Base64Utility;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 14/02/2018
  */
 public class JwsBuilder {
+
   private byte[] payload;
   private List<JwsSignature> signatures = new ArrayList<>();
   private JoseCryptoHeader protectedHeader;
@@ -55,7 +55,9 @@ public class JwsBuilder {
   }
 
   public JwsBuilder sign(Key key, ESignatureAlgorithm algorithm) throws IOException, GeneralSecurityException {
-    if (protectedHeader == null) protectedHeader = new JoseCryptoHeader();
+    if (protectedHeader == null) {
+      protectedHeader = new JoseCryptoHeader();
+    }
     protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
     signatures.add(JwsSignature.getInstance(payload, key, protectedHeader, unprotectedHeader));
     return this;

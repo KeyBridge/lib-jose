@@ -5,32 +5,29 @@ import ch.keybridge.jose.JoseCryptoHeader;
 import ch.keybridge.jose.adapter.XmlAdapterByteArrayBase64Url;
 import ch.keybridge.jose.util.Base64Utility;
 import ch.keybridge.jose.util.JsonMarshaller;
-
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 /**
- * 7.2.2.  Flattened JWS JSON Serialization Syntax
+ * 7.2.2. Flattened JWS JSON Serialization Syntax
  * <p>
- * The flattened JWS JSON Serialization syntax is based upon the general
- * syntax but flattens it, optimizing it for the single digital
- * signature/MAC case.  It flattens it by removing the "signatures"
- * member and instead placing those members defined for use in the
- * "signatures" array (the "protected", "header", and "signature"
- * members) in the top-level JSON object (at the same level as the
- * "payload" member).
+ * The flattened JWS JSON Serialization syntax is based upon the general syntax
+ * but flattens it, optimizing it for the single digital signature/MAC case. It
+ * flattens it by removing the "signatures" member and instead placing those
+ * members defined for use in the "signatures" array (the "protected", "header",
+ * and "signature" members) in the top-level JSON object (at the same level as
+ * the "payload" member).
  * <p>
- * The "signatures" member MUST NOT be present when using this syntax.
- * Other than this syntax difference, JWS JSON Serialization objects
- * using the flattened syntax are processed identically to those using
- * the general syntax.
+ * The "signatures" member MUST NOT be present when using this syntax. Other
+ * than this syntax difference, JWS JSON Serialization objects using the
+ * flattened syntax are processed identically to those using the general syntax.
  * <p>
- * In summary, the syntax of a JWS using the flattened JWS JSON
- * Serialization is as follows:
+ * In summary, the syntax of a JWS using the flattened JWS JSON Serialization is
+ * as follows:
  * <pre>
  * {
  *  "payload":"[[payload contents]]",
@@ -38,13 +35,12 @@ import java.security.GeneralSecurityException;
  *  "header":[[non-integrity-protected header contents]],
  *  "signature":"[[signature contents]]"
  * }
- * </pre>
- * See Appendix A.7 for an example JWS using the flattened JWS JSON
+ * </pre> See Appendix A.7 for an example JWS using the flattened JWS JSON
  * Serialization syntax.
  */
-
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JwsJsonFlattened extends JwsJsonBase {
+
   @XmlElement(name = "protected")
   private JoseCryptoHeader protectedHeader;
   @XmlElement(name = "header")
@@ -84,24 +80,22 @@ public class JwsJsonFlattened extends JwsJsonBase {
   }
 
   /**
-   * 7.1.  JWS Compact Serialization
+   * 7.1. JWS Compact Serialization
    * <p>
-   * The JWS Compact Serialization represents digitally signed or MACed
-   * content as a compact, URL-safe string.  This string is:
+   * The JWS Compact Serialization represents digitally signed or MACed content
+   * as a compact, URL-safe string. This string is:
    * <pre>
    * BASE64URL(UTF8(JWS Protected Header)) || ’.’ ||
    * BASE64URL(JWS Payload) || ’.’ ||
    * BASE64URL(JWS Signature)
-   * </pre>
-   * Only one signature/MAC is supported by the JWS Compact Serialization
-   * and it provides no syntax to represent a JWS Unprotected Header
-   * value.
+   * </pre> Only one signature/MAC is supported by the JWS Compact Serialization
+   * and it provides no syntax to represent a JWS Unprotected Header value.
    *
    * @return this JWS object encoded in compact serialization
    */
   public String getCompactForm() throws IOException {
-    return Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader)) + '.' +
-        Base64Utility.toBase64Url(payload) + '.' + Base64Utility.toBase64Url(signature);
+    return Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader)) + '.'
+      + Base64Utility.toBase64Url(payload) + '.' + Base64Utility.toBase64Url(signature);
   }
 
   public boolean isSignatureValid(String secret) throws IOException, GeneralSecurityException {

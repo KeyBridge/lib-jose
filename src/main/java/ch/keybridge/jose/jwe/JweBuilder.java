@@ -3,17 +3,17 @@ package ch.keybridge.jose.jwe;
 import ch.keybridge.jose.jwe.encryption.EEncryptionAlgo;
 import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
 import ch.keybridge.jose.util.Base64Utility;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import static ch.keybridge.jose.util.Base64Utility.toBase64Url;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 public class JweBuilder {
+
   /**
    * Default algorithms
    */
@@ -22,8 +22,9 @@ public class JweBuilder {
 
   private EEncryptionAlgo encryptionAlgo = CONTENT_ENC_ALGO;
   /**
-   * Cannot set a default Key Management algorithm at this point because we don't know if
-   * a symmetric or asymmetric key will be used for payload encryption.
+   * Cannot set a default Key Management algorithm at this point because we
+   * don't know if a symmetric or asymmetric key will be used for payload
+   * encryption.
    */
   private EKeyManagementAlgorithm keyMgmtAlgo;
   private JweJoseHeader protectedHeader = new JweJoseHeader();
@@ -49,8 +50,9 @@ public class JweBuilder {
   }
 
   /**
-   * Resolve the Key Management algorithm from the SecretKey length (16, 24, or 32).
-   * This only applies for symmetric encryption (wrapping) of encryption keys.
+   * Resolve the Key Management algorithm from the SecretKey length (16, 24, or
+   * 32). This only applies for symmetric encryption (wrapping) of encryption
+   * keys.
    *
    * @param key non-nul SecretKey instance
    * @return
@@ -99,19 +101,21 @@ public class JweBuilder {
   }
 
   public JweJsonFlattened buildJweJsonFlattened(PublicKey key) throws IOException, GeneralSecurityException {
-    if (keyMgmtAlgo == null) keyMgmtAlgo = KEY_MGMT_ALGO_ASYM;
+    if (keyMgmtAlgo == null) {
+      keyMgmtAlgo = KEY_MGMT_ALGO_ASYM;
+    }
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
-        protectedHeader, unprotectedHeader);
+                                        protectedHeader, unprotectedHeader);
   }
 
   public JweJsonFlattened buildJweJsonFlattened(SecretKey key) throws IOException, GeneralSecurityException {
     keyMgmtAlgo = resolveSecretKeyAlgorithm(key);
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
-        protectedHeader, unprotectedHeader);
+                                        protectedHeader, unprotectedHeader);
   }
 
   public JweJsonFlattened buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException,
-      GeneralSecurityException {
+    GeneralSecurityException {
     SecretKey key = createSecretKey(base64UrlEncodedSecret);
     keyMgmtAlgo = resolveSecretKeyAlgorithm(key);
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);

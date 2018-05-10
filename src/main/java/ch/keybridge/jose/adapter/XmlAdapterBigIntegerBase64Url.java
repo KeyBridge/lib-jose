@@ -16,9 +16,8 @@
 package ch.keybridge.jose.adapter;
 
 import ch.keybridge.jose.util.Base64Utility;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.math.BigInteger;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * Converts BigInteger instances into Base64URL-encoded strings and vice versa
@@ -26,16 +25,16 @@ import java.math.BigInteger;
 public class XmlAdapterBigIntegerBase64Url extends XmlAdapter<String, BigInteger> {
 
   /**
-   * Returns a byte array representation of the specified big integer
-   * without the sign bit.
-   *
-   * Copied from <a href="https://commons.apache.org/proper/commons-codec/xref/org/apache/commons/codec/binary/Base64.html">
+   * Returns a byte array representation of the specified big integer without
+   * the sign bit.
+   * <p>
+   * Copied from
+   * <a href="https://commons.apache.org/proper/commons-codec/xref/org/apache/commons/codec/binary/Base64.html">
    * Apache Commons Codec</a>
    *
-   * @param bigInt The big integer to be converted. Must not be
-   *               {@code null}.
-   * @return A byte array representation of the big integer, without the
-   *         sign bit.
+   * @param bigInt The big integer to be converted. Must not be {@code null}.
+   * @return A byte array representation of the big integer, without the sign
+   *         bit.
    */
   private static byte[] toBytesUnsigned(final BigInteger bigInt) {
     // Copied from Apache Commons Codec 1.8

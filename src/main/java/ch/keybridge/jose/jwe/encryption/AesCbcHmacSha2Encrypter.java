@@ -1,22 +1,22 @@
 package ch.keybridge.jose.jwe.encryption;
 
 import ch.keybridge.jose.util.SecureRandomUtility;
-
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.util.Arrays;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.util.Arrays;
 
 /**
  * https://tools.ietf.org/html/rfc7516#appendix-B
  * https://tools.ietf.org/html/draft-mcgrew-aead-aes-cbc-hmac-sha2-05#appendix-B
  */
 public class AesCbcHmacSha2Encrypter implements Encrypter {
+
   final static int IV_BYTE_LENGTH = 128 / 8;
   private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
   private static final String SECRET_KEY_ALGORITHM = "AES";
@@ -59,8 +59,12 @@ public class AesCbcHmacSha2Encrypter implements Encrypter {
 
   @Override
   public EncryptionResult encrypt(byte[] payload, byte[] iv, byte[] aad, Key key) throws GeneralSecurityException {
-    if (iv == null) iv = SecureRandomUtility.generateBytes(IV_BYTE_LENGTH);
-    if (aad == null) aad = new byte[0];
+    if (iv == null) {
+      iv = SecureRandomUtility.generateBytes(IV_BYTE_LENGTH);
+    }
+    if (aad == null) {
+      aad = new byte[0];
+    }
     validateInputs(key, aad, iv);
 
     Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
@@ -72,10 +76,14 @@ public class AesCbcHmacSha2Encrypter implements Encrypter {
 
   @Override
   public byte[] decrypt(byte[] ciphertext, byte[] iv, byte[] aad, byte[] authTag, Key key) throws
-      GeneralSecurityException {
-    if (aad == null) aad = new byte[0];
+    GeneralSecurityException {
+    if (aad == null) {
+      aad = new byte[0];
+    }
     validateInputs(key, aad, iv);
-    if (!Arrays.equals(authTag, calculateAuthenticationTag(ciphertext, aad, iv, key))) return null;
+    if (!Arrays.equals(authTag, calculateAuthenticationTag(ciphertext, aad, iv, key))) {
+      return null;
+    }
 
     Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
     cipher.init(Cipher.DECRYPT_MODE, generateEncryptionKey(key), new IvParameterSpec(iv));
@@ -87,7 +95,7 @@ public class AesCbcHmacSha2Encrypter implements Encrypter {
   }
 
   private byte[] calculateAuthenticationTag(byte[] ciphertext, byte[] aad, byte[] iv, Key key) throws
-      GeneralSecurityException {
+    GeneralSecurityException {
     final byte[] al = getUnsignedLongBytes(aad.length * 8);
     final byte[] macInput = concatenate(aad, iv, ciphertext, al);
     Mac mac = Mac.getInstance(configuration.JCE_MAC_ALG);
@@ -97,17 +105,20 @@ public class AesCbcHmacSha2Encrypter implements Encrypter {
   }
 
   private void validateInputs(Key key, byte[] aad, byte[] iv) {
-    if (key.getEncoded().length != configuration.INPUT_KEY_LENGTH)
-      throw new IllegalArgumentException("Key must be " + configuration.INPUT_KEY_LENGTH + " bytes in length. Key " +
-          "length:" + key.getEncoded().length);
-    if (!key.getAlgorithm().equals(SECRET_KEY_ALGORITHM))
-      throw new IllegalArgumentException("SecretKey must be an AES key");
-    if (iv == null || iv.length != IV_BYTE_LENGTH) {
-      throw new IllegalArgumentException("Initialisation vector must be " + IV_BYTE_LENGTH + " bytes long. " +
-          "Provided IV: " + (iv == null ? null : (iv.length + " bytes. ")));
+    if (key.getEncoded().length != configuration.INPUT_KEY_LENGTH) {
+      throw new IllegalArgumentException("Key must be " + configuration.INPUT_KEY_LENGTH + " bytes in length. Key "
+        + "length:" + key.getEncoded().length);
     }
-    if (aad == null)
+    if (!key.getAlgorithm().equals(SECRET_KEY_ALGORITHM)) {
+      throw new IllegalArgumentException("SecretKey must be an AES key");
+    }
+    if (iv == null || iv.length != IV_BYTE_LENGTH) {
+      throw new IllegalArgumentException("Initialisation vector must be " + IV_BYTE_LENGTH + " bytes long. "
+        + "Provided IV: " + (iv == null ? null : (iv.length + " bytes. ")));
+    }
+    if (aad == null) {
       throw new IllegalArgumentException("Additional authenticated data must not be null");
+    }
   }
 
   private SecretKey generateMacKey(Key key) {
@@ -115,9 +126,8 @@ public class AesCbcHmacSha2Encrypter implements Encrypter {
   }
 
   private SecretKey generateEncryptionKey(Key key) {
-    return new SecretKeySpec(Arrays.copyOfRange(key.getEncoded(), configuration.MAC_KEY_LEN, configuration
-        .INPUT_KEY_LENGTH),
-        SECRET_KEY_ALGORITHM);
+    return new SecretKeySpec(Arrays.copyOfRange(key.getEncoded(), configuration.MAC_KEY_LEN, configuration.INPUT_KEY_LENGTH),
+                             SECRET_KEY_ALGORITHM);
   }
 
   public enum Configuration {
@@ -133,7 +143,8 @@ public class AesCbcHmacSha2Encrypter implements Encrypter {
     public final int T_LEN; // Authentication tag length in bytes
 
     /**
-     * Create immutable configuration containing parameters for the AES-CBC-HMAC-SHA2 encryption scheme.
+     * Create immutable configuration containing parameters for the
+     * AES-CBC-HMAC-SHA2 encryption scheme.
      *
      * @param INPUT_KEY_LENGTH number of octets in input key
      * @param ENC_KEY_LEN      number of octets in encryption key
@@ -142,8 +153,7 @@ public class AesCbcHmacSha2Encrypter implements Encrypter {
      * @param jce_mac_alg      Java (JCE) MAC algorithm name
      * @param t_LEN            Authentication tag length in bytes
      */
-    Configuration(int INPUT_KEY_LENGTH, int ENC_KEY_LEN, int MAC_KEY_LEN, String MAC_ALG, String jce_mac_alg, int
-        t_LEN) {
+    Configuration(int INPUT_KEY_LENGTH, int ENC_KEY_LEN, int MAC_KEY_LEN, String MAC_ALG, String jce_mac_alg, int t_LEN) {
       this.INPUT_KEY_LENGTH = INPUT_KEY_LENGTH;
       this.ENC_KEY_LEN = ENC_KEY_LEN;
       this.MAC_KEY_LEN = MAC_KEY_LEN;
