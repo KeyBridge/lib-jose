@@ -4,13 +4,13 @@ import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
 import ch.keybridge.jose.jwk.JwkRsaPrivateKey;
 import ch.keybridge.jose.util.CryptographyUtility;
 import ch.keybridge.jose.util.JsonMarshaller;
-import org.junit.Test;
-
 import java.nio.charset.StandardCharsets;
+import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 
 public class CryptographyUtilityTest {
+
   @Test
   public void encryptAndDecrypt() throws Exception {
     final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/rsa-private-key.json");

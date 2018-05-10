@@ -2,11 +2,10 @@ package ch.keybridge.jose.io;
 
 import ch.keybridge.jose.jwe.JweBuilder;
 import ch.keybridge.jose.jwe.JweJsonFlattened;
-import org.junit.Test;
-
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import org.junit.Test;
 
 import static ch.keybridge.jose.util.JsonMarshaller.fromJson;
 import static ch.keybridge.jose.util.JsonMarshaller.toJson;
@@ -26,8 +25,8 @@ public class JsonMarshallerTest {
       generator.initialize(2048);
       KeyPair keyPair = generator.generateKeyPair();
       JweJsonFlattened original = JweBuilder.getInstance()
-          .withBinaryPayload("somePayload".getBytes(StandardCharsets.UTF_8))
-          .buildJweJsonFlattened(keyPair.getPublic());
+        .withBinaryPayload("somePayload".getBytes(StandardCharsets.UTF_8))
+        .buildJweJsonFlattened(keyPair.getPublic());
 
       JweJsonFlattened unmarshalled = fromJson(toJson(original), JweJsonFlattened.class);
       assertEquals(original, unmarshalled);
