@@ -1,10 +1,14 @@
-# JOSE - JSON Object Signing and Encryption
+# lib-jose
 
-JOSE is a framework intended to provide a method to securely transfer claims (such as authorization information) between parties. The JOSE framework provides a collection of specifications to serve this purpose.  
+## JSON Object Signing and Encryption
 
-The standard provides a general approach to signing and encryption of any content, not necessarily in JSON. However, it is deliberately built on JSON and base64url to be easily usable in web applications. Also, while being used in OpenID Connect, it can be used as a building block in other protocols.
+A clean-room implementation of the JSON Object Signing  Encryption (JOSE) specifications, in Java.
 
-It consists of several RFCs:
+_JOSE_ is a framework intended to provide a method to securely transfer claims (such as authorization information) between parties. The JOSE framework provides a collection of specifications to serve this purpose.  
+
+The standard provides a general approach to signing and encryption of any content, not necessarily in JSON. However, it is deliberately built on JSON and _base64url_ to be easily usable in web applications. Also, while being used in OpenID Connect, it can be used as a building block in other protocols.
+
+_JOSE_ consists of several RFCs:
 
  * [7515 JWS](./doc/rfc7515.pdf)    JSON Web Signature, describes producing and handling signed messages
  * [7516 JWE](./doc/rfc7516.pdf)    JSON Web Encryption, describes producting and handling encrypted messages
@@ -20,15 +24,15 @@ A number of examples are defined in:
  
  * [7520 JOSE](./doc/rfc7520.pdf)    Examples of Protecting Content Using JOSE
 
-## Installation
+# Build and installation
 
-**Note**: The following instructions are NOT necessary for Oracle JRE/JDK distributions in the US.
+**Note**: The following instructions are NOT necessary for Oracle JRE/JDK distributions in the United States.
 
-For OpenJDK or for Non-US distributions: _Due to import control restrictions of some countries, the version of the JCE policy files that are bundled in the Java Runtime Environment allow "strong" but limited cryptography to be used. JCE has been through the U.S. export review process.  The JCE framework, along with the various JCE providers that come standard with it (SunJCE, SunEC, SunPKCS11, SunMSCAPI, etc), is exportable._
+For OpenJDK or for Non-US JDK distributions: _Due to import control restrictions of some countries, the version of the JCE policy files that are bundled in the Java Runtime Environment allow "strong" but limited cryptography to be used. JCE has been through the U.S. export review process.  The JCE framework, along with the various JCE providers that come standard with it (SunJCE, SunEC, SunPKCS11, SunMSCAPI, etc), is exportable._
 
 Basically: The default JRE supports encryption using up to 128 bit keys due to some foreign jurisdiction import restrictions. To support larger encryption keys (e.g. 256 bit) you must update your JRE with a policy file for your jurisdiction.
 
-For JRE versions less than 9:
+**For JRE versions less than 9:**
 
 You must add (or replace) the files `local_policy.jar` and `US_export_policy.jar` to to suppport unlimited strength encryption. These are available for donwload from Oracle.
 
@@ -42,12 +46,14 @@ Extract the jar files from the zip archive and save them in `${java.home}/jre/li
 
 See the [StackOverflow thread](https://stackoverflow.com/questions/6481627/java-security-illegal-key-size-or-default-parameters) for additional narrative on this issue.
 
-For JDK versions 9 and above:
+**For JDK versions 9 and above:**
 
-This is implemented using a configuration change. Either:
+Encryption policy is implemented using a configuration change. Either:
 
   * Uncomment line `#crypto.policy=unlimited` in `lib\security\java.security`. [Release notes](http://oracle.com/technetwork/java/javase/8u151-relnotes-3850493.html)
   * Call `Security.setProperty("crypto.policy", "unlimited")` in your application.
+
+# JOSE components
 
 ## JWK - JSON Web Key
 
@@ -244,5 +250,36 @@ JWT standard defines claims - name/value pair asserting information about subjec
     "jti" (JWT ID) as unique identifier for JWT
 
 While standard mandates what are mandatory values of the claims, all of them are optional to use in a valid JWT. This means applications can use any structure for JWT if it`s not intended to use publicly, and for public JWT set of claims is defined and collisions in names are prevented.
+
+
+# References
+
+ * [7515 JWS](./doc/rfc7515.pdf)    JSON Web Signature, describes producing and handling signed messages
+ * [7516 JWE](./doc/rfc7516.pdf)    JSON Web Encryption, describes producting and handling encrypted messages
+ * [7517 JWK](./doc/rfc7517.pdf)    JSON Web Key, describes format and handling of cryptographic keys in JOSE
+ * [7518 JWA](./doc/rfc7518.pdf)    JSON Web Algorithms, describes cryptographic algorithms used in JOSE
+ * [7519 JWT](./doc/rfc7519.pdf)    JSON Web Token, describes representation of claims encoded in JSON and protected by 
+ * [7797 JUP](./doc/rfc7797.pdf)    JSON Web Signature for Unencoded Payloads
+ * [7520 JOSE](./doc/rfc7520.pdf)    Examples of Protecting Content Using JOSE
+
+# License
+
+Copyright 2017-2018 Key Bridge. Licensed under Apache 2.0.
+
+
+# History
+
+Check the POM file for latest developments.
+
+    v0.0.1 - new project
+    v0.1.0 - core functionality implemented
+    v0.1.1 - API improvements
+    v0.2.0 - API improvements: added JWE Builder
+    v0.2.1 - JwsJsonFlattened signature validation method added
+    v0.2.2 - new method JOSE::unpackSignedAndEncryptedJson for use with a secret key
+    v0.3.0 - reconfigure as pojo library; prepare for release
+
+  
+
 
 

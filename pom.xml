@@ -15,7 +15,7 @@
   </properties>
 
   <name>jose</name>
-  <description>               JSON Object Signing and Encryption (JOSE)
+  <description>JSON Object Signing and Encryption (JOSE)
 
     A clean-room implementation of the JSON Object Signing
     and Encryption (JOSE) specifications. Includes
