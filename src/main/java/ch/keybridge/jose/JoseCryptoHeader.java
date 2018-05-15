@@ -6,6 +6,8 @@ import java.net.URI;
 import java.util.List;
 
 /**
+ * A subtype of JoseBase which contains encryption-related fields used across JWS and JWE.
+ * @see <a "doc/jose-header.pdf">JOSE header type diagram</a>
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 02/01/2018
  */
@@ -168,5 +170,42 @@ public class JoseCryptoHeader extends JoseBase {
 
   public void setTyp(String typ) {
     this.typ = typ;
+  }
+
+  @Override
+  public String toString() {
+    return "JoseCryptoHeader{" +
+        "jku=" + jku +
+        ", jwk=" + jwk +
+        ", typ='" + typ + '\'' +
+        ", cty='" + cty + '\'' +
+        ", crit=" + crit +
+        '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+
+    JoseCryptoHeader header = (JoseCryptoHeader) o;
+
+    if (jku != null ? !jku.equals(header.jku) : header.jku != null) return false;
+    if (jwk != null ? !jwk.equals(header.jwk) : header.jwk != null) return false;
+    if (typ != null ? !typ.equals(header.typ) : header.typ != null) return false;
+    if (cty != null ? !cty.equals(header.cty) : header.cty != null) return false;
+    return crit != null ? crit.equals(header.crit) : header.crit == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (jku != null ? jku.hashCode() : 0);
+    result = 31 * result + (jwk != null ? jwk.hashCode() : 0);
+    result = 31 * result + (typ != null ? typ.hashCode() : 0);
+    result = 31 * result + (cty != null ? cty.hashCode() : 0);
+    result = 31 * result + (crit != null ? crit.hashCode() : 0);
+    return result;
   }
 }

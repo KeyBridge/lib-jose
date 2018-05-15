@@ -33,6 +33,11 @@ public class JweBuilder {
   private JweBuilder() {
   }
 
+  /**
+   * Create a new instance of JweBuilder
+   *
+   * @return a new JweBuilder instance
+   */
   public static JweBuilder getInstance() {
     return new JweBuilder();
   }
@@ -40,8 +45,8 @@ public class JweBuilder {
   /**
    * Create an AES secret key instance from a Base64URL encoded string
    *
-   * @param base64UrlEncodedSecret
-   * @return
+   * @param base64UrlEncodedSecret base64URL-encoded bytes of the secret
+   * @return a SecretKey instance
    */
   public static SecretKey createSecretKey(String base64UrlEncodedSecret) {
     byte[] secretBytes = Base64Utility.fromBase64Url(base64UrlEncodedSecret);
@@ -53,7 +58,7 @@ public class JweBuilder {
    * This only applies for symmetric encryption (wrapping) of encryption keys.
    *
    * @param key non-nul SecretKey instance
-   * @return
+   * @return EKeyManagementAlgorithm
    */
   private static EKeyManagementAlgorithm resolveKeyManagementAlgorithm(SecretKey key) {
     switch (key.getEncoded().length) {
@@ -68,48 +73,100 @@ public class JweBuilder {
     }
   }
 
+  /**
+   * Add binary payload for signing or HMAC calculation
+   *
+   * @param payload data to sign
+   * @return this builder
+   */
   public JweBuilder withBinaryPayload(byte[] payload) {
     this.payload = payload;
     return this;
   }
 
+  /**
+   * Add string payload for signing or HMAC calculation
+   * @param payload string to sign
+   * @return this builder
+   */
   public JweBuilder withStringPayload(String payload) {
     this.payload = toBase64Url(payload).getBytes(US_ASCII);
     return this;
   }
 
+  /**
+   * Add a protected header
+   * @param header a JoseCryptoHeader instance
+   * @return this builder
+   */
   public JweBuilder withProtectedHeader(JweJoseHeader header) {
     protectedHeader = header;
     return this;
   }
 
+  /**
+   * Add an unprotected header
+   * @param header a JoseCryptoHeader instance
+   * @return this builder
+   */
   public JweBuilder withUnprotectedHeader(JweJoseHeader header) {
     unprotectedHeader = header;
     return this;
   }
 
+  /**
+   * Set the encryption algorithm
+   * @param algorithm EEncryptionAlgo
+   * @return this builder
+   */
   public JweBuilder withEncryptionAlgorithm(EEncryptionAlgo algorithm) {
     encryptionAlgo = algorithm;
     return this;
   }
 
+  /**
+   * Set the key management algorithm
+   * @param algorithm EKeyManagementAlgorithm
+   * @return this builder
+   */
   public JweBuilder withKeyManagementAlgorithm(EKeyManagementAlgorithm algorithm) {
     keyMgmtAlgo = algorithm;
     return this;
   }
 
+  /**
+   * Encrypt the payload with the provided recipient's PublicKey
+   * @param key public key
+   * @return a JweJsonFlattened instance
+   * @throws IOException in case of failure to serialise the protected header to JSON
+   * @throws GeneralSecurityException in case of failure to encrypt
+   */
   public JweJsonFlattened buildJweJsonFlattened(PublicKey key) throws IOException, GeneralSecurityException {
     if (keyMgmtAlgo == null) keyMgmtAlgo = KEY_MGMT_ALGO_ASYM;
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
         protectedHeader, unprotectedHeader);
   }
 
+  /**
+   * Encrypt the payload with the shared SecretKey
+   * @param key secret key
+   * @return a JweJsonFlattened instance
+   * @throws IOException in case of failure to serialise the protected header to JSON
+   * @throws GeneralSecurityException in case of failure to encrypt
+   */
   public JweJsonFlattened buildJweJsonFlattened(SecretKey key) throws IOException, GeneralSecurityException {
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
         protectedHeader, unprotectedHeader);
   }
 
+  /**
+   * Encrypt the payload with the shared secret
+   * @param base64UrlEncodedSecret base64URL-encoded bytes of the shared secret
+   * @return a JweJsonFlattened instance
+   * @throws IOException in case of failure to serialise the protected header to JSON
+   * @throws GeneralSecurityException in case of failure to encrypt
+   */
   public JweJsonFlattened buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException,
       GeneralSecurityException {
     SecretKey key = createSecretKey(base64UrlEncodedSecret);
