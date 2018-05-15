@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>keybridge.lib</groupId>
   <artifactId>lib-jose</artifactId>
-  <version>0.2.2</version>
+  <version>0.2.3</version>
   <packaging>bundle</packaging>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,11 +38,6 @@
       <groupId>com.fasterxml.jackson.module</groupId>
       <artifactId>jackson-module-jaxb-annotations</artifactId>
       <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-      <version>${bouncycastle.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>

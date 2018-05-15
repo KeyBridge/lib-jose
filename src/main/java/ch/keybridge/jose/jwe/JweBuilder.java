@@ -17,8 +17,8 @@ public class JweBuilder {
   /**
    * Default algorithms
    */
-  private static final EEncryptionAlgo CONTENT_ENC_ALGO = EEncryptionAlgo.A256GCM;
-  private static final EKeyManagementAlgorithm KEY_MGMT_ALGO_ASYM = EKeyManagementAlgorithm.RSA_OAEP;
+  private static final EEncryptionAlgo CONTENT_ENC_ALGO = EEncryptionAlgo.A128CBC_HS256;
+  private static final EKeyManagementAlgorithm KEY_MGMT_ALGO_ASYM = EKeyManagementAlgorithm.RSA1_5;
 
   private EEncryptionAlgo encryptionAlgo = CONTENT_ENC_ALGO;
   /**
@@ -55,7 +55,7 @@ public class JweBuilder {
    * @param key non-nul SecretKey instance
    * @return
    */
-  private static EKeyManagementAlgorithm resolveSecretKeyAlgorithm(SecretKey key) {
+  private static EKeyManagementAlgorithm resolveKeyManagementAlgorithm(SecretKey key) {
     switch (key.getEncoded().length) {
       case 16:
         return EKeyManagementAlgorithm.A128KW;
@@ -105,7 +105,7 @@ public class JweBuilder {
   }
 
   public JweJsonFlattened buildJweJsonFlattened(SecretKey key) throws IOException, GeneralSecurityException {
-    keyMgmtAlgo = resolveSecretKeyAlgorithm(key);
+    keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
         protectedHeader, unprotectedHeader);
   }
@@ -113,7 +113,7 @@ public class JweBuilder {
   public JweJsonFlattened buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException,
       GeneralSecurityException {
     SecretKey key = createSecretKey(base64UrlEncodedSecret);
-    keyMgmtAlgo = resolveSecretKeyAlgorithm(key);
+    keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);
   }
 }
