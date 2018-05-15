@@ -49,6 +49,10 @@ This is implemented using a configuration change. Either:
   * Uncomment line `#crypto.policy=unlimited` in `lib\security\java.security`. [Release notes](http://oracle.com/technetwork/java/javase/8u151-relnotes-3850493.html)
   * Call `Security.setProperty("crypto.policy", "unlimited")` in your application.
 
+## Examples
+
+Usage examples are available [here](examples.md). 
+
 ## JWK - JSON Web Key
 
 JSON Web Key is a data structure representing a cryptographic key with both the cryptographic data and other attributes, such as key usage.
