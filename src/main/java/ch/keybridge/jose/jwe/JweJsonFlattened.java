@@ -24,42 +24,70 @@ import static ch.keybridge.jose.util.Base64Utility.*;
 import static ch.keybridge.jose.util.JsonMarshaller.fromJson;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
+/**
+ * 7.2.2.  Flattened JWE JSON Serialization Syntax
+ * <p>
+ * The flattened JWE JSON Serialization syntax is based upon the general
+ * syntax, but flattens it, optimizing it for the single-recipient case.
+ * It flattens it by removing the "recipients" member and instead
+ * placing those members defined for use in the "recipients" array (the
+ * "header" and "encrypted_key" members) in the top-level JSON object
+ * (at the same level as the "ciphertext" member).
+ * <p>
+ * The "recipients" member MUST NOT be present when using this syntax.
+ * Other than this syntax difference, JWE JSON Serialization objects
+ * using the flattened syntax are processed identically to those using
+ * the general syntax.
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JweJsonFlattened {
-
+  /**
+   * Integrity-protected header contents
+   */
   @XmlElement(name = "protected", required = true)
   private JweJoseHeader protectedHeader;
-
+  /**
+   * Non-integrity-protected header contents
+   */
   @XmlElement(name = "unprotected", required = true)
   private JweJoseHeader unprotected;
-
+  /**
+   * Encrypted key contents
+   */
   @XmlElement(name = "encrypted_key")
-  @XmlJavaTypeAdapter(type=byte[].class, value = XmlAdapterByteArrayBase64Url.class)
+  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] encryptedKey;
-
+  /**
+   * Initialization vector contents
+   */
   @XmlElement(name = "iv")
-  @XmlJavaTypeAdapter(type=byte[].class, value = XmlAdapterByteArrayBase64Url.class)
+  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] initializationVector;
-
+  /**
+   * Ciphertext contents
+   */
   @XmlElement(name = "ciphertext")
-  @XmlJavaTypeAdapter(type=byte[].class, value = XmlAdapterByteArrayBase64Url.class)
+  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] ciphertext;
-
+  /**
+   * Authentication tag contents
+   */
   @XmlElement(name = "tag")
-  @XmlJavaTypeAdapter(type=byte[].class, value = XmlAdapterByteArrayBase64Url.class)
+  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] authenticationTag;
-
+  /**
+   * Additional authenticated data contents
+   */
   @XmlElement(name = "aad")
-  @XmlJavaTypeAdapter(type=byte[].class, value = XmlAdapterByteArrayBase64Url.class)
+  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] additionalAuthenticationData;
 
   public JweJsonFlattened() {
   }
 
   /**
-   *
    * Converts a JWE compact serialization string into a JWE instance
-   *
+   * <p>
    * In the JWE Compact Serialization, no JWE Shared Unprotected Header or
    * JWE Per-Recipient Unprotected Header are used.  In this case, the
    * JOSE Header and the JWE Protected Header are the same.
@@ -97,12 +125,12 @@ public class JweJsonFlattened {
   }
 
   /**
-   *
    * Creates a JWE instance for the payload using the provided public key
-   * @param payload byte array representing the data that is to be JWE-encrypted
+   *
+   * @param payload    byte array representing the data that is to be JWE-encrypted
    * @param contentEnc Content encryption algorithm
-   * @param keyMgmt key management algorithm
-   * @param key a Key instance which is used to encrypt the random data encryption key
+   * @param keyMgmt    key management algorithm
+   * @param key        a Key instance which is used to encrypt the random data encryption key
    * @return a valid JWE instance
    * @throws GeneralSecurityException thrown if requested algorithms are not available
    */
@@ -134,10 +162,20 @@ public class JweJsonFlattened {
     return jwe;
   }
 
+  /**
+   * Get the integrity-protected header
+   *
+   * @return integrity-protected header
+   */
   public JweJoseHeader getProtectedHeader() {
     return protectedHeader;
   }
 
+  /**
+   * Get the non-integrity-protected header
+   *
+   * @return non-integrity-protected header
+   */
   public JweJoseHeader getUnprotected() {
     return unprotected;
   }

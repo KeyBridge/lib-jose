@@ -25,7 +25,6 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JwsJson extends JwsJsonBase {
-//  private static final Logger LOG = Logger.getLogger(JwsJson.class.getCanonicalName());
   /**
    * The "signatures" member value MUST be an array of JSON objects.
    * Each object represents a signature or MAC over the JWS Payload and
@@ -33,7 +32,10 @@ public class JwsJson extends JwsJsonBase {
    */
   private List<JwsSignature> signatures;
 
-  public JwsJson() {
+  /**
+   * Default constructor. Used by JSON (de)serialisers.
+   */
+  private JwsJson() {
   }
 
   public JwsJson(byte[] payload, List<JwsSignature> signatures) {
@@ -41,22 +43,43 @@ public class JwsJson extends JwsJsonBase {
     this.signatures = signatures;
   }
 
+  /**
+   * Create instance from JSON string
+   *
+   * @param json JSON string
+   * @return a JwsJsonFlattened instace
+   * @throws IOException in case of failure to deserialise the JSON string
+   */
   public static JwsJson fromJson(String json) throws IOException {
     return JsonMarshaller.fromJson(json, JwsJson.class);
   }
 
+  /**
+   * Get the signatures as list
+   *
+   * @return signature list
+   */
   public List<JwsSignature> getSignatures() {
     return new ArrayList<>(signatures);
   }
 
+  /**
+   * Convert to JwsJsonFlattened. Must contain a single signature.
+   * @return a JwsJsonFlattened instance
+   */
   public JwsJsonFlattened toFlattened() {
     if (signatures.isEmpty()) throw new IllegalArgumentException("Must sign data!");
     if (signatures.size() > 1) throw new IllegalArgumentException("JWS Flattened format support only one signature.");
     JwsSignature signature = signatures.get(0);
     return new JwsJsonFlattened(
-        signature.getProtectedHeader(), signature.getUnprotectedheader(), payload, signature.getSignatureBytes());
+        signature.getProtectedHeader(), signature.getUnprotectedHeader(), payload, signature.getSignatureBytes());
   }
 
+  /**
+   * Serialise to JSON.
+   * @return JSON string
+   * @throws IOException in case of failure to serialise the object to JSON
+   */
   public String toJson() throws IOException {
     return JsonMarshaller.toJson(this);
   }

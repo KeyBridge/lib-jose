@@ -13,6 +13,29 @@ import java.security.Key;
 import java.util.Arrays;
 
 /**
+ * A content encrypter that uses AES as the block cipher and CBC mode
+ * as the mode of operation.
+ * <p>
+ * RFC 7518 § 5.2.  AES_CBC_HMAC_SHA2 Algorithms
+ * <p>
+ * This section defines a family of authenticated encryption algorithms
+ * built using a composition of AES [AES] in Cipher Block Chaining (CBC)
+ * mode [NIST.800-38A] with PKCS #7 padding operations per Section 6.3
+ * of [RFC5652] and HMAC ([RFC2104] and [SHS]) operations.  This
+ * algorithm family is called AES_CBC_HMAC_SHA2.  It also defines three
+ * instances of this family: the first using 128-bit CBC keys and HMAC
+ * SHA-256, the second using 192-bit CBC keys and HMAC SHA-384, and the
+ * third using 256-bit CBC keys and HMAC SHA-512.  Test cases for these
+ * algorithms can be found in Appendix B.
+ * These algorithms are based upon "Authenticated Encryption with AES-
+ * CBC and HMAC-SHA" [AEAD-CBC-SHA], performing the same cryptographic
+ * computations, but with the Initialization Vector (IV) and
+ * Authentication Tag values remaining separate, rather than being
+ * concatenated with the ciphertext value in the output representation.
+ * This option is discussed in Appendix B of that specification.  This
+ * algorithm family is a generalization of the algorithm family in
+ * [AEAD-CBC-SHA] and can be used to implement those algorithms.
+ * <p>
  * https://tools.ietf.org/html/rfc7516#appendix-B
  * https://tools.ietf.org/html/draft-mcgrew-aead-aes-cbc-hmac-sha2-05#appendix-B
  */

@@ -2,26 +2,24 @@ package ch.keybridge.jose.jwe;
 
 import ch.keybridge.TestFileReader;
 import ch.keybridge.TestUtil;
-import ch.keybridge.jose.jwe.encryption.AesCbcHmacSha2Encrypter;
-import ch.keybridge.jose.jwe.encryption.EEncryptionAlgo;
-import ch.keybridge.jose.jwe.encryption.Encrypter;
-import ch.keybridge.jose.jwe.encryption.EncryptionResult;
+import ch.keybridge.jose.jwe.encryption.*;
 import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
 import ch.keybridge.jose.jwk.JwkRsaPrivateKey;
 import ch.keybridge.jose.jwk.JwkSymmetricKey;
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.util.Arrays;
+import org.junit.Test;
+
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import org.junit.Test;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.util.Arrays;
 
 import static ch.keybridge.jose.util.Base64Utility.toBase64Url;
 import static ch.keybridge.jose.util.JsonMarshaller.fromJson;
@@ -708,4 +706,39 @@ public class JWETest {
 
   }
 
+  @Test
+  public void testAesGcmEncrypter() throws Exception {
+    testEncrypter(new AesGcmEncrypter(128));
+    testEncrypter(new AesGcmEncrypter(192));
+    testEncrypter(new AesGcmEncrypter(256));
+  }
+
+  @Test
+  public void testAesCbcHmacSha2Encrypter() throws Exception {
+    testEncrypter(new AesCbcHmacSha2Encrypter(AesCbcHmacSha2Encrypter.Configuration.AES_128_CBC_HMAC_SHA_256));
+    testEncrypter(new AesCbcHmacSha2Encrypter(AesCbcHmacSha2Encrypter.Configuration.AES_192_CBC_HMAC_SHA_384));
+    testEncrypter(new AesCbcHmacSha2Encrypter(AesCbcHmacSha2Encrypter.Configuration.AES_256_CBC_HMAC_SHA_512));
+  }
+
+  public void testEncrypter(Encrypter encrypter) throws GeneralSecurityException {
+    byte[] payload = ("      156, 223, 120, 156, 115, 232, 150, 209, 145, 133, 104, 112, 237, 156,\n" +
+        "      116, 250, 65, 102, 212, 210, 103, 240, 177, 61, 93, 40, 71, 231, 223,\n" +
+        "      226, 240, 157, 15, 31, 150, 89, 200, 215, 198, 203, 108, 70, 117, 66,\n" +
+        "      212, 238, 193, 205, 23, 161, 169, 218, 243, 203, 128, 214, 127, 253,\n" +
+        "      215, 139, 43, 17, 135, 103, 179, 220, 28, 2, 212, 206, 131, 158, 128,\n" +
+        "      66, 62, 240, 78, 186, 141, 125, 132, 227, 60, 137, 43, 31, 152, 199,\n" +
+        "      54, 72, 34, 212, 115, 11, 152, 101, 70, 42, 219, 233, 142, 66, 151,\n" +
+        "      250, 126, 146, 141, 216, 190, 73, 50, 177, 146, 5, 52, 247, 28, 197,\n" +
+        "      21, 59, 170, 247, 181, 89, 131, 241, 169, 182, 246, 99, 15, 36, 102").getBytes(StandardCharsets.UTF_8);
+    byte[] aad = "some additional authenticated data for testing".getBytes(StandardCharsets.UTF_8);
+
+    Key key = encrypter.generateKey();
+
+    EncryptionResult result = encrypter.encrypt(payload, null, aad, key);
+
+    assertArrayEquals(aad, result.getAad());
+
+    byte[] decrypted = encrypter.decrypt(result.getCiphertext(), result.getIv(), aad, result.getAuthTag(), key);
+    assertArrayEquals(payload, decrypted);
+  }
 }

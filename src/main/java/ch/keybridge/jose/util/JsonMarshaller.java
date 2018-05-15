@@ -48,7 +48,7 @@ public class JsonMarshaller {
   }
 
   /**
-   * Unserialize an object from JSON
+   * Deserialize an object from JSON
    *
    * @param json  json string representing the object
    * @param clazz class of target object

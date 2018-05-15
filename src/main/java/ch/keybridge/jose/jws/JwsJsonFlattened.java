@@ -67,20 +67,41 @@ public class JwsJsonFlattened extends JwsJsonBase {
     this.signature = signature;
   }
 
+  /**
+   * Create instance from JSON string
+   *
+   * @param json JSON string
+   * @return a JwsJsonFlattened instace
+   * @throws IOException in case of failure to deserialise the JSON string
+   */
+  public static JwsJsonFlattened fromJson(String json) throws IOException {
+    return JsonMarshaller.fromJson(json, JwsJsonFlattened.class);
+  }
+
+  /**
+   * Get the protected header
+   *
+   * @return protected header
+   */
   public JoseBase getProtectedHeader() {
     return protectedHeader;
   }
 
+  /**
+   * Get the unprotected header
+   *
+   * @return unprotected header
+   */
   public JoseBase getUnprotectedHeader() {
     return unprotectedHeader;
   }
 
+  /**
+   * Get the signature of HMAC bytes
+   * @return signature of HMAC bytes
+   */
   public byte[] getSignatureBytes() {
     return signature;
-  }
-
-  public JwsSignature getJwsSignature() {
-    return JwsSignature.getInstance(protectedHeader, unprotectedHeader, signature);
   }
 
   /**
@@ -104,15 +125,33 @@ public class JwsJsonFlattened extends JwsJsonBase {
         Base64Utility.toBase64Url(payload) + '.' + Base64Utility.toBase64Url(signature);
   }
 
-  public boolean isSignatureValid(String secret) throws IOException, GeneralSecurityException {
+  /**
+   * Get the signature as a JwsSignature instance
+   *
+   * @return a JwsSignature instance
+   */
+  public JwsSignature getJwsSignature() {
+    return JwsSignature.getInstance(protectedHeader, unprotectedHeader, signature);
+  }
+
+  /**
+   * Validate signature
+   *
+   * @param base64UrlEncodedSecret base64Url-encoded bytes of the shared secret
+   * @return true if the digital signature or HMAC is valid
+   * @throws IOException              in case of failure to serialise the protected header to JSON
+   * @throws GeneralSecurityException in case of failure to validate the signature
+   */
+  public boolean isSignatureValid(String base64UrlEncodedSecret) throws IOException, GeneralSecurityException {
     JwsSignature signature = getJwsSignature();
-    return signature.isValidSignature(payload, secret);
+    return signature.isValidSignature(payload, base64UrlEncodedSecret);
   }
 
-  public static JwsJsonFlattened fromJson(String json) throws IOException {
-    return JsonMarshaller.fromJson(json, JwsJsonFlattened.class);
-  }
-
+  /**
+   * Serialise to JSON.
+   * @return JSON string
+   * @throws IOException in case of failure to serialise the object to JSON
+   */
   public String toJson() throws IOException {
     return JsonMarshaller.toJson(this);
   }
