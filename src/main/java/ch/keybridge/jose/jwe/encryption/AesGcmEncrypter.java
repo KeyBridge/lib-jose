@@ -44,6 +44,7 @@ import java.util.Arrays;
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 03/01/2018
  */
+@Deprecated // May not be included in all JVMs and hence not recommended
 public class AesGcmEncrypter implements Encrypter {
   /**
    * Use of an initialization vector (IV) of size 96 bits is REQUIRED with this algorithm.
