@@ -1,6 +1,7 @@
 package ch.keybridge.jose;
 
 import ch.keybridge.jose.jwe.JweBuilder;
+import ch.keybridge.jose.jwe.JweJoseHeader;
 import ch.keybridge.jose.jwe.JweJsonFlattened;
 import ch.keybridge.jose.jws.ESignatureAlgorithm;
 import ch.keybridge.jose.jws.JwsBuilder;
@@ -108,17 +109,21 @@ public class JOSE {
     try {
       String jsonPayload = JsonMarshaller.toJson(object);
 
-      JoseCryptoHeader header = new JoseCryptoHeader();
-      header.setKid(senderId);
+      JoseCryptoHeader jwsHeader = new JoseCryptoHeader();
+      jwsHeader.setKid(senderId);
 
       JwsJsonFlattened jws = JwsBuilder.getInstance()
           .withStringPayload(jsonPayload)
-          .withProtectedHeader(header)
+          .withProtectedHeader(jwsHeader)
           .sign(senderPrivateKey, ESignatureAlgorithm.RS256)
           .buildJsonFlattened();
 
+      JweJoseHeader jweHeader = new JweJoseHeader();
+      jweHeader.setKid(senderId);
+
       return JweBuilder.getInstance()
           .withStringPayload(jws.toJson())
+          .withProtectedHeader(jweHeader)
           .buildJweJsonFlattened(publicKey)
           .toJson();
     } catch (IOException | GeneralSecurityException e) {
@@ -142,17 +147,21 @@ public class JOSE {
     try {
       String jsonPayload = JsonMarshaller.toJson(object);
 
-      JoseCryptoHeader header = new JoseCryptoHeader();
-      header.setKid(senderId);
+      JoseCryptoHeader jwsHeader = new JoseCryptoHeader();
+      jwsHeader.setKid(senderId);
 
       JwsJsonFlattened jws = JwsBuilder.getInstance()
           .withStringPayload(jsonPayload)
-          .withProtectedHeader(header)
+          .withProtectedHeader(jwsHeader)
           .sign(base64UrlEncodedSecret)
           .buildJsonFlattened();
 
+      JweJoseHeader jweHeader = new JweJoseHeader();
+      jweHeader.setKid(senderId);
+
       return JweBuilder.getInstance()
           .withStringPayload(jws.toJson())
+          .withProtectedHeader(jweHeader)
           .buildJweJsonFlattened(base64UrlEncodedSecret)
           .toJson();
     } catch (IOException | GeneralSecurityException e) {
