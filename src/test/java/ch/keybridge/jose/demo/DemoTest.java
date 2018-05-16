@@ -22,13 +22,11 @@ import java.security.KeyPairGenerator;
 public class DemoTest {
   @Test
   public void joseSignEncryptPublicPrivateKeys() throws GeneralSecurityException {
-    SasRegistrationRequest registrationRequest = new SasRegistrationRequest();
-    registrationRequest.setHardwareAddress("someHardwareAddress");
-    registrationRequest.setUrl("http://localhost:8080");
-    registrationRequest.setInet4Address("127.0.0.1");
+    System.out.println("Sign and encrypt using public/private keys\n");
+    String sampleText = "sample text to sign and encrypt";
 
     System.out.println("Original object:");
-    System.out.println(registrationRequest);
+    System.out.println(sampleText);
     System.out.println();
 
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
@@ -36,28 +34,28 @@ public class DemoTest {
     KeyPair senderKeyPair = generator.generateKeyPair();
     KeyPair recipientKeyPair = generator.generateKeyPair();
 
-    String json = JOSE.write(registrationRequest, senderKeyPair.getPrivate(), recipientKeyPair.getPublic(), "senderId");
+    String json = JOSE.write(sampleText, senderKeyPair.getPrivate(), recipientKeyPair.getPublic(), "myKeyId");
     System.out.println("Signed and encrypted JSON:");
     System.out.println(json);
     System.out.println();
 
-    SasRegistrationRequest decryptedRequest = JOSE.read(json, SasRegistrationRequest.class, recipientKeyPair
+    String decryptedRequest = JOSE.read(json, String.class, recipientKeyPair
         .getPrivate(), senderKeyPair.getPublic());
-    Assert.assertEquals(registrationRequest, decryptedRequest);
+    Assert.assertEquals(sampleText, decryptedRequest);
 
     System.out.println("Decrypted object:");
-    System.out.println(registrationRequest);
+    System.out.println(sampleText);
+    System.out.println();
   }
 
   @Test
   public void joseSignEncryptSharedSecret() throws GeneralSecurityException {
-    EscNotificationMessage message = new EscNotificationMessage();
-    message.setActive(true);
-    message.setChannelName("CBRS5");
-    message.setDpaId("DPA002");
+    System.out.println("Sign and encrypt using shared keys\n");
+
+    String sampleText = "sample text to sign and encrypt";
 
     System.out.println("Original object:");
-    System.out.println(message);
+    System.out.println(sampleText);
     System.out.println();
 
     KeyGenerator generator = KeyGenerator.getInstance("HmacSHA256");
@@ -65,33 +63,39 @@ public class DemoTest {
 
     String base64UrlEncodedSecret = Base64Utility.toBase64Url(key.getEncoded());
 
-    String json = JOSE.write(message, base64UrlEncodedSecret, "senderId");
+    String json = JOSE.write(sampleText, base64UrlEncodedSecret, "myKeyId");
     System.out.println("Signed and encrypted JSON:");
     System.out.println(json);
     System.out.println();
 
-    EscNotificationMessage decrypted = JOSE.read(json, EscNotificationMessage.class, base64UrlEncodedSecret);
+    String decrypted = JOSE.read(json, String.class, base64UrlEncodedSecret);
 
-    Assert.assertEquals(message, decrypted);
+    Assert.assertEquals(sampleText, decrypted);
 
     System.out.println("Decrypted object:");
-    System.out.println(message);
+    System.out.println(sampleText);
+    System.out.println();
   }
 
   @Test
   public void signingWithKeyedHashes() throws GeneralSecurityException, IOException {
+    System.out.println("Sign using HMAC\n");
+
+    String sampleText = "sample text to sign";
+
     KeyGenerator generator = KeyGenerator.getInstance("HmacSHA256");
     SecretKey key = generator.generateKey();
 
     String base64UrlEncodedSecret = Base64Utility.toBase64Url(key.getEncoded());
 
     String json = JwsBuilder.getInstance()
-        .withStringPayload("Some payload")
+        .withStringPayload(sampleText)
         .sign(base64UrlEncodedSecret)
         .buildJsonFlattened()
         .toJson();
 
     System.out.println(json);
+    System.out.println();
 
     /**
      * Signature validation
@@ -102,24 +106,27 @@ public class DemoTest {
 
   @Test
   public void signingWithPrivateKeys() throws GeneralSecurityException, IOException {
+    System.out.println("Sign using private key\n");
+
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
 
     KeyPair senderKeyPair = generator.generateKeyPair();
 
     String json = JwsBuilder.getInstance()
-        .withStringPayload("Some payload")
+        .withStringPayload("sample text to sign")
         .sign(senderKeyPair.getPrivate(), ESignatureAlgorithm.RS256)
         .buildJsonFlattened()
         .toJson();
 
     System.out.println(json);
     json = JwsBuilder.getInstance()
-        .withStringPayload("Some payload")
+        .withStringPayload("sample text to sign")
         .sign(senderKeyPair.getPrivate(), ESignatureAlgorithm.RS512)
         .buildJsonFlattened()
         .toJson();
 
     System.out.println(json);
+    System.out.println();
 
     /**
      * Signature validation
