@@ -34,11 +34,11 @@
     v0.2.2 - new method JOSE::unpackSignedAndEncryptedJson for use with a secret key
   </description>
   <dependencies>
-    <dependency>
+    <!--    <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>
       <artifactId>jackson-module-jaxb-annotations</artifactId>
       <version>${jackson.version}</version>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk15on</artifactId>
