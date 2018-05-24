@@ -97,7 +97,7 @@ public class JwsJsonSignatureTest {
 
     List<PublicKey> wrongPublicKeys = IntStream.range(0, 5)
         .mapToObj(i -> generator.generateKeyPair().getPublic()).collect(Collectors.toList());
-    for (ESignatureAlgorithm algorithm : asList(PS256, PS384, PS384, RS256, RS384, RS512)) {
+    for (ESignatureAlgorithm algorithm : asList(RS256, RS384, RS512)) {
       System.out.println(algorithm.getJoseAlgorithmName());
       testSingAndVerifyRSA(payload, keyPair.getPublic(), keyPair.getPrivate(), algorithm, wrongPublicKeys);
     }
@@ -142,6 +142,6 @@ public class JwsJsonSignatureTest {
         .sign(secret)
         .buildJsonFlattened();
 
-    assertTrue(jws.isSignatureValid(secret));
+    assertTrue(jws.getJwsSignature().isValidSignature(jws.getPayload(), secret));
   }
 }

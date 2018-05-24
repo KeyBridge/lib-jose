@@ -9,8 +9,40 @@ import static ch.keybridge.jose.jwe.encryption.AesCbcHmacSha2Encrypter.Configura
  * Parameter values that are defined by this specification for use with
  * JWE.
  * <p>
- * All also use a JWE Initialization Vector value and produce JWE
- * Ciphertext and JWE Authentication Tag values.
+ * All also use a JWE Initialization Vector value and produce JWE Ciphertext and JWE Authentication Tag values.
+ * <p>
+ * RFC-7518 § A.3.  Content Encryption Algorithm Identifier Cross-Reference
+ * <p>
+ * This section contains a table cross-referencing the JWE "enc"
+ * (encryption algorithm) values defined in this specification with the
+ * equivalent identifiers used by other standards and software packages.
+ * For the composite algorithms "A128CBC-HS256", "A192CBC-HS384", and
+ * "A256CBC-HS512", the corresponding AES-CBC algorithm identifiers are
+ * listed.
+ * <pre>
+ *    +-------------------------------------------------------------------+
+ *    | JWE           | XML ENC                                           |
+ *    | | JCA                                   | OID                     |
+ *    +-------------------------------------------------------------------+
+ *    | A128CBC-HS256 | http://www.w3.org/2001/04/xmlenc#aes128-cbc       |
+ *    | | AES/CBC/PKCS5Padding                  | 2.16.840.1.101.3.4.1.2  |
+ *    +-------------------------------------------------------------------+
+ *    | A192CBC-HS384 | http://www.w3.org/2001/04/xmlenc#aes192-cbc       |
+ *    | | AES/CBC/PKCS5Padding                  | 2.16.840.1.101.3.4.1.22 |
+ *    +-------------------------------------------------------------------+
+ *    | A256CBC-HS512 | http://www.w3.org/2001/04/xmlenc#aes256-cbc       |
+ *    | | AES/CBC/PKCS5Padding                  | 2.16.840.1.101.3.4.1.42 |
+ *    +-------------------------------------------------------------------+
+ *    | A128GCM       | http://www.w3.org/2009/xmlenc11#aes128-gcm        |
+ *    | | AES/GCM/NoPadding                     | 2.16.840.1.101.3.4.1.6  |
+ *    +-------------------------------------------------------------------+
+ *    | A192GCM       | http://www.w3.org/2009/xmlenc11#aes192-gcm        |
+ *    | | AES/GCM/NoPadding                     | 2.16.840.1.101.3.4.1.26 |
+ *    +-------------------------------------------------------------------+
+ *    | A256GCM       | http://www.w3.org/2009/xmlenc11#aes256-gcm        |
+ *    | | AES/GCM/NoPadding                     | 2.16.840.1.101.3.4.1.46 |
+ *    +-------------------------------------------------------------------+
+ *    </pre>
  */
 public enum EEncryptionAlgo {
   /**

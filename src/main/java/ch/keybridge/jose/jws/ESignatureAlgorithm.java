@@ -47,15 +47,15 @@ public enum ESignatureAlgorithm {
   /**
    * RSASSA-PSS using SHA-256 and MGF1 with SHA-256
    */
-  PS256("PS256", "SHA256withRSAandMGF1"),
+//  PS256("PS256", "SHA256withRSAandMGF1"),
   /**
    * RSASSA-PSS using SHA-384 and MGF1 with SHA-384
    */
-  PS384("PS384", "SHA384withRSAandMGF1"),
+//  PS384("PS384", "SHA384withRSAandMGF1"),
   /**
    * RSASSA-PSS using SHA-512 and MGF1 with SHA-512
    */
-  PS512("PS512", "SHA512withRSAandMGF1"),
+//  PS512("PS512", "SHA512withRSAandMGF1"),
   /**
    * No digital signature or MAC performed
    */

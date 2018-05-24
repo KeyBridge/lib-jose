@@ -52,7 +52,9 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 /**
- * Developer note: t
+ * Developer note: When deserialising from JSON, ignore unknown fields without throwing exceptions.
+ * @see
+ * <a href="https://fasterxml.github.io/jackson-annotations/javadoc/2.6/com/fasterxml/jackson/annotation/JsonIgnoreProperties.html#ignoreUnknown()">ignoreUnknown</a>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JoseBase {
