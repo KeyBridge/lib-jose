@@ -6,19 +6,19 @@ The standard provides a general approach to signing and encryption of any conten
 
 It consists of several RFCs:
 
- * [7515 JWS](./doc/rfc7515.pdf)    JSON Web Signature, describes producing and handling signed messages
- * [7516 JWE](./doc/rfc7516.pdf)    JSON Web Encryption, describes producting and handling encrypted messages
- * [7517 JWK](./doc/rfc7517.pdf)    JSON Web Key, describes format and handling of cryptographic keys in JOSE
- * [7518 JWA](./doc/rfc7518.pdf)    JSON Web Algorithms, describes cryptographic algorithms used in JOSE
- * [7519 JWT](./doc/rfc7519.pdf)    JSON Web Token, describes representation of claims encoded in JSON and protected by JWS or JWE
+ * [7515 JWS](https://tools.ietf.org/html/rfc7515)    JSON Web Signature, describes producing and handling signed messages
+ * [7516 JWE](https://tools.ietf.org/html/rfc7516)    JSON Web Encryption, describes producting and handling encrypted messages
+ * [7517 JWK](https://tools.ietf.org/html/rfc7517)    JSON Web Key, describes format and handling of cryptographic keys in JOSE
+ * [7518 JWA](https://tools.ietf.org/html/rfc7518)    JSON Web Algorithms, describes cryptographic algorithms used in JOSE
+ * [7519 JWT](https://tools.ietf.org/html/rfc7519)    JSON Web Token, describes representation of claims encoded in JSON and protected by JWS or JWE
 
 plus
 
- * [7797 JUP](./doc/rfc7797.pdf)    JSON Web Signature for Unencoded Payloads
+ * [7797 JUP](https://tools.ietf.org/html/rfc7797)    JSON Web Signature for Unencoded Payloads
 
 A number of examples are defined in: 
  
- * [7520 JOSE](./doc/rfc7520.pdf)    Examples of Protecting Content Using JOSE
+ * [7520 JOSE](https://tools.ietf.org/html/rfc7520)    Examples of Protecting Content Using JOSE
 
 ## Installation
 

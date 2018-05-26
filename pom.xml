@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>keybridge.lib</groupId>
   <artifactId>jose</artifactId>
-  <version>0.3.0</version>
+  <version>0.4.0</version>
   <packaging>jar</packaging>
 
   <name>lib-jose</name>
@@ -28,6 +28,8 @@
     v0.2.1 - JwsJsonFlattened signature validation method added
     v0.2.2 - new method JOSE::unpackSignedAndEncryptedJson for use with a secret key
     v0.3.0 - package a JAR, not OSGI bundle
+    v0.4.0 - refactor into org.ietf base package
+
 
   </description>
 
