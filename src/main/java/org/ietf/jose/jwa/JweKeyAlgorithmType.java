@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlEnumValue;
  * of possible algorithms. This enumerated set is limited to instances known to
  * work in all JVM distributions.
  */
-public enum JWEKeyAlgorithmType {
+public enum JweKeyAlgorithmType {
 
   /**
    * 4.2. Key Encryption with RSAES-PKCS1-v1_5
@@ -132,13 +132,13 @@ public enum JWEKeyAlgorithmType {
    */
   private final AlgorithmParameterSpec additionalParameters;
 
-  JWEKeyAlgorithmType(String joseAlgorithmName, String javaAlgorithmName, AlgorithmParameterSpec additionalParameters) {
+  JweKeyAlgorithmType(String joseAlgorithmName, String javaAlgorithmName, AlgorithmParameterSpec additionalParameters) {
     this.joseAlgorithmName = joseAlgorithmName;
     this.javaAlgorithmName = javaAlgorithmName;
     this.additionalParameters = additionalParameters;
   }
 
-  JWEKeyAlgorithmType(String joseAlgorithmName, String javaAlgorithmName) {
+  JweKeyAlgorithmType(String joseAlgorithmName, String javaAlgorithmName) {
     this(joseAlgorithmName, javaAlgorithmName, null);
   }
 
@@ -151,11 +151,11 @@ public enum JWEKeyAlgorithmType {
    * @param alg
    * @return
    */
-  public static JWEKeyAlgorithmType resolveAlgorithm(String alg) {
+  public static JweKeyAlgorithmType resolveAlgorithm(String alg) {
     if (alg == null || alg.isEmpty()) {
       return UNSUPPORTED;
     }
-    for (JWEKeyAlgorithmType algorithm : JWEKeyAlgorithmType.values()) {
+    for (JweKeyAlgorithmType algorithm : JweKeyAlgorithmType.values()) {
       if (alg.equals(algorithm.joseAlgorithmName)) {
         return algorithm;
       }

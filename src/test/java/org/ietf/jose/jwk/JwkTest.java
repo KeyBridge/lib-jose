@@ -1,5 +1,7 @@
 package org.ietf.jose.jwk;
 
+import org.ietf.jose.jwk.key.EcKey;
+import org.ietf.jose.jwk.key.RsaPrivateKey;
 import java.io.IOException;
 import java.math.BigInteger;
 import org.ietf.TestFileReader;

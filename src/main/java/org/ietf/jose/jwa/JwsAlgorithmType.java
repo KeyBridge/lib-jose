@@ -7,7 +7,7 @@ package org.ietf.jose.jwa;
  * defined by this specification for use with JWS, each of which is explained in
  * more detail in the following sections:
  */
-public enum JWSAlgorithmType {
+public enum JwsAlgorithmType {
   /**
    * HMAC using SHA-256 (Required)
    */
@@ -88,16 +88,16 @@ public enum JWSAlgorithmType {
    */
   private final String javaAlgorithmName;
 
-  JWSAlgorithmType(String joseAlgorithmName, String javaAlgorithmName) {
+  JwsAlgorithmType(String joseAlgorithmName, String javaAlgorithmName) {
     this.joseAlgorithmName = joseAlgorithmName;
     this.javaAlgorithmName = javaAlgorithmName;
   }
 
-  public static JWSAlgorithmType resolveAlgorithm(String alg) {
+  public static JwsAlgorithmType resolveAlgorithm(String alg) {
     if (alg == null || alg.isEmpty()) {
       return UNKNOWN;
     }
-    for (JWSAlgorithmType algorithm : JWSAlgorithmType.values()) {
+    for (JwsAlgorithmType algorithm : JwsAlgorithmType.values()) {
       if (alg.equals(algorithm.joseAlgorithmName)) {
         return algorithm;
       }

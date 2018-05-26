@@ -15,24 +15,24 @@
  */
 package org.ietf.jose.adapter;
 
-import org.ietf.jose.jwk.WktX509Certificate;
+import org.ietf.jose.jws.X509CertificateHeader;
 import java.util.Base64;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * Converts WktX509Certificate instances into Base64URL-encoded strings and vice
- * versa
+ * Converts X509CertificateHeader instances into Base64URL-encoded strings and vice
+ versa
  */
-public class XmlAdapterX509Certificate extends XmlAdapter<String, WktX509Certificate> {
+public class XmlAdapterX509Certificate extends XmlAdapter<String, X509CertificateHeader> {
 
   @Override
-  public String marshal(WktX509Certificate v) {
+  public String marshal(X509CertificateHeader v) {
     return v.toString();
   }
 
   @Override
-  public WktX509Certificate unmarshal(String v) {
-    WktX509Certificate certificate = new WktX509Certificate();
+  public X509CertificateHeader unmarshal(String v) {
+    X509CertificateHeader certificate = new X509CertificateHeader();
     certificate.data = Base64.getDecoder().decode(v);
     return certificate;
   }

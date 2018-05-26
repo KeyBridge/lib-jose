@@ -18,14 +18,14 @@ import org.ietf.jose.jwk.JWK;
  * Parameter space; when a parameter is used by both specifications, its usage
  * must be compatible between the specifications.
  * <p>
- * A subtype of JoseBase which contains encryption-related fields used across
- * JWS and JWE.
+ * A subtype of AbstractJoseObject which contains encryption-related fields used
+ * across JWS and JWE.
  *
  * @see <a href="doc/jose-header.pdf">JOSE header type diagram</a>
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 02/01/2018
  */
-public class JoseCryptoHeader extends JoseBase {
+public class JoseCryptoHeader extends AbstractJoseObject {
 
   /**
    * 4.1.2. "jku" (JWK Set URL) Header Parameter

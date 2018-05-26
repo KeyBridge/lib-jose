@@ -2,14 +2,13 @@ package org.ietf.jose.jwe;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.JoseBase;
+import org.ietf.jose.AbstractJoseObject;
 import org.ietf.jose.adapter.XmlAdapterEContentEncryptionAlgorithm;
-import org.ietf.jose.jwa.JWEEncryptionAlgorithmType;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 
 /**
- * RFC 7516
+ * RFC 7516 JSON Web Encryption (JWE)
  * <p>
  * 4. JOSE Header
  * <p>
@@ -48,7 +47,7 @@ import org.ietf.jose.jwa.JWEEncryptionAlgorithmType;
  * @author Key Bridge
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JoseHeader extends JoseBase {
+public class JoseHeader extends AbstractJoseObject {
 
   /**
    * 4.1.2. "enc" (Encryption Algorithm) Header Parameter
@@ -70,9 +69,8 @@ public class JoseHeader extends JoseBase {
    * initial contents of this registry are the values defined in Section 5.1 of
    * [JWA].
    */
-  @XmlElement(name = "enc")
-  @XmlJavaTypeAdapter(type = JWEEncryptionAlgorithmType.class, value = XmlAdapterEContentEncryptionAlgorithm.class)
-  private JWEEncryptionAlgorithmType contentEncryptionAlgorithm;
+  @XmlJavaTypeAdapter(type = JweEncryptionAlgorithmType.class, value = XmlAdapterEContentEncryptionAlgorithm.class)
+  private JweEncryptionAlgorithmType enc;
 
   /**
    * 4.1.3. "zip" (Compression Algorithm) Header Parameter
@@ -91,16 +89,24 @@ public class JoseHeader extends JoseBase {
    * Parameter is OPTIONAL. This Header Parameter MUST be understood and
    * processed by implementations.
    */
-  @XmlElement(name = "zip")
-  private String compressionAlgorithm;
+  private String zip;
 
-  public JWEEncryptionAlgorithmType getContentEncryptionAlgorithm() {
-    return contentEncryptionAlgorithm;
+  //<editor-fold defaultstate="collapsed" desc="Getter and Setter">
+  public JweEncryptionAlgorithmType getEnc() {
+    return enc;
   }
 
-  public void setContentEncryptionAlgorithm(JWEEncryptionAlgorithmType contentEncryptionAlgorithm) {
-    this.contentEncryptionAlgorithm = contentEncryptionAlgorithm;
+  public void setEnc(JweEncryptionAlgorithmType enc) {
+    this.enc = enc;
   }
+
+  public String getZip() {
+    return zip;
+  }
+
+  public void setZip(String zip) {
+    this.zip = zip;
+  }//</editor-fold>
 
   @Override
   public boolean equals(Object o) {
@@ -113,11 +119,11 @@ public class JoseHeader extends JoseBase {
 
     JoseHeader that = (JoseHeader) o;
 
-    return contentEncryptionAlgorithm == that.contentEncryptionAlgorithm;
+    return enc == that.enc;
   }
 
   @Override
   public int hashCode() {
-    return contentEncryptionAlgorithm != null ? contentEncryptionAlgorithm.hashCode() : 0;
+    return enc != null ? enc.hashCode() : 0;
   }
 }

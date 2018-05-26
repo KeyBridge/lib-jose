@@ -1,8 +1,8 @@
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JWSAlgorithmType;
+import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.TestUtil;
-import org.ietf.jose.jwk.SymmetricKey;
+import org.ietf.jose.jwk.key.SymmetricKey;
 import org.ietf.jose.util.CryptographyUtility;
 import org.junit.Test;
 
@@ -174,7 +174,7 @@ public class JwsJsonTest {
      */
     final String expectedSignature = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
     assertEquals(expectedSignature, toBase64Url(hmac));
-    key.setAlg(JWSAlgorithmType.HS256.getJoseAlgorithmName());
+    key.setAlg(JwsAlgorithmType.HS256.getJoseAlgorithmName());
     /**
      * Check whether the EncryptionUtility returns the same result
      */

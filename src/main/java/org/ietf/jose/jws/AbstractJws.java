@@ -21,7 +21,7 @@ import org.ietf.jose.util.Base64Utility;
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 02/01/2018
  */
-public class JwsJsonBase {
+public abstract class AbstractJws {
 
   /**
    * The "payload" member MUST be present and contain the value BASE64URL(JWS

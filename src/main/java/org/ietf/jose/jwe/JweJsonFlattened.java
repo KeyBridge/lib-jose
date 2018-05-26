@@ -2,9 +2,9 @@ package org.ietf.jose.jwe;
 
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.jwe.encryption.Encrypter;
-import org.ietf.jose.jwa.JWEEncryptionAlgorithmType;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwe.encryption.EncryptionResult;
-import org.ietf.jose.jwa.JWEKeyAlgorithmType;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
 import java.io.IOException;
@@ -140,8 +140,8 @@ public class JweJsonFlattened {
    *                                  available
    */
   public static JweJsonFlattened getInstance(final byte[] payload,
-                                             final JWEEncryptionAlgorithmType contentEnc,
-                                             JWEKeyAlgorithmType keyMgmt,
+                                             final JweEncryptionAlgorithmType contentEnc,
+                                             JweKeyAlgorithmType keyMgmt,
                                              Key key,
                                              JoseHeader protectedHeader,
                                              JoseHeader uprotected) throws IOException, GeneralSecurityException {
@@ -151,7 +151,7 @@ public class JweJsonFlattened {
      * content and the content encryption key are encrypted
      */
     protectedHeader.setAlg(keyMgmt.getJoseAlgorithmName());
-    protectedHeader.setContentEncryptionAlgorithm(contentEnc);
+    protectedHeader.setEnc(contentEnc);
     jwe.protectedHeader = protectedHeader;
 
     jwe.unprotected = uprotected;
@@ -216,7 +216,7 @@ public class JweJsonFlattened {
   }
 
   public byte[] decryptPayload(Key key) throws GeneralSecurityException {
-    final JWEKeyAlgorithmType keyManagementAlgorithm = JWEKeyAlgorithmType.resolveAlgorithm(protectedHeader
+    final JweKeyAlgorithmType keyManagementAlgorithm = JweKeyAlgorithmType.resolveAlgorithm(protectedHeader
       .getAlg());
     final SecretKey aesKey = (SecretKey) CryptographyUtility.unwrapKey(encryptedKey, key, keyManagementAlgorithm
                                                                        .getJavaAlgorithm(), "AES"); //todo
@@ -225,7 +225,7 @@ public class JweJsonFlattened {
      * into the Java installation security directory
      * https://stackoverflow.com/questions/6481627/java-security-illegal-key-size-or-default-parameters
      */
-    Encrypter encrypter = protectedHeader.getContentEncryptionAlgorithm().getEncrypter();
+    Encrypter encrypter = protectedHeader.getEnc().getEncrypter();
     return encrypter.decrypt(ciphertext, initializationVector, additionalAuthenticationData, authenticationTag, aesKey);
   }
 

@@ -1,11 +1,11 @@
 package org.ietf.jose.jwa;
 
 import javax.xml.bind.annotation.XmlEnumValue;
-import org.ietf.jose.jwe.encryption.AesCbcHmacSha2Encrypter;
+import org.ietf.jose.jwe.encryption.DefaultEncrypter;
 import org.ietf.jose.jwe.encryption.AesGcmEncrypter;
 import org.ietf.jose.jwe.encryption.Encrypter;
 
-import static org.ietf.jose.jwe.encryption.AesCbcHmacSha2Encrypter.Configuration.*;
+import static org.ietf.jose.jwe.encryption.DefaultEncrypter.Configuration.*;
 
 /**
  * RFC-7518
@@ -55,25 +55,25 @@ import static org.ietf.jose.jwe.encryption.AesCbcHmacSha2Encrypter.Configuration
  *    +-------------------------------------------------------------------+
  * </pre>
  */
-public enum JWEEncryptionAlgorithmType {
+public enum JweEncryptionAlgorithmType {
   /**
    * AES_128_CBC_HMAC_SHA_256 authenticated encryption algorithm, as defined in
    * RFC 7518 Section 5.2.3
    */
   @XmlEnumValue("A128CBC-HS256")
-  A128CBC_HS256("A128CBC-HS256", new AesCbcHmacSha2Encrypter(AES_128_CBC_HMAC_SHA_256)),
+  A128CBC_HS256("A128CBC-HS256", new DefaultEncrypter(AES_128_CBC_HMAC_SHA_256)),
   /**
    * AES_192_CBC_HMAC_SHA_384 authenticated encryption algorithm, as defined in
    * RFC 7518 Section 5.2.4
    */
   @XmlEnumValue("A192CBC-HS384")
-  A192CBC_HS384("A192CBC-HS384", new AesCbcHmacSha2Encrypter(AES_192_CBC_HMAC_SHA_384)),
+  A192CBC_HS384("A192CBC-HS384", new DefaultEncrypter(AES_192_CBC_HMAC_SHA_384)),
   /**
    * AES_256_CBC_HMAC_SHA_512 authenticated encryption algorithm, as defined in
    * RFC 7518 Section 5.2.5
    */
   @XmlEnumValue("A256CBC-HS512")
-  A256CBC_HS512("A256CBC-HS512", new AesCbcHmacSha2Encrypter(AES_256_CBC_HMAC_SHA_512)),
+  A256CBC_HS512("A256CBC-HS512", new DefaultEncrypter(AES_256_CBC_HMAC_SHA_512)),
   /**
    * RFC7518 § 5.3. Content Encryption with AES GCM This section defines the
    * specifics of performing authenticated encryption with AES in Galois/Counter
@@ -131,16 +131,16 @@ public enum JWEEncryptionAlgorithmType {
    */
   private final Encrypter encrypter;
 
-  JWEEncryptionAlgorithmType(String joseAlgorithmName, Encrypter encrypter) {
+  JweEncryptionAlgorithmType(String joseAlgorithmName, Encrypter encrypter) {
     this.joseAlgorithmName = joseAlgorithmName;
     this.encrypter = encrypter;
   }
 
-  public static JWEEncryptionAlgorithmType resolve(String joseAngorithm) {
+  public static JweEncryptionAlgorithmType resolve(String joseAngorithm) {
     if (joseAngorithm == null || joseAngorithm.isEmpty()) {
       return UNKNOWN;
     }
-    for (JWEEncryptionAlgorithmType algorithm : JWEEncryptionAlgorithmType.values()) {
+    for (JweEncryptionAlgorithmType algorithm : JweEncryptionAlgorithmType.values()) {
       if (joseAngorithm.equals(algorithm.joseAlgorithmName)) {
         return algorithm;
       }

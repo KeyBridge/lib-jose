@@ -1,4 +1,4 @@
-package org.ietf.jose.jwk;
+package org.ietf.jose.jws;
 
 import java.util.Arrays;
 import java.util.Base64;
@@ -23,7 +23,7 @@ import java.util.Base64;
  *
  * @author Key Bridge
  */
-public class WktX509Certificate {
+public class X509CertificateHeader {
 
   public byte[] data;
 
@@ -36,7 +36,7 @@ public class WktX509Certificate {
       return false;
     }
 
-    WktX509Certificate that = (WktX509Certificate) o;
+    X509CertificateHeader that = (X509CertificateHeader) o;
 
     return Arrays.equals(data, that.data);
   }

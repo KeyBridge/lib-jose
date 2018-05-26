@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.JoseBase;
+import org.ietf.jose.AbstractJoseObject;
 import org.ietf.jose.JoseCryptoHeader;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.util.Base64Utility;
@@ -14,10 +14,6 @@ import org.ietf.jose.util.JsonMarshaller;
 
 /**
  * RFC 7515 JSON Web Signature (JWS)
- * <p>
- * JSON Web Signature (JWS) represents content secured with digital signatures
- * or Message Authentication Codes (MACs) using JSON-based [RFC7159] data
- * structures.
  * <p>
  * 7.2.2. Flattened JWS JSON Serialization Syntax
  * <p>
@@ -45,7 +41,7 @@ import org.ietf.jose.util.JsonMarshaller;
  * Serialization syntax.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JwsJsonFlattened extends JwsJsonBase {
+public class FlattendedSignature extends AbstractJws {
 
   /**
    * The "protected" member MUST be present and contain the value
@@ -75,11 +71,13 @@ public class JwsJsonFlattened extends JwsJsonBase {
   /**
    * Default constructor; required for JSON/XML serializers
    */
-  public JwsJsonFlattened() {
+  public FlattendedSignature() {
   }
 
-  public JwsJsonFlattened(JoseCryptoHeader protectedHeader, JoseCryptoHeader unprotectedHeader, byte[] payload,
-                          byte[] signature) {
+  public FlattendedSignature(JoseCryptoHeader protectedHeader,
+                             JoseCryptoHeader unprotectedHeader,
+                             byte[] payload,
+                             byte[] signature) {
     this.protectedHeader = protectedHeader;
     this.unprotectedHeader = unprotectedHeader;
     this.payload = payload;
@@ -90,11 +88,11 @@ public class JwsJsonFlattened extends JwsJsonBase {
    * Create instance from JSON string
    *
    * @param json JSON string
-   * @return a JwsJsonFlattened instace
+   * @return a FlattendedSignature instace
    * @throws IOException in case of failure to deserialise the JSON string
    */
-  public static JwsJsonFlattened fromJson(String json) throws IOException {
-    return JsonMarshaller.fromJson(json, JwsJsonFlattened.class);
+  public static FlattendedSignature fromJson(String json) throws IOException {
+    return JsonMarshaller.fromJson(json, FlattendedSignature.class);
   }
 
   /**
@@ -102,7 +100,7 @@ public class JwsJsonFlattened extends JwsJsonBase {
    *
    * @return protected header
    */
-  public JoseBase getProtectedHeader() {
+  public AbstractJoseObject getProtectedHeader() {
     return protectedHeader;
   }
 
@@ -111,7 +109,7 @@ public class JwsJsonFlattened extends JwsJsonBase {
    *
    * @return unprotected header
    */
-  public JoseBase getUnprotectedHeader() {
+  public AbstractJoseObject getUnprotectedHeader() {
     return unprotectedHeader;
   }
 
@@ -144,12 +142,12 @@ public class JwsJsonFlattened extends JwsJsonBase {
   }
 
   /**
-   * Get the signature as a JwsJsonSignature instance
+   * Get the signature as a GeneralSignature instance
    *
-   * @return a JwsJsonSignature instance
+   * @return a GeneralSignature instance
    */
-  public JwsJsonSignature getJwsSignature() {
-    return JwsJsonSignature.getInstance(protectedHeader, unprotectedHeader, signature);
+  public GeneralSignature getJwsSignature() {
+    return GeneralSignature.getInstance(protectedHeader, unprotectedHeader, signature);
   }
 
   /**

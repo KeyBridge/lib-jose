@@ -1,6 +1,6 @@
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JWSAlgorithmType;
+import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.JoseCryptoHeader;
 import org.ietf.jose.jwk.JWK;
 import org.ietf.jose.util.Base64Utility;
@@ -21,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class JwsBuilder {
 
   private byte[] payload;
-  private List<JwsJsonSignature> signatures = new ArrayList<>();
+  private List<GeneralSignature> signatures = new ArrayList<>();
   private JoseCryptoHeader protectedHeader;
   private JoseCryptoHeader unprotectedHeader;
 
@@ -91,7 +91,7 @@ public class JwsBuilder {
    * @throws GeneralSecurityException in case of failure to sign
    */
   public JwsBuilder sign(JWK key) throws IOException, GeneralSecurityException {
-    signatures.add(JwsJsonSignature.getInstance(payload, key));
+    signatures.add(GeneralSignature.getInstance(payload, key));
     return this;
   }
 
@@ -105,12 +105,12 @@ public class JwsBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public JwsBuilder sign(Key key, JWSAlgorithmType algorithm) throws IOException, GeneralSecurityException {
+  public JwsBuilder sign(Key key, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
     if (protectedHeader == null) {
       protectedHeader = new JoseCryptoHeader();
     }
     protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
-    signatures.add(JwsJsonSignature.getInstance(payload, key, protectedHeader, unprotectedHeader));
+    signatures.add(GeneralSignature.getInstance(payload, key, protectedHeader, unprotectedHeader));
     return this;
   }
 
@@ -124,7 +124,7 @@ public class JwsBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public JwsBuilder sign(String secret, JWSAlgorithmType algorithm) throws IOException, GeneralSecurityException {
+  public JwsBuilder sign(String secret, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
     SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(secret), algorithm.getJavaAlgorithmName());
     return sign(key, algorithm);
   }
@@ -140,16 +140,16 @@ public class JwsBuilder {
    */
   public JwsBuilder sign(String secret) throws IOException, GeneralSecurityException {
     byte[] keyBytes = Base64Utility.fromBase64Url(secret);
-    JWSAlgorithmType algorithm;
+    JwsAlgorithmType algorithm;
     switch (keyBytes.length) {
       case 32:
-        algorithm = JWSAlgorithmType.HS256;
+        algorithm = JwsAlgorithmType.HS256;
         break;
       case 48:
-        algorithm = JWSAlgorithmType.HS384;
+        algorithm = JwsAlgorithmType.HS384;
         break;
       case 64:
-        algorithm = JWSAlgorithmType.HS512;
+        algorithm = JwsAlgorithmType.HS512;
         break;
       default:
         throw new IllegalArgumentException("Unsupported key length: " + keyBytes.length);
@@ -159,21 +159,21 @@ public class JwsBuilder {
   }
 
   /**
-   * Build a JwsJsonObject instance: A JWS object with one or more signatures
+   * Build a JWS instance: A JWS object with one or more signatures
    *
-   * @return a JwsJsonObject instance
+   * @return a JWS instance
    */
-  public JwsJsonObject buildJson() {
-    return new JwsJsonObject(payload, signatures);
+  public JWS buildJson() {
+    return new JWS(payload, signatures);
   }
 
   /**
-   * Build a JwsJsonFlattened instance: A JWS object with a single signature.
+   * Build a FlattendedSignature instance: A JWS object with a single signature.
    *
-   * @return a JwsJsonFlattened instance
+   * @return a FlattendedSignature instance
    */
-  public JwsJsonFlattened buildJsonFlattened() {
-    return new JwsJsonObject(payload, signatures).toFlattened();
+  public FlattendedSignature buildJsonFlattened() {
+    return new JWS(payload, signatures).toFlattened();
   }
 
   /**

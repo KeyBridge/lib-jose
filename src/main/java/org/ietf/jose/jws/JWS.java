@@ -33,24 +33,39 @@ import org.ietf.jose.util.JsonMarshaller;
  * 7.2.1. General JWS JSON Serialization Syntax The following members are
  * defined for use in top-level JSON objects used for the fully general JWS JSON
  * Serialization syntax:
+ * <p>
+ * In summary, the syntax of a JWS using the general JWS JSON Serialization is
+ * as follows:
+ * <pre>
+ * {
+ *  "payload":"<payload contents>",
+ *  "signatures":[
+ *   {"protected":"<integrity-protected header 1 contents>",
+ *    "header":<non-integrity-protected header 1 contents>,
+ *    "signature":"<signature 1 contents>"},
+ *    ...
+ *   {"protected":"<integrity-protected header N contents>",
+ *    "header":<non-integrity-protected header N contents>,
+ *    "signature":"<signature N contents>"}]
+ * }</pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JwsJsonObject extends JwsJsonBase {
+public class JWS extends AbstractJws {
 
   /**
    * The "signatures" member value MUST be an array of JSON objects. Each object
    * represents a signature or MAC over the JWS Payload and the JWS Protected
    * Header.
    */
-  private List<JwsJsonSignature> signatures;
+  private List<GeneralSignature> signatures;
 
   /**
    * Default constructor. Used by JSON (de)serialisers.
    */
-  private JwsJsonObject() {
+  private JWS() {
   }
 
-  public JwsJsonObject(byte[] payload, List<JwsJsonSignature> signatures) {
+  public JWS(byte[] payload, List<GeneralSignature> signatures) {
     this.payload = payload;
     this.signatures = signatures;
   }
@@ -59,11 +74,11 @@ public class JwsJsonObject extends JwsJsonBase {
    * Create instance from JSON string
    *
    * @param json JSON string
-   * @return a JwsJsonFlattened instace
+   * @return a FlattendedSignature instace
    * @throws IOException in case of failure to deserialise the JSON string
    */
-  public static JwsJsonObject fromJson(String json) throws IOException {
-    return JsonMarshaller.fromJson(json, JwsJsonObject.class);
+  public static JWS fromJson(String json) throws IOException {
+    return JsonMarshaller.fromJson(json, JWS.class);
   }
 
   /**
@@ -71,24 +86,24 @@ public class JwsJsonObject extends JwsJsonBase {
    *
    * @return signature list
    */
-  public List<JwsJsonSignature> getSignatures() {
+  public List<GeneralSignature> getSignatures() {
     return new ArrayList<>(signatures);
   }
 
   /**
-   * Convert to JwsJsonFlattened. Must contain a single signature.
+   * Convert to FlattendedSignature. Must contain a single signature.
    *
-   * @return a JwsJsonFlattened instance
+   * @return a FlattendedSignature instance
    */
-  public JwsJsonFlattened toFlattened() {
+  public FlattendedSignature toFlattened() {
     if (signatures.isEmpty()) {
       throw new IllegalArgumentException("Must sign data!");
     }
     if (signatures.size() > 1) {
       throw new IllegalArgumentException("JWS Flattened format support only one signature.");
     }
-    JwsJsonSignature signature = signatures.get(0);
-    return new JwsJsonFlattened(
+    GeneralSignature signature = signatures.get(0);
+    return new FlattendedSignature(
       signature.getProtectedHeader(), signature.getUnprotectedHeader(), payload, signature.getSignatureBytes());
   }
 
@@ -111,7 +126,7 @@ public class JwsJsonObject extends JwsJsonBase {
       return false;
     }
 
-    JwsJsonObject jwsJson = (JwsJsonObject) o;
+    JWS jwsJson = (JWS) o;
 
     if (payload != null ? !Arrays.equals(payload, jwsJson.payload) : jwsJson.payload != null) {
       return false;

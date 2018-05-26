@@ -1,10 +1,11 @@
-package org.ietf.jose.jwk;
+package org.ietf.jose.jwk.key;
 
 import java.util.Arrays;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.jwk.JWK;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)

@@ -1,4 +1,4 @@
-package org.ietf.jose.jwk;
+package org.ietf.jose.jwk.key;
 
 import java.math.BigInteger;
 import java.security.KeyFactory;

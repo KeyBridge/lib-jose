@@ -1,4 +1,4 @@
-package org.ietf.jose.jwk;
+package org.ietf.jose.jwk.key;
 
 import java.math.BigInteger;
 import java.security.KeyFactory;
@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
+import org.ietf.jose.jwk.JWK;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)

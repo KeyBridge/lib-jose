@@ -1,10 +1,10 @@
 package org.ietf.jose.util;
 
 import org.ietf.jose.jwk.JWK;
-import org.ietf.jose.jwk.EcKey;
-import org.ietf.jose.jwk.RsaPrivateKey;
-import org.ietf.jose.jwk.SymmetricKey;
-import org.ietf.jose.jwa.JWSAlgorithmType;
+import org.ietf.jose.jwk.key.EcKey;
+import org.ietf.jose.jwk.key.RsaPrivateKey;
+import org.ietf.jose.jwk.key.SymmetricKey;
+import org.ietf.jose.jwa.JwsAlgorithmType;
 import java.security.*;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
@@ -212,7 +212,7 @@ public class CryptographyUtility {
    * @throws GeneralSecurityException in case of failure
    */
   public static byte[] sign(byte[] payloadBytes, JWK jwk) throws GeneralSecurityException {
-    final JWSAlgorithmType algorithm = JWSAlgorithmType.resolveAlgorithm(jwk.getAlg());
+    final JwsAlgorithmType algorithm = JwsAlgorithmType.resolveAlgorithm(jwk.getAlg());
     if (jwk instanceof SymmetricKey) {
       SymmetricKey symmetricKey = (SymmetricKey) jwk;
       return sign(payloadBytes, new SecretKeySpec(symmetricKey.getK(), algorithm.getJavaAlgorithmName()), algorithm

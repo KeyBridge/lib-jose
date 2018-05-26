@@ -1,9 +1,9 @@
 package org.ietf.jose.demo;
 
 import org.ietf.jose.JOSE;
-import org.ietf.jose.jwa.JWSAlgorithmType;
+import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jws.JwsBuilder;
-import org.ietf.jose.jws.JwsJsonFlattened;
+import org.ietf.jose.jws.FlattendedSignature;
 import org.ietf.jose.util.Base64Utility;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -100,7 +100,7 @@ public class DemoTest {
     /**
      * Signature validation
      */
-    JwsJsonFlattened jws = JwsJsonFlattened.fromJson(json);
+    FlattendedSignature jws = FlattendedSignature.fromJson(json);
     Assert.assertTrue(jws.getJwsSignature().isValidSignature(jws.getPayload(), base64UrlEncodedSecret));
   }
 
@@ -114,14 +114,14 @@ public class DemoTest {
 
     String json = JwsBuilder.getInstance()
       .withStringPayload("sample text to sign")
-      .sign(senderKeyPair.getPrivate(), JWSAlgorithmType.RS256)
+      .sign(senderKeyPair.getPrivate(), JwsAlgorithmType.RS256)
       .buildJsonFlattened()
       .toJson();
 
     System.out.println(json);
     json = JwsBuilder.getInstance()
       .withStringPayload("sample text to sign")
-      .sign(senderKeyPair.getPrivate(), JWSAlgorithmType.RS512)
+      .sign(senderKeyPair.getPrivate(), JwsAlgorithmType.RS512)
       .buildJsonFlattened()
       .toJson();
 
@@ -131,7 +131,7 @@ public class DemoTest {
     /**
      * Signature validation
      */
-    JwsJsonFlattened jws = JwsJsonFlattened.fromJson(json);
+    FlattendedSignature jws = FlattendedSignature.fromJson(json);
     Assert.assertTrue(jws.getJwsSignature().isValidSignature(jws.getPayload(), senderKeyPair.getPublic()));
   }
 }

@@ -15,22 +15,22 @@
  */
 package org.ietf.jose.adapter;
 
-import org.ietf.jose.jwa.JWEEncryptionAlgorithmType;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * Converts EContentEncyptionAlgorithm enum values into Base64URL-encoded
  * strings and vice versa
  */
-public class XmlAdapterEContentEncryptionAlgorithm extends XmlAdapter<String, JWEEncryptionAlgorithmType> {
+public class XmlAdapterEContentEncryptionAlgorithm extends XmlAdapter<String, JweEncryptionAlgorithmType> {
 
   @Override
-  public String marshal(JWEEncryptionAlgorithmType v) {
+  public String marshal(JweEncryptionAlgorithmType v) {
     return v.getJoseAlgorithmName();
   }
 
   @Override
-  public JWEEncryptionAlgorithmType unmarshal(String v) {
-    return JWEEncryptionAlgorithmType.resolve(v);
+  public JweEncryptionAlgorithmType unmarshal(String v) {
+    return JweEncryptionAlgorithmType.resolve(v);
   }
 }

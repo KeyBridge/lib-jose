@@ -3,9 +3,9 @@ package org.ietf.jose;
 import org.ietf.jose.jwe.JweBuilder;
 import org.ietf.jose.jwe.JoseHeader;
 import org.ietf.jose.jwe.JweJsonFlattened;
-import org.ietf.jose.jwa.JWSAlgorithmType;
+import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jws.JwsBuilder;
-import org.ietf.jose.jws.JwsJsonFlattened;
+import org.ietf.jose.jws.FlattendedSignature;
 import org.ietf.jose.util.JsonMarshaller;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -45,7 +45,7 @@ public class JOSE {
       JweJsonFlattened jwe = JsonMarshaller.fromJson(json, JweJsonFlattened.class);
       String payload = jwe.decryptAsString(receiverKey);
 
-      JwsJsonFlattened jws = JsonMarshaller.fromJson(payload, JwsJsonFlattened.class);
+      FlattendedSignature jws = JsonMarshaller.fromJson(payload, FlattendedSignature.class);
 
       /**
        * The payload is rejected if the digital signature cannot be validated.
@@ -83,7 +83,7 @@ public class JOSE {
       /**
        * The payload is rejected if the digital signature cannot be validated.
        */
-      JwsJsonFlattened jws = JsonMarshaller.fromJson(payload, JwsJsonFlattened.class);
+      FlattendedSignature jws = JsonMarshaller.fromJson(payload, FlattendedSignature.class);
 
       boolean signatureValid = jws.getJwsSignature().isValidSignature(jws.getPayload(), base64UrlEncodedSecret);
       if (!signatureValid) {
@@ -119,10 +119,10 @@ public class JOSE {
       JoseCryptoHeader jwsHeader = new JoseCryptoHeader();
       jwsHeader.setKid(senderId);
 
-      JwsJsonFlattened jws = JwsBuilder.getInstance()
+      FlattendedSignature jws = JwsBuilder.getInstance()
         .withStringPayload(jsonPayload)
         .withProtectedHeader(jwsHeader)
-        .sign(senderPrivateKey, JWSAlgorithmType.RS256)
+        .sign(senderPrivateKey, JwsAlgorithmType.RS256)
         .buildJsonFlattened();
 
       JoseHeader jweHeader = new JoseHeader();
@@ -161,7 +161,7 @@ public class JOSE {
       JoseCryptoHeader jwsHeader = new JoseCryptoHeader();
       jwsHeader.setKid(senderId);
 
-      JwsJsonFlattened jws = JwsBuilder.getInstance()
+      FlattendedSignature jws = JwsBuilder.getInstance()
         .withStringPayload(jsonPayload)
         .withProtectedHeader(jwsHeader)
         .sign(base64UrlEncodedSecret)

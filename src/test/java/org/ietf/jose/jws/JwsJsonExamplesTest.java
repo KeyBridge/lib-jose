@@ -1,8 +1,8 @@
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JWSAlgorithmType;
+import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.TestFileReader;
-import org.ietf.jose.jwk.RsaPrivateKey;
+import org.ietf.jose.jwk.key.RsaPrivateKey;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class JwsJsonExamplesTest {
     byte[] signatureBytes = signer.sign();
     final String expectedSignature = "MRjdkly7_-oTPTS3AXP41iQIGKa80A0ZmTuV5MEaHoxnW2e5CZ5NlKtainoFmKZopdHM1O2U4mwzJdQx996ivp83xuglII7PNDi84wnB-BDkoBwA78185hX-Es4JIwmDLJK3lfWRa-XtL0RnltuYv746iYTh_qHRD68BNt1uSNCrUCTJDt5aAE6x8wW1Kt9eRo4QPocSadnHXFxnt8Is9UzpERV0ePPQdLuW3IS_de3xyIrDaLGdjluPxUAhb6L2aXic1U12podGU0KLUQSE_oI-ZnmKJ3F4uOZDnd6QZWJushZ41Axf_fcIe8u9ipH84ogoree7vjbU5y18kDquDg";
     assertEquals(expectedSignature, toBase64Url(signatureBytes));
-    key.setAlg(JWSAlgorithmType.RS256.getJoseAlgorithmName());
+    key.setAlg(JwsAlgorithmType.RS256.getJoseAlgorithmName());
     /**
      * Check whether the EncryptionUtility returns the same result
      */

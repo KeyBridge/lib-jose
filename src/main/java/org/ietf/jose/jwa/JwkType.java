@@ -46,7 +46,7 @@ package org.ietf.jose.jwa;
  *
  * @author Key Bridge
  */
-public enum JWKType {
+public enum JwkType {
   /**
    * Elliptic Curve [DSS] (Recommended+)
    * <p>

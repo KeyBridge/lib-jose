@@ -5,8 +5,8 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import org.ietf.jose.jwa.JWEEncryptionAlgorithmType;
-import org.ietf.jose.jwa.JWEKeyAlgorithmType;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.util.Base64Utility;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -32,16 +32,16 @@ public class JweBuilder {
   /**
    * Default algorithms
    */
-  private static final JWEEncryptionAlgorithmType CONTENT_ENC_ALGO = JWEEncryptionAlgorithmType.A128CBC_HS256;
-  private static final JWEKeyAlgorithmType KEY_MGMT_ALGO_ASYM = JWEKeyAlgorithmType.RSA1_5;
+  private static final JweEncryptionAlgorithmType CONTENT_ENC_ALGO = JweEncryptionAlgorithmType.A128CBC_HS256;
+  private static final JweKeyAlgorithmType KEY_MGMT_ALGO_ASYM = JweKeyAlgorithmType.RSA1_5;
 
-  private JWEEncryptionAlgorithmType encryptionAlgo = CONTENT_ENC_ALGO;
+  private JweEncryptionAlgorithmType encryptionAlgo = CONTENT_ENC_ALGO;
   /**
    * Cannot set a default Key Management algorithm at this point because we
    * don't know if a symmetric or asymmetric key will be used for payload
    * encryption.
    */
-  private JWEKeyAlgorithmType keyMgmtAlgo;
+  private JweKeyAlgorithmType keyMgmtAlgo;
   private JoseHeader protectedHeader = new JoseHeader();
   private JoseHeader unprotectedHeader;
   private byte[] payload;
@@ -75,16 +75,16 @@ public class JweBuilder {
    * keys.
    *
    * @param key non-nul SecretKey instance
-   * @return JWEKeyAlgorithmType
+   * @return JweKeyAlgorithmType
    */
-  private static JWEKeyAlgorithmType resolveKeyManagementAlgorithm(SecretKey key) {
+  private static JweKeyAlgorithmType resolveKeyManagementAlgorithm(SecretKey key) {
     switch (key.getEncoded().length) {
       case 16:
-        return JWEKeyAlgorithmType.A128KW;
+        return JweKeyAlgorithmType.A128KW;
       case 24:
-        return JWEKeyAlgorithmType.A192KW;
+        return JweKeyAlgorithmType.A192KW;
       case 32:
-        return JWEKeyAlgorithmType.A256KW;
+        return JweKeyAlgorithmType.A256KW;
       default:
         throw new IllegalArgumentException("Key length not 128/192/256 bits.");
     }
@@ -137,10 +137,10 @@ public class JweBuilder {
   /**
    * Set the encryption algorithm
    *
-   * @param algorithm JWEEncryptionAlgorithmType
+   * @param algorithm JweEncryptionAlgorithmType
    * @return this builder
    */
-  public JweBuilder withEncryptionAlgorithm(JWEEncryptionAlgorithmType algorithm) {
+  public JweBuilder withEncryptionAlgorithm(JweEncryptionAlgorithmType algorithm) {
     encryptionAlgo = algorithm;
     return this;
   }
@@ -148,10 +148,10 @@ public class JweBuilder {
   /**
    * Set the key management algorithm
    *
-   * @param algorithm JWEKeyAlgorithmType
+   * @param algorithm JweKeyAlgorithmType
    * @return this builder
    */
-  public JweBuilder withKeyManagementAlgorithm(JWEKeyAlgorithmType algorithm) {
+  public JweBuilder withKeyManagementAlgorithm(JweKeyAlgorithmType algorithm) {
     keyMgmtAlgo = algorithm;
     return this;
   }

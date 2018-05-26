@@ -1,6 +1,6 @@
 package org.ietf.jose.jwe;
 
-import org.ietf.jose.jwa.JWEEncryptionAlgorithmType;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -16,9 +16,9 @@ import javax.crypto.spec.SecretKeySpec;
 import org.ietf.TestFileReader;
 import org.ietf.TestUtil;
 import org.ietf.jose.jwe.encryption.*;
-import org.ietf.jose.jwa.JWEKeyAlgorithmType;
-import org.ietf.jose.jwk.RsaPrivateKey;
-import org.ietf.jose.jwk.SymmetricKey;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
+import org.ietf.jose.jwk.key.RsaPrivateKey;
+import org.ietf.jose.jwk.key.SymmetricKey;
 import org.junit.Test;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -144,7 +144,7 @@ public class JWETest {
      */
     JoseHeader joseHeader = new JoseHeader();
     joseHeader.setAlg("RSA-OAEP");
-    joseHeader.setContentEncryptionAlgorithm(JWEEncryptionAlgorithmType.A256GCM);
+    joseHeader.setEnc(JweEncryptionAlgorithmType.A256GCM);
 
     String joseHeaderJson = toJson(joseHeader);
     System.out.println(joseHeaderJson);
@@ -305,11 +305,11 @@ public class JWETest {
      * <p>
      * {"alg":"RSA1_5","enc":"A128CBC-HS256"}
      */
-    final JWEKeyAlgorithmType keyManagementAlgorithm = JWEKeyAlgorithmType.RSA1_5;
-    final JWEEncryptionAlgorithmType contentEncyptionAlgorithm = JWEEncryptionAlgorithmType.A128CBC_HS256;
+    final JweKeyAlgorithmType keyManagementAlgorithm = JweKeyAlgorithmType.RSA1_5;
+    final JweEncryptionAlgorithmType contentEncyptionAlgorithm = JweEncryptionAlgorithmType.A128CBC_HS256;
     JoseHeader joseHeader = new JoseHeader();
     joseHeader.setAlg(keyManagementAlgorithm.getJoseAlgorithmName());
-    joseHeader.setContentEncryptionAlgorithm(contentEncyptionAlgorithm);
+    joseHeader.setEnc(contentEncyptionAlgorithm);
 
     String joseHeaderJson = toJson(joseHeader);
     System.out.println(joseHeaderJson);
@@ -475,11 +475,11 @@ public class JWETest {
      * <p>
      * {"alg":"A128KW","enc":"A128CBC-HS256"}
      */
-    final JWEKeyAlgorithmType keyManagementAlgorithm = JWEKeyAlgorithmType.A128KW;
-    final JWEEncryptionAlgorithmType contentEncyptionAlgorithm = JWEEncryptionAlgorithmType.A128CBC_HS256;
+    final JweKeyAlgorithmType keyManagementAlgorithm = JweKeyAlgorithmType.A128KW;
+    final JweEncryptionAlgorithmType contentEncyptionAlgorithm = JweEncryptionAlgorithmType.A128CBC_HS256;
     JoseHeader joseHeader = new JoseHeader();
     joseHeader.setAlg(keyManagementAlgorithm.getJoseAlgorithmName());
-    joseHeader.setContentEncryptionAlgorithm(contentEncyptionAlgorithm);
+    joseHeader.setEnc(contentEncyptionAlgorithm);
 
     final String joseHeaderJson = toJson(joseHeader);
     System.out.println(joseHeaderJson);
@@ -651,7 +651,7 @@ public class JWETest {
     assertEquals(authTag.length, calculatedAuthTag.length);
     assertArrayEquals(authTag, calculatedAuthTag);
 
-    Encrypter encrypter = new AesCbcHmacSha2Encrypter(AesCbcHmacSha2Encrypter.Configuration.AES_128_CBC_HMAC_SHA_256);
+    Encrypter encrypter = new DefaultEncrypter(DefaultEncrypter.Configuration.AES_128_CBC_HMAC_SHA_256);
     EncryptionResult encryptionResult = encrypter.encrypt(plaintextBytes, initVector, aad, new SecretKeySpec(cekBytes, "AES"));
 
     assertArrayEquals(aad, encryptionResult.getAad());
@@ -669,8 +669,8 @@ public class JWETest {
     byte[] plaintext = TestUtil.createRandomString(100).getBytes();
     byte[] aad = TestUtil.createRandomString(20).getBytes();
 
-    for (JWEEncryptionAlgorithmType eEncryptionAlgo : JWEEncryptionAlgorithmType.values()) {
-      if (eEncryptionAlgo == JWEEncryptionAlgorithmType.UNKNOWN) {
+    for (JweEncryptionAlgorithmType eEncryptionAlgo : JweEncryptionAlgorithmType.values()) {
+      if (eEncryptionAlgo == JweEncryptionAlgorithmType.UNKNOWN) {
         continue;
       }
       System.out.println(eEncryptionAlgo);
@@ -715,9 +715,9 @@ public class JWETest {
 
   @Test
   public void testAesCbcHmacSha2Encrypter() throws Exception {
-    testEncrypter(new AesCbcHmacSha2Encrypter(AesCbcHmacSha2Encrypter.Configuration.AES_128_CBC_HMAC_SHA_256));
-    testEncrypter(new AesCbcHmacSha2Encrypter(AesCbcHmacSha2Encrypter.Configuration.AES_192_CBC_HMAC_SHA_384));
-    testEncrypter(new AesCbcHmacSha2Encrypter(AesCbcHmacSha2Encrypter.Configuration.AES_256_CBC_HMAC_SHA_512));
+    testEncrypter(new DefaultEncrypter(DefaultEncrypter.Configuration.AES_128_CBC_HMAC_SHA_256));
+    testEncrypter(new DefaultEncrypter(DefaultEncrypter.Configuration.AES_192_CBC_HMAC_SHA_384));
+    testEncrypter(new DefaultEncrypter(DefaultEncrypter.Configuration.AES_256_CBC_HMAC_SHA_512));
   }
 
   public void testEncrypter(Encrypter encrypter) throws GeneralSecurityException {
