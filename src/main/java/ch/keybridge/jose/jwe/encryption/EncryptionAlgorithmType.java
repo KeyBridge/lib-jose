@@ -1,5 +1,7 @@
 package ch.keybridge.jose.jwe.encryption;
 
+import javax.xml.bind.annotation.XmlEnumValue;
+
 import static ch.keybridge.jose.jwe.encryption.AesCbcHmacSha2Encrypter.Configuration.*;
 
 /**
@@ -48,16 +50,19 @@ public enum EncryptionAlgorithmType {
    * AES_128_CBC_HMAC_SHA_256 authenticated encryption algorithm, as defined in
    * RFC 7518 Section 5.2.3
    */
+  @XmlEnumValue("A128CBC-HS256")
   A128CBC_HS256("A128CBC-HS256", new AesCbcHmacSha2Encrypter(AES_128_CBC_HMAC_SHA_256)),
   /**
    * AES_192_CBC_HMAC_SHA_384 authenticated encryption algorithm, as defined in
    * RFC 7518 Section 5.2.4
    */
+  @XmlEnumValue("A192CBC-HS384")
   A192CBC_HS384("A192CBC-HS384", new AesCbcHmacSha2Encrypter(AES_192_CBC_HMAC_SHA_384)),
   /**
    * AES_256_CBC_HMAC_SHA_512 authenticated encryption algorithm, as defined in
    * RFC 7518 Section 5.2.5
    */
+  @XmlEnumValue("A256CBC-HS512")
   A256CBC_HS512("A256CBC-HS512", new AesCbcHmacSha2Encrypter(AES_256_CBC_HMAC_SHA_512)),
   /**
    * RFC7518 § 5.3. Content Encryption with AES GCM This section defines the
@@ -87,18 +92,22 @@ public enum EncryptionAlgorithmType {
    * <p>
    * Additional details about these algorithms is available in §5 of
    * <a href="https://www.ietf.org/rfc/rfc5116.txt">RFC 5116</a>.
+   *
+   * @deprecated AES in Galois/Counter Mode is not a JDK default transformation
    */
   A128GCM("A128GCM", new AesGcmEncrypter(128)),
   /**
    * AES GCM using 192-bit key.
    *
    * @see A128GCM
+   * @deprecated AES in Galois/Counter Mode is not a JDK default transformation
    */
   A192GCM("A192GCM", new AesGcmEncrypter(192)),
   /**
    * AES GCM using 256-bit key
    *
    * @see A128GCM
+   * @deprecated AES in Galois/Counter Mode is not a JDK default transformation
    */
   A256GCM("A256GCM", new AesGcmEncrypter(256)),
   UNKNOWN(null, null);
@@ -107,6 +116,9 @@ public enum EncryptionAlgorithmType {
    * The name of the algorithm as per the JWE/JOSE specification
    */
   private final String joseAlgorithmName;
+  /**
+   * An interface for encapsulating encryption and decryption algorithms.
+   */
   private final Encrypter encrypter;
 
   EncryptionAlgorithmType(String joseAlgorithmName, Encrypter encrypter) {
@@ -130,6 +142,11 @@ public enum EncryptionAlgorithmType {
     return joseAlgorithmName;
   }
 
+  /**
+   * Get the encryption and decryption algorithm associate with this type.
+   *
+   * @return an encryption and decryption instance
+   */
   public Encrypter getEncrypter() {
     return encrypter;
   }
