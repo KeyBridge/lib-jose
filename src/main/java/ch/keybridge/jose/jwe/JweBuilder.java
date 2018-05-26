@@ -1,6 +1,6 @@
 package ch.keybridge.jose.jwe;
 
-import ch.keybridge.jose.jwe.encryption.EEncryptionAlgo;
+import ch.keybridge.jose.jwe.encryption.EncryptionAlgorithmType;
 import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
 import ch.keybridge.jose.util.Base64Utility;
 import java.io.IOException;
@@ -17,10 +17,10 @@ public class JweBuilder {
   /**
    * Default algorithms
    */
-  private static final EEncryptionAlgo CONTENT_ENC_ALGO = EEncryptionAlgo.A128CBC_HS256;
+  private static final EncryptionAlgorithmType CONTENT_ENC_ALGO = EncryptionAlgorithmType.A128CBC_HS256;
   private static final EKeyManagementAlgorithm KEY_MGMT_ALGO_ASYM = EKeyManagementAlgorithm.RSA1_5;
 
-  private EEncryptionAlgo encryptionAlgo = CONTENT_ENC_ALGO;
+  private EncryptionAlgorithmType encryptionAlgo = CONTENT_ENC_ALGO;
   /**
    * Cannot set a default Key Management algorithm at this point because we
    * don't know if a symmetric or asymmetric key will be used for payload
@@ -122,10 +122,10 @@ public class JweBuilder {
   /**
    * Set the encryption algorithm
    *
-   * @param algorithm EEncryptionAlgo
+   * @param algorithm EncryptionAlgorithmType
    * @return this builder
    */
-  public JweBuilder withEncryptionAlgorithm(EEncryptionAlgo algorithm) {
+  public JweBuilder withEncryptionAlgorithm(EncryptionAlgorithmType algorithm) {
     encryptionAlgo = algorithm;
     return this;
   }

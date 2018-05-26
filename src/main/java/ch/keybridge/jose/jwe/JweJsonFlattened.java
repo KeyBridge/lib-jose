@@ -1,7 +1,7 @@
 package ch.keybridge.jose.jwe;
 
 import ch.keybridge.jose.adapter.XmlAdapterByteArrayBase64Url;
-import ch.keybridge.jose.jwe.encryption.EEncryptionAlgo;
+import ch.keybridge.jose.jwe.encryption.EncryptionAlgorithmType;
 import ch.keybridge.jose.jwe.encryption.Encrypter;
 import ch.keybridge.jose.jwe.encryption.EncryptionResult;
 import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
@@ -134,7 +134,7 @@ public class JweJsonFlattened {
    * @throws GeneralSecurityException thrown if requested algorithms are not
    *                                  available
    */
-  public static JweJsonFlattened getInstance(final byte[] payload, final EEncryptionAlgo contentEnc,
+  public static JweJsonFlattened getInstance(final byte[] payload, final EncryptionAlgorithmType contentEnc,
                                              EKeyManagementAlgorithm keyMgmt, Key key, JweJoseHeader protectedHeader,
                                              JweJoseHeader uprotected) throws IOException,
     GeneralSecurityException {

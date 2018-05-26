@@ -2,7 +2,7 @@ package ch.keybridge.jose.jwe;
 
 import ch.keybridge.jose.JoseBase;
 import ch.keybridge.jose.adapter.XmlAdapterEContentEncryptionAlgorithm;
-import ch.keybridge.jose.jwe.encryption.EEncryptionAlgo;
+import ch.keybridge.jose.jwe.encryption.EncryptionAlgorithmType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -32,8 +32,8 @@ public class JweJoseHeader extends JoseBase {
    * [JWA].
    */
   @XmlElement(name = "enc")
-  @XmlJavaTypeAdapter(type = EEncryptionAlgo.class, value = XmlAdapterEContentEncryptionAlgorithm.class)
-  private EEncryptionAlgo contentEncryptionAlgorithm;
+  @XmlJavaTypeAdapter(type = EncryptionAlgorithmType.class, value = XmlAdapterEContentEncryptionAlgorithm.class)
+  private EncryptionAlgorithmType contentEncryptionAlgorithm;
 
   /**
    * 4.1.3. "zip" (Compression Algorithm) Header Parameter
@@ -55,11 +55,11 @@ public class JweJoseHeader extends JoseBase {
   @XmlElement(name = "zip")
   private String compressionAlgorithm;
 
-  public EEncryptionAlgo getContentEncryptionAlgorithm() {
+  public EncryptionAlgorithmType getContentEncryptionAlgorithm() {
     return contentEncryptionAlgorithm;
   }
 
-  public void setContentEncryptionAlgorithm(EEncryptionAlgo contentEncryptionAlgorithm) {
+  public void setContentEncryptionAlgorithm(EncryptionAlgorithmType contentEncryptionAlgorithm) {
     this.contentEncryptionAlgorithm = contentEncryptionAlgorithm;
   }
 
