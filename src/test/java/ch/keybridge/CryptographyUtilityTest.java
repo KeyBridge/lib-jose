@@ -1,6 +1,6 @@
 package ch.keybridge;
 
-import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
+import ch.keybridge.jose.jwe.keymgmt.KeyManagementAlgorithmType;
 import ch.keybridge.jose.jwk.JwkRsaPrivateKey;
 import ch.keybridge.jose.util.CryptographyUtility;
 import ch.keybridge.jose.util.JsonMarshaller;
@@ -17,7 +17,7 @@ public class CryptographyUtilityTest {
 
     JwkRsaPrivateKey key = JsonMarshaller.fromJson(jwkJson, JwkRsaPrivateKey.class);
 
-    String algorithm = EKeyManagementAlgorithm.RSA_OAEP.getJavaAlgorithm();
+    String algorithm = KeyManagementAlgorithmType.RSA_OAEP.getJavaAlgorithm();
 
     byte[] plaintext = "some text for testing".getBytes(StandardCharsets.UTF_8);
     byte[] cipher = CryptographyUtility.encrypt(plaintext, key.getPublicKey(), algorithm);

@@ -1,10 +1,10 @@
 package ch.keybridge.jose.jwe;
 
 import ch.keybridge.jose.adapter.XmlAdapterByteArrayBase64Url;
-import ch.keybridge.jose.jwe.encryption.EncryptionAlgorithmType;
 import ch.keybridge.jose.jwe.encryption.Encrypter;
+import ch.keybridge.jose.jwe.encryption.EncryptionAlgorithmType;
 import ch.keybridge.jose.jwe.encryption.EncryptionResult;
-import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
+import ch.keybridge.jose.jwe.keymgmt.KeyManagementAlgorithmType;
 import ch.keybridge.jose.util.CryptographyUtility;
 import ch.keybridge.jose.util.JsonMarshaller;
 import java.io.IOException;
@@ -107,8 +107,7 @@ public class JweJsonFlattened {
   public static JweJsonFlattened fromCompactForm(String text) throws IOException {
     StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
     if (tokenizer.countTokens() != 5) {
-      throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string "
-        + "has " + tokenizer.countTokens() + ".");
+      throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string has " + tokenizer.countTokens() + ".");
     }
     JweJsonFlattened jwe = new JweJsonFlattened();
     String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
@@ -124,23 +123,33 @@ public class JweJsonFlattened {
   /**
    * Creates a JWE instance for the payload using the provided public key
    *
-   * @param payload    byte array representing the data that is to be
-   *                   JWE-encrypted
-   * @param contentEnc Content encryption algorithm
-   * @param keyMgmt    key management algorithm
-   * @param key        a Key instance which is used to encrypt the random data
-   *                   encryption key
+   * @param payload         byte array representing the data that is to be
+   *                        JWE-encrypted
+   * @param contentEnc      Content encryption algorithm
+   * @param keyMgmt         key management algorithm
+   * @param key             a Key instance which is used to encrypt the random
+   *                        data encryption key
+   * @param protectedHeader the JSON protected header, Populated with mandatory
+   *                        information on how the content and the content
+   *                        encryption key are encrypted
+   * @param uprotected      the unprotected content
    * @return a valid JWE instance
+   * @throws java.io.IOException      if the protectedHeader fails to marshal to
+   *                                  JSON
    * @throws GeneralSecurityException thrown if requested algorithms are not
    *                                  available
    */
-  public static JweJsonFlattened getInstance(final byte[] payload, final EncryptionAlgorithmType contentEnc,
-                                             EKeyManagementAlgorithm keyMgmt, Key key, JweJoseHeader protectedHeader,
-                                             JweJoseHeader uprotected) throws IOException,
-    GeneralSecurityException {
+  public static JweJsonFlattened getInstance(final byte[] payload,
+                                             final EncryptionAlgorithmType contentEnc,
+                                             KeyManagementAlgorithmType keyMgmt,
+                                             Key key,
+                                             JweJoseHeader protectedHeader,
+                                             JweJoseHeader uprotected) throws IOException, GeneralSecurityException {
     JweJsonFlattened jwe = new JweJsonFlattened();
-    // Populate the protected header with mandatory information on how the content and the content encryption key are
-    // encrypted
+    /**
+     * Populate the protected header with mandatory information on how the
+     * content and the content encryption key are encrypted
+     */
     protectedHeader.setAlg(keyMgmt.getJoseAlgorithmName());
     protectedHeader.setContentEncryptionAlgorithm(contentEnc);
     jwe.protectedHeader = protectedHeader;
@@ -152,7 +161,7 @@ public class JweJsonFlattened {
     /**
      * The default Additional Authentication Data can be the protected header
      */
-    String headerJson = JsonMarshaller.toJson(protectedHeader);
+    String headerJson = JsonMarshaller.toJson(protectedHeader); // throws IOException
     jwe.additionalAuthenticationData = toBase64Url(headerJson).getBytes(US_ASCII);
     EncryptionResult encryptionResult = contentEnc.getEncrypter().encrypt(payload, null, jwe.additionalAuthenticationData, contentEncryptionKey);
     jwe.ciphertext = encryptionResult.getCiphertext();
@@ -196,6 +205,7 @@ public class JweJsonFlattened {
    * Serialization.
    *
    * @return non-null string
+   * @throws java.io.IOException on JSON marshal error
    */
   public String toCompactForm() throws IOException {
     return toBase64Url(JsonMarshaller.toJson(protectedHeader)) + '.'
@@ -206,7 +216,7 @@ public class JweJsonFlattened {
   }
 
   public byte[] decryptPayload(Key key) throws GeneralSecurityException {
-    final EKeyManagementAlgorithm keyManagementAlgorithm = EKeyManagementAlgorithm.resolveAlgorithm(protectedHeader
+    final KeyManagementAlgorithmType keyManagementAlgorithm = KeyManagementAlgorithmType.resolveAlgorithm(protectedHeader
       .getAlg());
     final SecretKey aesKey = (SecretKey) CryptographyUtility.unwrapKey(encryptedKey, key, keyManagementAlgorithm
                                                                        .getJavaAlgorithm(), "AES"); //todo

@@ -1,7 +1,7 @@
 package ch.keybridge.jose.jwe;
 
 import ch.keybridge.jose.jwe.encryption.EncryptionAlgorithmType;
-import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
+import ch.keybridge.jose.jwe.keymgmt.KeyManagementAlgorithmType;
 import ch.keybridge.jose.util.Base64Utility;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -18,7 +18,7 @@ public class JweBuilder {
    * Default algorithms
    */
   private static final EncryptionAlgorithmType CONTENT_ENC_ALGO = EncryptionAlgorithmType.A128CBC_HS256;
-  private static final EKeyManagementAlgorithm KEY_MGMT_ALGO_ASYM = EKeyManagementAlgorithm.RSA1_5;
+  private static final KeyManagementAlgorithmType KEY_MGMT_ALGO_ASYM = KeyManagementAlgorithmType.RSA1_5;
 
   private EncryptionAlgorithmType encryptionAlgo = CONTENT_ENC_ALGO;
   /**
@@ -26,7 +26,7 @@ public class JweBuilder {
    * don't know if a symmetric or asymmetric key will be used for payload
    * encryption.
    */
-  private EKeyManagementAlgorithm keyMgmtAlgo;
+  private KeyManagementAlgorithmType keyMgmtAlgo;
   private JweJoseHeader protectedHeader = new JweJoseHeader();
   private JweJoseHeader unprotectedHeader;
   private byte[] payload;
@@ -60,16 +60,16 @@ public class JweBuilder {
    * keys.
    *
    * @param key non-nul SecretKey instance
-   * @return EKeyManagementAlgorithm
+   * @return KeyManagementAlgorithmType
    */
-  private static EKeyManagementAlgorithm resolveKeyManagementAlgorithm(SecretKey key) {
+  private static KeyManagementAlgorithmType resolveKeyManagementAlgorithm(SecretKey key) {
     switch (key.getEncoded().length) {
       case 16:
-        return EKeyManagementAlgorithm.A128KW;
+        return KeyManagementAlgorithmType.A128KW;
       case 24:
-        return EKeyManagementAlgorithm.A192KW;
+        return KeyManagementAlgorithmType.A192KW;
       case 32:
-        return EKeyManagementAlgorithm.A256KW;
+        return KeyManagementAlgorithmType.A256KW;
       default:
         throw new IllegalArgumentException("Key length not 128/192/256 bits.");
     }
@@ -133,10 +133,10 @@ public class JweBuilder {
   /**
    * Set the key management algorithm
    *
-   * @param algorithm EKeyManagementAlgorithm
+   * @param algorithm KeyManagementAlgorithmType
    * @return this builder
    */
-  public JweBuilder withKeyManagementAlgorithm(EKeyManagementAlgorithm algorithm) {
+  public JweBuilder withKeyManagementAlgorithm(KeyManagementAlgorithmType algorithm) {
     keyMgmtAlgo = algorithm;
     return this;
   }
@@ -182,8 +182,7 @@ public class JweBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
-  public JweJsonFlattened buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException,
-    GeneralSecurityException {
+  public JweJsonFlattened buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException, GeneralSecurityException {
     SecretKey key = createSecretKey(base64UrlEncodedSecret);
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);

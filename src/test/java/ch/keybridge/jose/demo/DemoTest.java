@@ -5,21 +5,21 @@ import ch.keybridge.jose.jws.ESignatureAlgorithm;
 import ch.keybridge.jose.jws.JwsBuilder;
 import ch.keybridge.jose.jws.JwsJsonFlattened;
 import ch.keybridge.jose.util.Base64Utility;
-import org.junit.Assert;
-import org.junit.Test;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 15/05/2018
  */
 public class DemoTest {
+
   @Test
   public void joseSignEncryptPublicPrivateKeys() throws GeneralSecurityException {
     System.out.println("Sign and encrypt using public/private keys\n");
@@ -40,7 +40,7 @@ public class DemoTest {
     System.out.println();
 
     String decryptedRequest = JOSE.read(json, String.class, recipientKeyPair
-        .getPrivate(), senderKeyPair.getPublic());
+                                        .getPrivate(), senderKeyPair.getPublic());
     Assert.assertEquals(sampleText, decryptedRequest);
 
     System.out.println("Decrypted object:");
@@ -63,7 +63,7 @@ public class DemoTest {
 
     String base64UrlEncodedSecret = Base64Utility.toBase64Url(key.getEncoded());
 
-    String json = JOSE.write(sampleText, base64UrlEncodedSecret, "myKeyId");
+    String json = JOSE.write(sampleText, base64UrlEncodedSecret, "myKeyId"); // java.security.InvalidKeyException: Illegal key size
     System.out.println("Signed and encrypted JSON:");
     System.out.println(json);
     System.out.println();
@@ -89,10 +89,10 @@ public class DemoTest {
     String base64UrlEncodedSecret = Base64Utility.toBase64Url(key.getEncoded());
 
     String json = JwsBuilder.getInstance()
-        .withStringPayload(sampleText)
-        .sign(base64UrlEncodedSecret)
-        .buildJsonFlattened()
-        .toJson();
+      .withStringPayload(sampleText)
+      .sign(base64UrlEncodedSecret)
+      .buildJsonFlattened()
+      .toJson();
 
     System.out.println(json);
     System.out.println();
@@ -113,17 +113,17 @@ public class DemoTest {
     KeyPair senderKeyPair = generator.generateKeyPair();
 
     String json = JwsBuilder.getInstance()
-        .withStringPayload("sample text to sign")
-        .sign(senderKeyPair.getPrivate(), ESignatureAlgorithm.RS256)
-        .buildJsonFlattened()
-        .toJson();
+      .withStringPayload("sample text to sign")
+      .sign(senderKeyPair.getPrivate(), ESignatureAlgorithm.RS256)
+      .buildJsonFlattened()
+      .toJson();
 
     System.out.println(json);
     json = JwsBuilder.getInstance()
-        .withStringPayload("sample text to sign")
-        .sign(senderKeyPair.getPrivate(), ESignatureAlgorithm.RS512)
-        .buildJsonFlattened()
-        .toJson();
+      .withStringPayload("sample text to sign")
+      .sign(senderKeyPair.getPrivate(), ESignatureAlgorithm.RS512)
+      .buildJsonFlattened()
+      .toJson();
 
     System.out.println(json);
     System.out.println();

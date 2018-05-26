@@ -10,7 +10,7 @@ import java.security.spec.AlgorithmParameterSpec;
  * to encrypt the CEK, producing the JWE Encrypted Key, or to use key agreement
  * to agree upon the CEK
  */
-public enum EKeyManagementAlgorithm {
+public enum KeyManagementAlgorithmType {
 
   /**
    * 4.2. Key Encryption with RSAES-PKCS1-v1_5
@@ -84,7 +84,17 @@ public enum EKeyManagementAlgorithm {
    * </pre> An example using this algorithm is shown in Appendix A.3 of [JWE].
    */
   A128KW("A128KW", "AESWrap"),
+  /**
+   * AES Key Wrap with default initial value using 192-bit key
+   *
+   * @see A128KW
+   */
   A192KW("A192KW", "AESWrap"),
+  /**
+   * AES Key Wrap with default initial value using 256-bit key
+   *
+   * @see A128KW
+   */
   A256KW("A256KW", "AESWrap"),
   /**
    * Unknown or unsupported algorithms resolve to UNSUPPORTED
@@ -96,10 +106,11 @@ public enum EKeyManagementAlgorithm {
    */
   private final String joseAlgorithmName;
   /**
-   * A.2. Key Management Algorithm Identifier Cross-Reference This section
-   * contains a table cross-referencing the JWE "alg" (algorithm) values defined
-   * in this specification with the equivalent identifiers used by other
-   * standards and software packages.
+   * A.2. Key Management Algorithm Identifier Cross-Reference
+   * <p>
+   * This section contains a table cross-referencing the JWE "alg" (algorithm)
+   * values defined in this specification with the equivalent identifiers used
+   * by other standards and software packages.
    */
   private final String javaAlgorithmName;
   /**
@@ -107,13 +118,13 @@ public enum EKeyManagementAlgorithm {
    */
   private final AlgorithmParameterSpec additionalParameters;
 
-  EKeyManagementAlgorithm(String joseAlgorithmName, String javaAlgorithmName, AlgorithmParameterSpec additionalParameters) {
+  KeyManagementAlgorithmType(String joseAlgorithmName, String javaAlgorithmName, AlgorithmParameterSpec additionalParameters) {
     this.joseAlgorithmName = joseAlgorithmName;
     this.javaAlgorithmName = javaAlgorithmName;
     this.additionalParameters = additionalParameters;
   }
 
-  EKeyManagementAlgorithm(String joseAlgorithmName, String javaAlgorithmName) {
+  KeyManagementAlgorithmType(String joseAlgorithmName, String javaAlgorithmName) {
     this(joseAlgorithmName, javaAlgorithmName, null);
   }
 
@@ -126,11 +137,11 @@ public enum EKeyManagementAlgorithm {
    * @param alg
    * @return
    */
-  public static EKeyManagementAlgorithm resolveAlgorithm(String alg) {
+  public static KeyManagementAlgorithmType resolveAlgorithm(String alg) {
     if (alg == null || alg.isEmpty()) {
       return UNSUPPORTED;
     }
-    for (EKeyManagementAlgorithm algorithm : EKeyManagementAlgorithm.values()) {
+    for (KeyManagementAlgorithmType algorithm : KeyManagementAlgorithmType.values()) {
       if (alg.equals(algorithm.joseAlgorithmName)) {
         return algorithm;
       }

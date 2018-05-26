@@ -3,23 +3,22 @@ package ch.keybridge.jose.jwe;
 import ch.keybridge.TestFileReader;
 import ch.keybridge.TestUtil;
 import ch.keybridge.jose.jwe.encryption.*;
-import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
+import ch.keybridge.jose.jwe.keymgmt.KeyManagementAlgorithmType;
 import ch.keybridge.jose.jwk.JwkRsaPrivateKey;
 import ch.keybridge.jose.jwk.JwkSymmetricKey;
-import org.junit.Test;
-
-import javax.crypto.Cipher;
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Arrays;
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import org.junit.Test;
 
 import static ch.keybridge.jose.util.Base64Utility.toBase64Url;
 import static ch.keybridge.jose.util.JsonMarshaller.fromJson;
@@ -144,7 +143,7 @@ public class JWETest {
      */
     JweJoseHeader joseHeader = new JweJoseHeader();
     joseHeader.setAlg("RSA-OAEP");
-    joseHeader.setContentEncryptionAlgorithm(EEncryptionAlgo.A256GCM);
+    joseHeader.setContentEncryptionAlgorithm(EncryptionAlgorithmType.A256GCM);
 
     String joseHeaderJson = toJson(joseHeader);
     System.out.println(joseHeaderJson);
@@ -305,8 +304,8 @@ public class JWETest {
      * <p>
      * {"alg":"RSA1_5","enc":"A128CBC-HS256"}
      */
-    final EKeyManagementAlgorithm keyManagementAlgorithm = EKeyManagementAlgorithm.RSA1_5;
-    final EEncryptionAlgo contentEncyptionAlgorithm = EEncryptionAlgo.A128CBC_HS256;
+    final KeyManagementAlgorithmType keyManagementAlgorithm = KeyManagementAlgorithmType.RSA1_5;
+    final EncryptionAlgorithmType contentEncyptionAlgorithm = EncryptionAlgorithmType.A128CBC_HS256;
     JweJoseHeader joseHeader = new JweJoseHeader();
     joseHeader.setAlg(keyManagementAlgorithm.getJoseAlgorithmName());
     joseHeader.setContentEncryptionAlgorithm(contentEncyptionAlgorithm);
@@ -475,8 +474,8 @@ public class JWETest {
      * <p>
      * {"alg":"A128KW","enc":"A128CBC-HS256"}
      */
-    final EKeyManagementAlgorithm keyManagementAlgorithm = EKeyManagementAlgorithm.A128KW;
-    final EEncryptionAlgo contentEncyptionAlgorithm = EEncryptionAlgo.A128CBC_HS256;
+    final KeyManagementAlgorithmType keyManagementAlgorithm = KeyManagementAlgorithmType.A128KW;
+    final EncryptionAlgorithmType contentEncyptionAlgorithm = EncryptionAlgorithmType.A128CBC_HS256;
     JweJoseHeader joseHeader = new JweJoseHeader();
     joseHeader.setAlg(keyManagementAlgorithm.getJoseAlgorithmName());
     joseHeader.setContentEncryptionAlgorithm(contentEncyptionAlgorithm);
@@ -669,15 +668,15 @@ public class JWETest {
     byte[] plaintext = TestUtil.createRandomString(100).getBytes();
     byte[] aad = TestUtil.createRandomString(20).getBytes();
 
-    for (EEncryptionAlgo eEncryptionAlgo : EEncryptionAlgo.values()) {
-      if (eEncryptionAlgo == EEncryptionAlgo.UNKNOWN) {
+    for (EncryptionAlgorithmType eEncryptionAlgo : EncryptionAlgorithmType.values()) {
+      if (eEncryptionAlgo == EncryptionAlgorithmType.UNKNOWN) {
         continue;
       }
       System.out.println(eEncryptionAlgo);
       final Encrypter encrypter = eEncryptionAlgo.getEncrypter();
       try {
         Key key = encrypter.generateKey();
-        EncryptionResult result = eEncryptionAlgo.getEncrypter().encrypt(plaintext, null, aad, key);
+        EncryptionResult result = eEncryptionAlgo.getEncrypter().encrypt(plaintext, null, aad, key);  // java.security.InvalidKeyException: Illegal key size
         byte[] decrypted = encrypter.decrypt(result.getCiphertext(), result.getIv(), aad, result.getAuthTag(), key);
         assertArrayEquals(plaintext, decrypted);
 
@@ -721,15 +720,15 @@ public class JWETest {
   }
 
   public void testEncrypter(Encrypter encrypter) throws GeneralSecurityException {
-    byte[] payload = ("      156, 223, 120, 156, 115, 232, 150, 209, 145, 133, 104, 112, 237, 156,\n" +
-        "      116, 250, 65, 102, 212, 210, 103, 240, 177, 61, 93, 40, 71, 231, 223,\n" +
-        "      226, 240, 157, 15, 31, 150, 89, 200, 215, 198, 203, 108, 70, 117, 66,\n" +
-        "      212, 238, 193, 205, 23, 161, 169, 218, 243, 203, 128, 214, 127, 253,\n" +
-        "      215, 139, 43, 17, 135, 103, 179, 220, 28, 2, 212, 206, 131, 158, 128,\n" +
-        "      66, 62, 240, 78, 186, 141, 125, 132, 227, 60, 137, 43, 31, 152, 199,\n" +
-        "      54, 72, 34, 212, 115, 11, 152, 101, 70, 42, 219, 233, 142, 66, 151,\n" +
-        "      250, 126, 146, 141, 216, 190, 73, 50, 177, 146, 5, 52, 247, 28, 197,\n" +
-        "      21, 59, 170, 247, 181, 89, 131, 241, 169, 182, 246, 99, 15, 36, 102").getBytes(StandardCharsets.UTF_8);
+    byte[] payload = ("      156, 223, 120, 156, 115, 232, 150, 209, 145, 133, 104, 112, 237, 156,\n"
+                      + "      116, 250, 65, 102, 212, 210, 103, 240, 177, 61, 93, 40, 71, 231, 223,\n"
+                      + "      226, 240, 157, 15, 31, 150, 89, 200, 215, 198, 203, 108, 70, 117, 66,\n"
+                      + "      212, 238, 193, 205, 23, 161, 169, 218, 243, 203, 128, 214, 127, 253,\n"
+                      + "      215, 139, 43, 17, 135, 103, 179, 220, 28, 2, 212, 206, 131, 158, 128,\n"
+                      + "      66, 62, 240, 78, 186, 141, 125, 132, 227, 60, 137, 43, 31, 152, 199,\n"
+                      + "      54, 72, 34, 212, 115, 11, 152, 101, 70, 42, 219, 233, 142, 66, 151,\n"
+                      + "      250, 126, 146, 141, 216, 190, 73, 50, 177, 146, 5, 52, 247, 28, 197,\n"
+                      + "      21, 59, 170, 247, 181, 89, 131, 241, 169, 182, 246, 99, 15, 36, 102").getBytes(StandardCharsets.UTF_8);
     byte[] aad = "some additional authenticated data for testing".getBytes(StandardCharsets.UTF_8);
 
     Key key = encrypter.generateKey();
