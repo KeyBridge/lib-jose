@@ -1,14 +1,27 @@
 package org.ietf.jose;
 
-import org.ietf.jose.jwk.JsonWebKey;
 import java.net.URI;
 import java.util.List;
+import org.ietf.jose.jwk.JWK;
 
 /**
+ * RFC 7515 JSON Web Signature (JWS)
+ * <p>
+ * 4.1. Registered Header Parameter Names
+ * <p>
+ * The following Header Parameter names for use in JWSs are registered in the
+ * IANA "JSON Web Signature and Encryption Header Parameters" registry
+ * established by Section 9.1, with meanings as defined in the subsections
+ * below.
+ * <p>
+ * As indicated by the common registry, JWSs and JWEs share a common Header
+ * Parameter space; when a parameter is used by both specifications, its usage
+ * must be compatible between the specifications.
+ * <p>
  * A subtype of JoseBase which contains encryption-related fields used across
  * JWS and JWE.
  *
- * @see <a "doc/jose-header.pdf">JOSE header type diagram</a>
+ * @see <a href="doc/jose-header.pdf">JOSE header type diagram</a>
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 02/01/2018
  */
@@ -35,7 +48,7 @@ public class JoseCryptoHeader extends JoseBase {
    * represented as a JSON Web Key [JWK]. Use of this Header Parameter is
    * OPTIONAL.
    */
-  protected JsonWebKey jwk;
+  protected JWK jwk;
   /**
    * 4.1.9. "typ" (Type) Header Parameter
    * <p>
@@ -134,11 +147,11 @@ public class JoseCryptoHeader extends JoseBase {
     this.jku = jku;
   }
 
-  public JsonWebKey getJwk() {
+  public JWK getJwk() {
     return jwk;
   }
 
-  public void setJwk(JsonWebKey jwk) {
+  public void setJwk(JWK jwk) {
     this.jwk = jwk;
   }
 

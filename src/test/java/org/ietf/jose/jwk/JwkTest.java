@@ -17,9 +17,9 @@ public class JwkTest {
   public void ecPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-public-key.json");
     System.out.println(json);
-    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
-    assertTrue(key instanceof JwkEcKey);
-    JwkEcKey ecKey = (JwkEcKey)key;
+    JWK key = JsonMarshaller.fromJson(json, JWK.class);
+    assertTrue(key instanceof EcKey);
+    EcKey ecKey = (EcKey)key;
     assertEquals("P-521", ecKey.getCrv());
     assertEquals("sig", ecKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", ecKey.getKid());
@@ -29,7 +29,7 @@ public class JwkTest {
         ("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1")), ecKey.getY());
     assertEquals(null, ecKey.getD());
 
-    JwkEcKey keyReconverted = (JwkEcKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(ecKey), JsonWebKey.class);
+    EcKey keyReconverted = (EcKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(ecKey), JWK.class);
     assertEquals(ecKey, keyReconverted);
   }
 
@@ -37,9 +37,9 @@ public class JwkTest {
   public void ecPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-private-key.json");
     System.out.println(json);
-    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
-    assertTrue(key instanceof JwkEcKey);
-    JwkEcKey ecKey = (JwkEcKey)key;
+    JWK key = JsonMarshaller.fromJson(json, JWK.class);
+    assertTrue(key instanceof EcKey);
+    EcKey ecKey = (EcKey)key;
     assertEquals("P-521", ecKey.getCrv());
     assertEquals("sig", ecKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", ecKey.getKid());
@@ -50,7 +50,7 @@ public class JwkTest {
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url
         ("AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zbKipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt")), ecKey.getD());
 
-    JwkEcKey keyReconverted = (JwkEcKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(ecKey), JsonWebKey.class);
+    EcKey keyReconverted = (EcKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(ecKey), JWK.class);
     assertEquals(ecKey, keyReconverted);
   }
 
@@ -58,9 +58,9 @@ public class JwkTest {
   public void rsaPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-public-key.json");
     System.out.println(json);
-    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
-    assertTrue(key instanceof JwkRsaPrivateKey);
-    JwkRsaPrivateKey rsaKey = (JwkRsaPrivateKey) key;
+    JWK key = JsonMarshaller.fromJson(json, JWK.class);
+    assertTrue(key instanceof RsaPrivateKey);
+    RsaPrivateKey rsaKey = (RsaPrivateKey) key;
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url
         ("n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O" +
             "-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqVwGU_NsYOYL" +
@@ -72,7 +72,7 @@ public class JwkTest {
     assertEquals("sig", rsaKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", rsaKey.getKid());
 
-    JwkRsaPrivateKey keyReconverted = (JwkRsaPrivateKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(rsaKey), JsonWebKey.class);
+    RsaPrivateKey keyReconverted = (RsaPrivateKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(rsaKey), JWK.class);
     assertEquals(rsaKey, keyReconverted);
   }
 
@@ -80,9 +80,9 @@ public class JwkTest {
   public void rsaPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
     System.out.println(json);
-    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
-    assertTrue(key instanceof JwkRsaPrivateKey);
-    JwkRsaPrivateKey rsaKey = (JwkRsaPrivateKey) key;
+    JWK key = JsonMarshaller.fromJson(json, JWK.class);
+    assertTrue(key instanceof RsaPrivateKey);
+    RsaPrivateKey rsaKey = (RsaPrivateKey) key;
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url
         ("n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O" +
             "-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqVwGU_NsYOYL" +
@@ -100,7 +100,7 @@ public class JwkTest {
     assertEquals("sig", rsaKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", rsaKey.getKid());
 
-    JwkRsaPrivateKey keyReconverted = (JwkRsaPrivateKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(rsaKey), JsonWebKey.class);
+    RsaPrivateKey keyReconverted = (RsaPrivateKey) JsonMarshaller.fromJson(JsonMarshaller.toJson(rsaKey), JWK.class);
     assertEquals(rsaKey, keyReconverted);
   }
 
@@ -110,8 +110,8 @@ public class JwkTest {
     System.out.println(json);
     JwkSet deserialized = JsonMarshaller.fromJson(json, JwkSet.class);
     assertEquals(2, deserialized.keys.size());
-    assertTrue(deserialized.keys.get(0) instanceof JwkEcKey);
-    JwkEcKey ecKey = (JwkEcKey)deserialized.keys.get(0);
+    assertTrue(deserialized.keys.get(0) instanceof EcKey);
+    EcKey ecKey = (EcKey)deserialized.keys.get(0);
     assertEquals("P-256", ecKey.getCrv());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4")), ecKey
         .getX());
@@ -120,8 +120,8 @@ public class JwkTest {
     assertEquals("enc", ecKey.getUse());
     assertEquals("1", ecKey.getKid());
 
-    assertTrue(deserialized.keys.get(1) instanceof JwkRsaPrivateKey);
-    JwkRsaPrivateKey rsaKey = (JwkRsaPrivateKey) deserialized.keys.get(1);
+    assertTrue(deserialized.keys.get(1) instanceof RsaPrivateKey);
+    RsaPrivateKey rsaKey = (RsaPrivateKey) deserialized.keys.get(1);
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url
         ("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw")), rsaKey.getModulus());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AQAB")), rsaKey.getPublicExponent());
@@ -138,8 +138,8 @@ public class JwkTest {
     System.out.println(json);
     JwkSet deserialized = JsonMarshaller.fromJson(json, JwkSet.class);
     assertEquals(2, deserialized.keys.size());
-    assertTrue(deserialized.keys.get(0) instanceof JwkEcKey);
-    JwkEcKey ecKey = (JwkEcKey)deserialized.keys.get(0);
+    assertTrue(deserialized.keys.get(0) instanceof EcKey);
+    EcKey ecKey = (EcKey)deserialized.keys.get(0);
     assertEquals("P-256", ecKey.getCrv());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4")), ecKey
         .getX());
@@ -150,8 +150,8 @@ public class JwkTest {
     assertEquals("enc", ecKey.getUse());
     assertEquals("1", ecKey.getKid());
 
-    assertTrue(deserialized.keys.get(1) instanceof JwkRsaPrivateKey);
-    JwkRsaPrivateKey rsaKey = (JwkRsaPrivateKey) deserialized.keys.get(1);
+    assertTrue(deserialized.keys.get(1) instanceof RsaPrivateKey);
+    RsaPrivateKey rsaKey = (RsaPrivateKey) deserialized.keys.get(1);
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url
         ("0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw")), rsaKey.getModulus());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AQAB")), rsaKey.getPublicExponent());

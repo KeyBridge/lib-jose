@@ -1,9 +1,9 @@
 package org.ietf.jose.util;
 
-import org.ietf.jose.jwk.JsonWebKey;
-import org.ietf.jose.jwk.JwkEcKey;
-import org.ietf.jose.jwk.JwkRsaPrivateKey;
-import org.ietf.jose.jwk.JwkSymmetricKey;
+import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.jwk.EcKey;
+import org.ietf.jose.jwk.RsaPrivateKey;
+import org.ietf.jose.jwk.SymmetricKey;
 import org.ietf.jose.jwa.JWSAlgorithmType;
 import java.security.*;
 import java.security.spec.AlgorithmParameterSpec;
@@ -211,16 +211,16 @@ public class CryptographyUtility {
    * @return bytes of the signature or HMAC
    * @throws GeneralSecurityException in case of failure
    */
-  public static byte[] sign(byte[] payloadBytes, JsonWebKey jwk) throws GeneralSecurityException {
+  public static byte[] sign(byte[] payloadBytes, JWK jwk) throws GeneralSecurityException {
     final JWSAlgorithmType algorithm = JWSAlgorithmType.resolveAlgorithm(jwk.getAlg());
-    if (jwk instanceof JwkSymmetricKey) {
-      JwkSymmetricKey symmetricKey = (JwkSymmetricKey) jwk;
+    if (jwk instanceof SymmetricKey) {
+      SymmetricKey symmetricKey = (SymmetricKey) jwk;
       return sign(payloadBytes, new SecretKeySpec(symmetricKey.getK(), algorithm.getJavaAlgorithmName()), algorithm
                   .getJavaAlgorithmName());
-    } else if (jwk instanceof JwkRsaPrivateKey) {
-      JwkRsaPrivateKey rsaKey = (JwkRsaPrivateKey) jwk;
+    } else if (jwk instanceof RsaPrivateKey) {
+      RsaPrivateKey rsaKey = (RsaPrivateKey) jwk;
       return sign(payloadBytes, rsaKey.getPrivateKey(), algorithm.getJavaAlgorithmName());
-    } else if (jwk instanceof JwkEcKey) {
+    } else if (jwk instanceof EcKey) {
       throw new UnsupportedOperationException("Elliptic curve keys are not supported");
     }
     return null;

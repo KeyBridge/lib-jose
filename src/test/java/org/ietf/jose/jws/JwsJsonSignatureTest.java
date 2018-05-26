@@ -1,6 +1,5 @@
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JWSAlgorithmType;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -10,8 +9,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.crypto.KeyGenerator;
 import org.ietf.jose.JoseCryptoHeader;
-import org.ietf.jose.jwk.JsonWebKey;
-import org.ietf.jose.jwk.JwkRsaPrivateKey;
+import org.ietf.jose.jwa.JWSAlgorithmType;
+import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.jwk.RsaPrivateKey;
 import org.ietf.jose.util.Base64Utility;
 import org.junit.Test;
 
@@ -31,8 +31,8 @@ public class JwsJsonSignatureTest {
     try {
       JoseCryptoHeader header = new JoseCryptoHeader();
       header.setAlg(alg.getJoseAlgorithmName());
-      JwsJson jws = JwsBuilder.getInstance().withBinaryPayload(payload).sign(privateKey, alg).buildJson();
-      JwsSignature signature = jws.getSignatures().get(0); //JwsSignature.getInstance(payload, privateKey, header);
+      JwsJsonObject jws = JwsBuilder.getInstance().withBinaryPayload(payload).sign(privateKey, alg).buildJson();
+      JwsJsonSignature signature = jws.getSignatures().get(0); //JwsSignature.getInstance(payload, privateKey, header);
       assertTrue(signature.isValidSignature(payload, publicKey));
       wrongPublicKeys.forEach(key -> {
         try {
@@ -52,8 +52,8 @@ public class JwsJsonSignatureTest {
     try {
       JoseCryptoHeader header = new JoseCryptoHeader();
       header.setAlg(alg.getJoseAlgorithmName());
-      JwsJson jws = JwsBuilder.getInstance().withBinaryPayload(payload).sign(secret, alg).buildJson();
-      JwsSignature signature = jws.getSignatures().get(0); //JwsSignature.getInstance(payload, privateKey, header);
+      JwsJsonObject jws = JwsBuilder.getInstance().withBinaryPayload(payload).sign(secret, alg).buildJson();
+      JwsJsonSignature signature = jws.getSignatures().get(0); //JwsSignature.getInstance(payload, privateKey, header);
       assertTrue(signature.isValidSignature(payload, secret));
 
       for (int i = 0; i < 100; i++) {
@@ -72,20 +72,20 @@ public class JwsJsonSignatureTest {
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
     generator.initialize(2048);
     KeyPair keyPair = generator.generateKeyPair();
-    JsonWebKey keyOne = JwkRsaPrivateKey.getInstance(keyPair);
-    JsonWebKey keyTwo = JwkRsaPrivateKey.getInstance(keyPair);
+    JWK keyOne = RsaPrivateKey.getInstance(keyPair);
+    JWK keyTwo = RsaPrivateKey.getInstance(keyPair);
 
     keyOne.setAlg(RS256.getJoseAlgorithmName());
     keyTwo.setAlg(RS512.getJoseAlgorithmName());
 
-    JwsSignature signature = JwsSignature.getInstance("sign this".getBytes(), keyOne);
-    JwsSignature signature2 = JwsSignature.getInstance("sign this".getBytes(), keyTwo);
+    JwsJsonSignature signature = JwsJsonSignature.getInstance("sign this".getBytes(), keyOne);
+    JwsJsonSignature signature2 = JwsJsonSignature.getInstance("sign this".getBytes(), keyTwo);
 
     System.out.println(toBase64Url(signature.getSignatureBytes()));
     System.out.println(toBase64Url(signature2.getSignatureBytes()));
 
     String longString = createRandomString(10000);
-    JwsSignature signature3 = JwsSignature.getInstance(longString.getBytes(), keyTwo);
+    JwsJsonSignature signature3 = JwsJsonSignature.getInstance(longString.getBytes(), keyTwo);
     System.out.println(toBase64Url(signature3.getSignatureBytes()));
   }
 
@@ -118,7 +118,7 @@ public class JwsJsonSignatureTest {
 
     List<PublicKey> wrongPublicKeys = IntStream.range(0, 5)
       .mapToObj(i -> generator.generateKeyPair().getPublic()).collect(Collectors.toList());
-    for (JWSAlgorithmType algorithm : asList(ES256, ES284, ES512)) {
+    for (JWSAlgorithmType algorithm : asList(ES256, ES384, ES512)) {
       System.out.println(algorithm.getJoseAlgorithmName());
       testSingAndVerifyRSA(payload, keyPair.getPublic(), keyPair.getPrivate(), algorithm, wrongPublicKeys);
     }

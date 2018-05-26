@@ -1,14 +1,16 @@
 package org.ietf.jose.jwt;
 
-import org.ietf.jose.adapter.XmlAdapterInstantLong;
 import java.time.Instant;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.ietf.jose.adapter.XmlAdapterInstantLong;
 
 /**
- * RFC 7519 § 4. JWT Claims
+ * RFC 7519 JSON Web Token (JWT)
+ * <p>
+ * 4. JWT Claims
  * <p>
  * The JWT Claims Set represents a JSON object whose members are the claims
  * conveyed by the JWT. The Claim Names within a JWT Claims Set MUST be unique;
@@ -26,19 +28,20 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * There are three classes of JWT Claim Names: Registered Claim Names, Public
  * Claim Names, and Private Claim Names.
  * <p>
- * 4.1. Registered Claim Names The following Claim Names are registered in the
- * IANA "JSON Web Token Claims" registry established by Section 10.1. None of
- * the claims defined below are intended to be mandatory to use or implement in
- * all cases, but rather they provide a starting point for a set of useful,
- * interoperable claims. Applications using JWTs should define which specific
- * claims they use and when they are required or optional. All the names are
- * short because a core goal of JWTs is for the representation to be compact.
+ * 4.1. Registered Claim Names
+ * <p>
+ * The following Claim Names are registered in the IANA "JSON Web Token Claims"
+ * registry established by Section 10.1. None of the claims defined below are
+ * intended to be mandatory to use or implement in all cases, but rather they
+ * provide a starting point for a set of useful, interoperable claims.
+ * Applications using JWTs should define which specific claims they use and when
+ * they are required or optional. All the names are short because a core goal of
+ * JWTs is for the representation to be compact.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JwtClaim {
 
   /**
-   *
    * 4.1.1. "iss" (Issuer) Claim The "iss" (issuer) claim identifies the
    * principal that issued the JWT. The processing of this claim is generally
    * application specific. The "iss" value is a case-sensitive string containing
@@ -47,7 +50,6 @@ public class JwtClaim {
   @XmlElement(name = "iss")
   private String issuer;
   /**
-   *
    * 4.1.2. "sub" (Subject) Claim The "sub" (subject) claim identifies the
    * principal that is the subject of the JWT. The claims in a JWT are normally
    * statements about the subject. The subject value MUST either be scoped to be
@@ -59,7 +61,6 @@ public class JwtClaim {
   @XmlElement(name = "sub")
   private String subject;
   /**
-   *
    * 4.1.3. "aud" (Audience) Claim The "aud" (audience) claim identifies the
    * recipients that the JWT is intended for. Each principal intended to process
    * the JWT MUST identify itself with a value in the audience claim. If the

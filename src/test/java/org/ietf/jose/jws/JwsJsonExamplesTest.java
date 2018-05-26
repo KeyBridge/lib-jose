@@ -2,7 +2,7 @@ package org.ietf.jose.jws;
 
 import org.ietf.jose.jwa.JWSAlgorithmType;
 import org.ietf.TestFileReader;
-import org.ietf.jose.jwk.JwkRsaPrivateKey;
+import org.ietf.jose.jwk.RsaPrivateKey;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class JwsJsonExamplesTest {
         '.' + toBase64Url(payload);
 
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    JwkRsaPrivateKey key = JsonMarshaller.fromJson(json, JwkRsaPrivateKey.class);
+    RsaPrivateKey key = JsonMarshaller.fromJson(json, RsaPrivateKey.class);
 
     KeyFactory kf = KeyFactory.getInstance("RSA");
     RSAPrivateKeySpec spec = new RSAPrivateKeySpec(key.getModulus(), key.getPrivateExponent());

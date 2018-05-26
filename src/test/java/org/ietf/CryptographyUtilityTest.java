@@ -1,7 +1,7 @@
 package org.ietf;
 
 import org.ietf.jose.jwa.JWEKeyAlgorithmType;
-import org.ietf.jose.jwk.JwkRsaPrivateKey;
+import org.ietf.jose.jwk.RsaPrivateKey;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
 import org.junit.Test;
@@ -15,7 +15,7 @@ public class CryptographyUtilityTest {
   public void encryptAndDecrypt() throws Exception {
     final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/rsa-private-key.json");
 
-    JwkRsaPrivateKey key = JsonMarshaller.fromJson(jwkJson, JwkRsaPrivateKey.class);
+    RsaPrivateKey key = JsonMarshaller.fromJson(jwkJson, RsaPrivateKey.class);
 
     String algorithm = JWEKeyAlgorithmType.RSA_OAEP.getJavaAlgorithm();
 

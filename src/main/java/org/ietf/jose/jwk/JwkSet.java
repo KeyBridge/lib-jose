@@ -6,6 +6,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
+ * RFC 7517 JSON Web Key (JWK)
+ * <p>
  * 5. JWK Set Format
  * <p>
  * A JWK Set is a JSON object that represents a set of JWKs. The JSON object
@@ -38,7 +40,7 @@ public class JwkSet {
    * assign a meaning to the order for their purposes, if desired.
    */
   @XmlElement(required = true)
-  List<? extends JsonWebKey> keys;
+  List<? extends JWK> keys;
 
   @Override
   public String toString() {

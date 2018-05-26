@@ -1,7 +1,7 @@
 package org.ietf.jose;
 
 import org.ietf.jose.jwe.JweBuilder;
-import org.ietf.jose.jwe.JweJoseHeader;
+import org.ietf.jose.jwe.JoseHeader;
 import org.ietf.jose.jwe.JweJsonFlattened;
 import org.ietf.jose.jwa.JWSAlgorithmType;
 import org.ietf.jose.jws.JwsBuilder;
@@ -125,7 +125,7 @@ public class JOSE {
         .sign(senderPrivateKey, JWSAlgorithmType.RS256)
         .buildJsonFlattened();
 
-      JweJoseHeader jweHeader = new JweJoseHeader();
+      JoseHeader jweHeader = new JoseHeader();
       jweHeader.setKid(senderId);
 
       return JweBuilder.getInstance()
@@ -167,7 +167,7 @@ public class JOSE {
         .sign(base64UrlEncodedSecret)
         .buildJsonFlattened();
 
-      JweJoseHeader jweHeader = new JweJoseHeader();
+      JoseHeader jweHeader = new JoseHeader();
       jweHeader.setKid(senderId);
 
       return JweBuilder.getInstance()

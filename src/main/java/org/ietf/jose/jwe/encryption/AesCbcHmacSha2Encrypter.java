@@ -1,6 +1,5 @@
 package org.ietf.jose.jwe.encryption;
 
-import org.ietf.jose.util.SecureRandomUtility;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.Arrays;
@@ -10,6 +9,7 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import org.ietf.jose.util.SecureRandomUtility;
 
 /**
  * A content encrypter that uses AES as the block cipher and CBC mode as the
@@ -48,36 +48,16 @@ public class AesCbcHmacSha2Encrypter implements Encrypter {
   }
 
   /**
-   * @param l
-   * @return
+   * {@inheritDoc}
    */
-  private static byte[] getUnsignedLongBytes(long l) {
-    byte[] result = new byte[8];
-    for (int i = 7; i >= 0; i--) {
-      result[i] = (byte) (l & 0xFF);
-      l >>= 8;
-    }
-    return result;
-  }
-
-  private static byte[] concatenate(byte[] aad, byte[] iv, byte[] ciphertext, byte[] a) {
-    byte[] output = new byte[aad.length + iv.length + ciphertext.length + a.length];
-    int idx = 0;
-    System.arraycopy(aad, 0, output, idx, aad.length);
-    idx += aad.length;
-    System.arraycopy(iv, 0, output, idx, iv.length);
-    idx += iv.length;
-    System.arraycopy(ciphertext, 0, output, idx, ciphertext.length);
-    idx += ciphertext.length;
-    System.arraycopy(a, 0, output, idx, a.length);
-    return output;
-  }
-
   @Override
   public Key generateKey() throws GeneralSecurityException {
     return new SecretKeySpec(SecureRandomUtility.generateBytes(configuration.INPUT_KEY_LENGTH), SECRET_KEY_ALGORITHM);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public EncryptionResult encrypt(byte[] payload, byte[] iv, byte[] aad, Key key) throws GeneralSecurityException {
     if (iv == null) {
@@ -95,6 +75,9 @@ public class AesCbcHmacSha2Encrypter implements Encrypter {
     return new EncryptionResult(iv, aad, ciphertext, calculateAuthenticationTag(ciphertext, aad, iv, key));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public byte[] decrypt(byte[] ciphertext, byte[] iv, byte[] aad, byte[] authTag, Key key) throws
     GeneralSecurityException {
@@ -125,6 +108,28 @@ public class AesCbcHmacSha2Encrypter implements Encrypter {
     return Arrays.copyOf(macValue, configuration.T_LEN);
   }
 
+  private static byte[] getUnsignedLongBytes(long l) {
+    byte[] result = new byte[8];
+    for (int i = 7; i >= 0; i--) {
+      result[i] = (byte) (l & 0xFF);
+      l >>= 8;
+    }
+    return result;
+  }
+
+  private static byte[] concatenate(byte[] aad, byte[] iv, byte[] ciphertext, byte[] a) {
+    byte[] output = new byte[aad.length + iv.length + ciphertext.length + a.length];
+    int idx = 0;
+    System.arraycopy(aad, 0, output, idx, aad.length);
+    idx += aad.length;
+    System.arraycopy(iv, 0, output, idx, iv.length);
+    idx += iv.length;
+    System.arraycopy(ciphertext, 0, output, idx, ciphertext.length);
+    idx += ciphertext.length;
+    System.arraycopy(a, 0, output, idx, a.length);
+    return output;
+  }
+
   private void validateInputs(Key key, byte[] aad, byte[] iv) {
     if (key.getEncoded().length != configuration.INPUT_KEY_LENGTH) {
       throw new IllegalArgumentException("Key must be " + configuration.INPUT_KEY_LENGTH + " bytes in length. Key "
@@ -151,6 +156,10 @@ public class AesCbcHmacSha2Encrypter implements Encrypter {
                              SECRET_KEY_ALGORITHM);
   }
 
+  /**
+   * Immutable configuration parameters for the AES-CBC-HMAC-SHA2 encryption
+   * scheme.
+   */
   public enum Configuration {
     AES_128_CBC_HMAC_SHA_256(32, 16, 16, "SHA-256", "HmacSHA256", 16),
     AES_192_CBC_HMAC_SHA_384(48, 24, 24, "SHA-384", "HmacSHA384", 24),

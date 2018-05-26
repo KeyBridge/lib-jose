@@ -2,7 +2,7 @@ package org.ietf.jose.jws;
 
 import org.ietf.jose.jwa.JWSAlgorithmType;
 import org.ietf.TestUtil;
-import org.ietf.jose.jwk.JwkSymmetricKey;
+import org.ietf.jose.jwk.SymmetricKey;
 import org.ietf.jose.util.CryptographyUtility;
 import org.junit.Test;
 
@@ -145,9 +145,9 @@ public class JwsJsonTest {
      aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow"
      }
      */
-    JwkSymmetricKey key = fromJson("{\"kty\":\"oct\",\n" +
+    SymmetricKey key = fromJson("{\"kty\":\"oct\",\n" +
             "\"k\":\"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow\"}",
-        JwkSymmetricKey.class);
+        SymmetricKey.class);
 
     Mac mac = Mac.getInstance("HmacSHA256");
     SecretKeySpec secretKeySpec = new SecretKeySpec(key.getK(), "HmacSHA256");
