@@ -20,7 +20,17 @@ A number of examples are defined in:
  
  * [7520 JOSE](https://tools.ietf.org/html/rfc7520)    Examples of Protecting Content Using JOSE
 
-## Installation
+## Implementation
+
+This implementation includes a default profile with algorithms selected to run on all JVM instances. 
+
+See the [Java Cryptography Architecture (JCA) Documentation](https://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html) for more information about algorithm selection.
+
+## Use
+
+See the [examples](doc/examples.md) for sample code.
+
+## Installation and key length errors
 
 **Note**: The following instructions are NOT necessary for Oracle JRE/JDK distributions in the US.
 
@@ -248,5 +258,17 @@ JWT standard defines claims - name/value pair asserting information about subjec
     "jti" (JWT ID) as unique identifier for JWT
 
 While standard mandates what are mandatory values of the claims, all of them are optional to use in a valid JWT. This means applications can use any structure for JWT if it`s not intended to use publicly, and for public JWT set of claims is defined and collisions in names are prevented.
+
+
+# License
+
+Copyright 2018 Key Bridge. Published under the Apache 2.0 license.
+
+# References
+
+ * [jwt.io](https://jwt.io/) - a catalog of open source JWT implementations
+ * [jose4j](https://bitbucket.org/b_c/jose4j/overview) another complete but poorly documented implementation in java
+
+
 
 

@@ -1,20 +1,17 @@
-/*
- * Copyright 2018 Key Bridge. All rights reserved. Use is subject to license
- * terms.
+/* 
+ * Copyright 2018 Key Bridge.
  *
- * This software code is protected by Copyrights and remains the property of
- * Key Bridge and its suppliers, if any. Key Bridge reserves all rights in and to
- * Copyrights and no license is granted under Copyrights in this Software
- * License Agreement.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Key Bridge generally licenses Copyrights for commercialization pursuant to
- * the terms of either a Standard Software Source Code License Agreement or a
- * Standard Product License Agreement. A copy of either Agreement can be
- * obtained upon request by sending an email to info@keybridgewireless.com.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * All information contained herein is the property of Key Bridge and its
- * suppliers, if any. The intellectual and technical concepts contained herein
- * are proprietary.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.ietf.jose.jwa;
 
