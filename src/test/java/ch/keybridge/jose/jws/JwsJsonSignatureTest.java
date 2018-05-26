@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 
 import static ch.keybridge.TestUtil.createRandomString;
 import static ch.keybridge.TestUtil.getAlteredBytes;
-import static ch.keybridge.jose.jws.ESignatureAlgorithm.*;
+import static ch.keybridge.jose.jws.SignatureAlgorithmType.*;
 import static ch.keybridge.jose.util.Base64Utility.fromBase64Url;
 import static ch.keybridge.jose.util.Base64Utility.toBase64Url;
 import static java.util.Arrays.asList;
@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 
 public class JwsJsonSignatureTest {
   private static void testSingAndVerifyRSA(byte[] payload, PublicKey publicKey, PrivateKey privateKey,
-                                           ESignatureAlgorithm alg,
+                                           SignatureAlgorithmType alg,
                                            List<PublicKey> wrongPublicKeys) {
     try {
       JoseCryptoHeader header = new JoseCryptoHeader();
@@ -47,7 +47,7 @@ public class JwsJsonSignatureTest {
     }
   }
 
-  private static void testSingAndVerifySymmetric(byte[] payload, String secret, ESignatureAlgorithm alg) {
+  private static void testSingAndVerifySymmetric(byte[] payload, String secret, SignatureAlgorithmType alg) {
     try {
       JoseCryptoHeader header = new JoseCryptoHeader();
       header.setAlg(alg.getJoseAlgorithmName());
@@ -97,7 +97,7 @@ public class JwsJsonSignatureTest {
 
     List<PublicKey> wrongPublicKeys = IntStream.range(0, 5)
         .mapToObj(i -> generator.generateKeyPair().getPublic()).collect(Collectors.toList());
-    for (ESignatureAlgorithm algorithm : asList(RS256, RS384, RS512)) {
+    for (SignatureAlgorithmType algorithm : asList(RS256, RS384, RS512)) {
       System.out.println(algorithm.getJoseAlgorithmName());
       testSingAndVerifyRSA(payload, keyPair.getPublic(), keyPair.getPrivate(), algorithm, wrongPublicKeys);
     }
@@ -116,7 +116,7 @@ public class JwsJsonSignatureTest {
 
     List<PublicKey> wrongPublicKeys = IntStream.range(0, 5)
         .mapToObj(i -> generator.generateKeyPair().getPublic()).collect(Collectors.toList());
-    for (ESignatureAlgorithm algorithm : asList(ES256, ES284, ES512)) {
+    for (SignatureAlgorithmType algorithm : asList(ES256, ES284, ES512)) {
       System.out.println(algorithm.getJoseAlgorithmName());
       testSingAndVerifyRSA(payload, keyPair.getPublic(), keyPair.getPrivate(), algorithm, wrongPublicKeys);
     }
@@ -126,7 +126,7 @@ public class JwsJsonSignatureTest {
   public void testHmacSignatures() {
 
     final byte[] payload = "sign this".getBytes();
-    for (ESignatureAlgorithm algorithm : asList(HS256, HS384, HS512)) {
+    for (SignatureAlgorithmType algorithm : asList(HS256, HS384, HS512)) {
       System.out.println(algorithm.getJoseAlgorithmName());
       testSingAndVerifySymmetric(payload, toBase64Url(createRandomString(20)), algorithm);
     }

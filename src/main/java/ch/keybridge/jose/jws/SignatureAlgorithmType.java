@@ -7,7 +7,7 @@ package ch.keybridge.jose.jws;
  * defined by this specification for use with JWS, each of which is explained in
  * more detail in the following sections:
  */
-public enum ESignatureAlgorithm {
+public enum SignatureAlgorithmType {
   /**
    * HMAC using SHA-256
    */
@@ -46,16 +46,22 @@ public enum ESignatureAlgorithm {
   ES512("ES512", "SHA512withECDSA"),
   /**
    * RSASSA-PSS using SHA-256 and MGF1 with SHA-256
+   *
+   * @deprecated not supported by default in all JRE
    */
-//  PS256("PS256", "SHA256withRSAandMGF1"),
+  PS256("PS256", "SHA256withRSAandMGF1"),
   /**
    * RSASSA-PSS using SHA-384 and MGF1 with SHA-384
+   *
+   * @deprecated not supported by default in all JRE
    */
-//  PS384("PS384", "SHA384withRSAandMGF1"),
+  PS384("PS384", "SHA384withRSAandMGF1"),
   /**
    * RSASSA-PSS using SHA-512 and MGF1 with SHA-512
+   *
+   * @deprecated not supported by default in all JRE
    */
-//  PS512("PS512", "SHA512withRSAandMGF1"),
+  PS512("PS512", "SHA512withRSAandMGF1"),
   /**
    * No digital signature or MAC performed
    */
@@ -79,16 +85,16 @@ public enum ESignatureAlgorithm {
    */
   private final String javaAlgorithmName;
 
-  ESignatureAlgorithm(String joseAlgorithmName, String javaAlgorithmName) {
+  SignatureAlgorithmType(String joseAlgorithmName, String javaAlgorithmName) {
     this.joseAlgorithmName = joseAlgorithmName;
     this.javaAlgorithmName = javaAlgorithmName;
   }
 
-  public static ESignatureAlgorithm resolveAlgorithm(String alg) {
+  public static SignatureAlgorithmType resolveAlgorithm(String alg) {
     if (alg == null || alg.isEmpty()) {
       return UNKNOWN;
     }
-    for (ESignatureAlgorithm algorithm : ESignatureAlgorithm.values()) {
+    for (SignatureAlgorithmType algorithm : SignatureAlgorithmType.values()) {
       if (alg.equals(algorithm.joseAlgorithmName)) {
         return algorithm;
       }

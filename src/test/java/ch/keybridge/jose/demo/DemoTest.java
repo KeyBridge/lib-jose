@@ -1,7 +1,7 @@
 package ch.keybridge.jose.demo;
 
 import ch.keybridge.jose.JOSE;
-import ch.keybridge.jose.jws.ESignatureAlgorithm;
+import ch.keybridge.jose.jws.SignatureAlgorithmType;
 import ch.keybridge.jose.jws.JwsBuilder;
 import ch.keybridge.jose.jws.JwsJsonFlattened;
 import ch.keybridge.jose.util.Base64Utility;
@@ -114,14 +114,14 @@ public class DemoTest {
 
     String json = JwsBuilder.getInstance()
       .withStringPayload("sample text to sign")
-      .sign(senderKeyPair.getPrivate(), ESignatureAlgorithm.RS256)
+      .sign(senderKeyPair.getPrivate(), SignatureAlgorithmType.RS256)
       .buildJsonFlattened()
       .toJson();
 
     System.out.println(json);
     json = JwsBuilder.getInstance()
       .withStringPayload("sample text to sign")
-      .sign(senderKeyPair.getPrivate(), ESignatureAlgorithm.RS512)
+      .sign(senderKeyPair.getPrivate(), SignatureAlgorithmType.RS512)
       .buildJsonFlattened()
       .toJson();
 

@@ -104,7 +104,7 @@ public class JwsBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public JwsBuilder sign(Key key, ESignatureAlgorithm algorithm) throws IOException, GeneralSecurityException {
+  public JwsBuilder sign(Key key, SignatureAlgorithmType algorithm) throws IOException, GeneralSecurityException {
     if (protectedHeader == null) {
       protectedHeader = new JoseCryptoHeader();
     }
@@ -123,7 +123,7 @@ public class JwsBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public JwsBuilder sign(String secret, ESignatureAlgorithm algorithm) throws IOException, GeneralSecurityException {
+  public JwsBuilder sign(String secret, SignatureAlgorithmType algorithm) throws IOException, GeneralSecurityException {
     SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(secret), algorithm.getJavaAlgorithmName());
     return sign(key, algorithm);
   }
@@ -139,16 +139,16 @@ public class JwsBuilder {
    */
   public JwsBuilder sign(String secret) throws IOException, GeneralSecurityException {
     byte[] keyBytes = Base64Utility.fromBase64Url(secret);
-    ESignatureAlgorithm algorithm;
+    SignatureAlgorithmType algorithm;
     switch (keyBytes.length) {
       case 32:
-        algorithm = ESignatureAlgorithm.HS256;
+        algorithm = SignatureAlgorithmType.HS256;
         break;
       case 48:
-        algorithm = ESignatureAlgorithm.HS384;
+        algorithm = SignatureAlgorithmType.HS384;
         break;
       case 64:
-        algorithm = ESignatureAlgorithm.HS512;
+        algorithm = SignatureAlgorithmType.HS512;
         break;
       default:
         throw new IllegalArgumentException("Unsupported key length: " + keyBytes.length);

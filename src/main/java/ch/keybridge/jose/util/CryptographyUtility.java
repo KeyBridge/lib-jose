@@ -4,7 +4,7 @@ import ch.keybridge.jose.jwk.JsonWebKey;
 import ch.keybridge.jose.jwk.JwkEcKey;
 import ch.keybridge.jose.jwk.JwkRsaPrivateKey;
 import ch.keybridge.jose.jwk.JwkSymmetricKey;
-import ch.keybridge.jose.jws.ESignatureAlgorithm;
+import ch.keybridge.jose.jws.SignatureAlgorithmType;
 import java.security.*;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
@@ -212,7 +212,7 @@ public class CryptographyUtility {
    * @throws GeneralSecurityException in case of failure
    */
   public static byte[] sign(byte[] payloadBytes, JsonWebKey jwk) throws GeneralSecurityException {
-    final ESignatureAlgorithm algorithm = ESignatureAlgorithm.resolveAlgorithm(jwk.getAlg());
+    final SignatureAlgorithmType algorithm = SignatureAlgorithmType.resolveAlgorithm(jwk.getAlg());
     if (jwk instanceof JwkSymmetricKey) {
       JwkSymmetricKey symmetricKey = (JwkSymmetricKey) jwk;
       return sign(payloadBytes, new SecretKeySpec(symmetricKey.getK(), algorithm.getJavaAlgorithmName()), algorithm

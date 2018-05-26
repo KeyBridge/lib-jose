@@ -126,7 +126,7 @@ public class JwsSignature {
     JwsSignature signature = new JwsSignature();
     signature.protectedHeader = protectedHeader;
     signature.unprotectedHeader = unprotectedHeader;
-    ESignatureAlgorithm algorithm = ESignatureAlgorithm.resolveAlgorithm(protectedHeader.getAlg());
+    SignatureAlgorithmType algorithm = SignatureAlgorithmType.resolveAlgorithm(protectedHeader.getAlg());
 
     String protectedHeaderJson = JsonMarshaller.toJson(signature.protectedHeader);
     String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
@@ -199,7 +199,7 @@ public class JwsSignature {
   public boolean isValidSignature(byte[] payload, Key key) throws IOException, GeneralSecurityException {
     String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
     String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
-    ESignatureAlgorithm algorithm = ESignatureAlgorithm.resolveAlgorithm(protectedHeader.getAlg());
+    SignatureAlgorithmType algorithm = SignatureAlgorithmType.resolveAlgorithm(protectedHeader.getAlg());
     return CryptographyUtility.validateSignature(signature, fullPayload.getBytes(US_ASCII), key, algorithm
                                                  .getJavaAlgorithmName());
   }
@@ -219,7 +219,7 @@ public class JwsSignature {
     throws IOException, GeneralSecurityException {
     String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
     String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
-    ESignatureAlgorithm algorithm = ESignatureAlgorithm.resolveAlgorithm(protectedHeader.getAlg());
+    SignatureAlgorithmType algorithm = SignatureAlgorithmType.resolveAlgorithm(protectedHeader.getAlg());
 
     SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(base64UrlEncodedSecret), algorithm.getJavaAlgorithmName());
     return CryptographyUtility.validateSignature(signature, fullPayload.getBytes(US_ASCII), key, algorithm

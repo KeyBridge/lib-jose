@@ -1,6 +1,6 @@
 package ch.keybridge.jose.jwk;
 
-public enum EKeyOperation {
+public enum KeyOperationType {
   SIGN("sign"),
   VERIFY("verify"),
   ENCRYPT("encrypt"),
@@ -12,7 +12,7 @@ public enum EKeyOperation {
 
   private final String value;
 
-  EKeyOperation(String value) {
+  KeyOperationType(String value) {
     this.value = value;
   }
 

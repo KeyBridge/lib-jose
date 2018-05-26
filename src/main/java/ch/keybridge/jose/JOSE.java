@@ -3,7 +3,7 @@ package ch.keybridge.jose;
 import ch.keybridge.jose.jwe.JweBuilder;
 import ch.keybridge.jose.jwe.JweJoseHeader;
 import ch.keybridge.jose.jwe.JweJsonFlattened;
-import ch.keybridge.jose.jws.ESignatureAlgorithm;
+import ch.keybridge.jose.jws.SignatureAlgorithmType;
 import ch.keybridge.jose.jws.JwsBuilder;
 import ch.keybridge.jose.jws.JwsJsonFlattened;
 import ch.keybridge.jose.util.JsonMarshaller;
@@ -122,7 +122,7 @@ public class JOSE {
       JwsJsonFlattened jws = JwsBuilder.getInstance()
         .withStringPayload(jsonPayload)
         .withProtectedHeader(jwsHeader)
-        .sign(senderPrivateKey, ESignatureAlgorithm.RS256)
+        .sign(senderPrivateKey, SignatureAlgorithmType.RS256)
         .buildJsonFlattened();
 
       JweJoseHeader jweHeader = new JweJoseHeader();

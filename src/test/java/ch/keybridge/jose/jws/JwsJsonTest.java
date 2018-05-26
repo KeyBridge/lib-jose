@@ -173,7 +173,7 @@ public class JwsJsonTest {
      */
     final String expectedSignature = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
     assertEquals(expectedSignature, toBase64Url(hmac));
-    key.setAlg(ESignatureAlgorithm.HS256.getJoseAlgorithmName());
+    key.setAlg(SignatureAlgorithmType.HS256.getJoseAlgorithmName());
     /**
      * Check whether the EncryptionUtility returns the same result
      */
