@@ -1,12 +1,5 @@
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JWSAlgorithmType;
-import org.ietf.jose.JoseCryptoHeader;
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.jwk.JsonWebKey;
-import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.CryptographyUtility;
-import org.ietf.jose.util.JsonMarshaller;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -16,30 +9,45 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.ietf.jose.JoseCryptoHeader;
+import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.jwa.JWSAlgorithmType;
+import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.util.Base64Utility;
+import org.ietf.jose.util.CryptographyUtility;
+import org.ietf.jose.util.JsonMarshaller;
 
-import static org.ietf.jose.util.Base64Utility.toBase64Url;
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static org.ietf.jose.util.Base64Utility.toBase64Url;
 
 /**
- * RFC 7515 § 7.2.1 The following members are defined for use in the JSON
- * objects that are elements of the "signatures" array: protected
+ * RFC 7515 JSON Web Signature (JWS)
  * <p>
- * The "protected" member MUST be present and contain the value
+ * JSON Web Signature (JWS) represents content secured with digital signatures
+ * or Message Authentication Codes (MACs) using JSON-based [RFC7159] data
+ * structures.
+ * <p>
+ * 7.2.1. General JWS JSON Serialization Syntax
+ * <p>
+ * The following members are defined for use in the JSON objects that are
+ * elements of the "signatures" array:
+ * <p>
+ * protected: The "protected" member MUST be present and contain the value
  * BASE64URL(UTF8(JWS Protected Header)) when the JWS Protected Header value is
  * non-empty; otherwise, it MUST be absent. These Header Parameter values are
- * integrity protected. header
+ * integrity protected.
  * <p>
- * The "header" member MUST be present and contain the value JWS Unprotected
- * Header when the JWS Unprotected Header value is non- empty; otherwise, it
- * MUST be absent. This value is represented as an unencoded JSON object, rather
- * than as a string. These Header Parameter values are not integrity protected.
- * signature
+ * header: The "header" member MUST be present and contain the value JWS
+ * Unprotected Header when the JWS Unprotected Header value is non- empty;
+ * otherwise, it MUST be absent. This value is represented as an unencoded JSON
+ * object, rather than as a string. These Header Parameter values are not
+ * integrity protected.
  * <p>
- * The "signature" member MUST be present and contain the value BASE64URL(JWS
- * Signature).
+ * signature: The "signature" member MUST be present and contain the value
+ * BASE64URL(JWS Signature).
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JwsSignature {
+public class JwsJsonSignature {
 
   /**
    * The "protected" member MUST be present and contain the value
@@ -69,14 +77,14 @@ public class JwsSignature {
    * Create signature for the provided payload and JSON Web Key
    *
    * @param payload data to sign
-   * @param key     a valid JsonWebKey instance
-   * @return a JwsSignature instance
+   * @param key     a valid JWK instance
+   * @return a JwsJsonSignature instance
    * @throws IOException              in case of failure to serialise the
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public static JwsSignature getInstance(byte[] payload, JsonWebKey key) throws IOException, GeneralSecurityException {
-    JwsSignature signature = new JwsSignature();
+  public static JwsJsonSignature getInstance(byte[] payload, JWK key) throws IOException, GeneralSecurityException {
+    JwsJsonSignature signature = new JwsJsonSignature();
     JoseCryptoHeader ph = new JoseCryptoHeader();
     ph.setAlg(key.getAlg());
     ph.setX5c(key.getX5c());
@@ -100,11 +108,11 @@ public class JwsSignature {
    *                        javax.crypto.SecretKey or java.security.PrivateKey
    * @param protectedHeader a JoseCryptoHeader that will be integrity-protected
    *                        by the signature
-   * @return JwsSignature instance
+   * @return JwsJsonSignature instance
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  public static JwsSignature getInstance(byte[] payload, Key key, JoseCryptoHeader protectedHeader) throws IOException,
+  public static JwsJsonSignature getInstance(byte[] payload, Key key, JoseCryptoHeader protectedHeader) throws IOException,
     GeneralSecurityException {
     return getInstance(payload, key, protectedHeader, null);
   }
@@ -119,12 +127,12 @@ public class JwsSignature {
    *                          integrity-protected
    * @param unprotectedHeader a JoseCryptoHeader that will not be
    *                          integrity-protected by the signature
-   * @return JwsSignature instance
+   * @return JwsJsonSignature instance
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  public static JwsSignature getInstance(byte[] payload, Key key, JoseCryptoHeader protectedHeader, JoseCryptoHeader unprotectedHeader) throws IOException, GeneralSecurityException {
-    JwsSignature signature = new JwsSignature();
+  public static JwsJsonSignature getInstance(byte[] payload, Key key, JoseCryptoHeader protectedHeader, JoseCryptoHeader unprotectedHeader) throws IOException, GeneralSecurityException {
+    JwsJsonSignature signature = new JwsJsonSignature();
     signature.protectedHeader = protectedHeader;
     signature.unprotectedHeader = unprotectedHeader;
     JWSAlgorithmType algorithm = JWSAlgorithmType.resolveAlgorithm(protectedHeader.getAlg());
@@ -143,10 +151,10 @@ public class JwsSignature {
    * @param protectedHeader   a JoseCryptoHeader instance
    * @param unprotectedHeader a JoseCryptoHeader instance
    * @param signatureBytes    signature or HMAC
-   * @return a JwsSignature signature
+   * @return a JwsJsonSignature signature
    */
-  static JwsSignature getInstance(JoseCryptoHeader protectedHeader, JoseCryptoHeader unprotectedHeader, byte[] signatureBytes) {
-    JwsSignature signature = new JwsSignature();
+  static JwsJsonSignature getInstance(JoseCryptoHeader protectedHeader, JoseCryptoHeader unprotectedHeader, byte[] signatureBytes) {
+    JwsJsonSignature signature = new JwsJsonSignature();
     signature.protectedHeader = protectedHeader;
     signature.unprotectedHeader = unprotectedHeader;
     signature.signature = signatureBytes;

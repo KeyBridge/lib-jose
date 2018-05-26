@@ -1,15 +1,17 @@
 package org.ietf.jose.jws;
 
-import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonMarshaller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import org.ietf.jose.util.Base64Utility;
+import org.ietf.jose.util.JsonMarshaller;
 
 /**
+ * RFC 7515 JSON Web Signature (JWS)
+ * <p>
  * JSON Web Signature (JWS) represents content secured with digital signatures
  * or Message Authentication Codes (MACs) using JSON-based data structures.
  * Cryptographic algorithms and identifiers for use with this specification are
@@ -17,27 +19,38 @@ import javax.xml.bind.annotation.XmlAccessorType;
  * registry defined by that specification. Related encryption capabilities are
  * described in the separate JSON Web Encryption (JWE) specification.
  * <p>
+ * 7.2. JWS JSON Serialization
+ * <p>
+ * The JWS JSON Serialization represents digitally signed or MACed content as a
+ * JSON object. This representation is neither optimized for compactness nor
+ * URL-safe.
+ * <p>
+ * 7.2.1. General JWS JSON Serialization Syntax
+ * <p>
+ * The following members are defined for use in top-level JSON objects used for
+ * the fully general JWS JSON Serialization syntax:
+ * <p>
  * 7.2.1. General JWS JSON Serialization Syntax The following members are
  * defined for use in top-level JSON objects used for the fully general JWS JSON
  * Serialization syntax:
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JwsJson extends JwsJsonBase {
+public class JwsJsonObject extends JwsJsonBase {
 
   /**
    * The "signatures" member value MUST be an array of JSON objects. Each object
    * represents a signature or MAC over the JWS Payload and the JWS Protected
    * Header.
    */
-  private List<JwsSignature> signatures;
+  private List<JwsJsonSignature> signatures;
 
   /**
    * Default constructor. Used by JSON (de)serialisers.
    */
-  private JwsJson() {
+  private JwsJsonObject() {
   }
 
-  public JwsJson(byte[] payload, List<JwsSignature> signatures) {
+  public JwsJsonObject(byte[] payload, List<JwsJsonSignature> signatures) {
     this.payload = payload;
     this.signatures = signatures;
   }
@@ -49,8 +62,8 @@ public class JwsJson extends JwsJsonBase {
    * @return a JwsJsonFlattened instace
    * @throws IOException in case of failure to deserialise the JSON string
    */
-  public static JwsJson fromJson(String json) throws IOException {
-    return JsonMarshaller.fromJson(json, JwsJson.class);
+  public static JwsJsonObject fromJson(String json) throws IOException {
+    return JsonMarshaller.fromJson(json, JwsJsonObject.class);
   }
 
   /**
@@ -58,7 +71,7 @@ public class JwsJson extends JwsJsonBase {
    *
    * @return signature list
    */
-  public List<JwsSignature> getSignatures() {
+  public List<JwsJsonSignature> getSignatures() {
     return new ArrayList<>(signatures);
   }
 
@@ -74,7 +87,7 @@ public class JwsJson extends JwsJsonBase {
     if (signatures.size() > 1) {
       throw new IllegalArgumentException("JWS Flattened format support only one signature.");
     }
-    JwsSignature signature = signatures.get(0);
+    JwsJsonSignature signature = signatures.get(0);
     return new JwsJsonFlattened(
       signature.getProtectedHeader(), signature.getUnprotectedHeader(), payload, signature.getSignatureBytes());
   }
@@ -98,7 +111,7 @@ public class JwsJson extends JwsJsonBase {
       return false;
     }
 
-    JwsJson jwsJson = (JwsJson) o;
+    JwsJsonObject jwsJson = (JwsJsonObject) o;
 
     if (payload != null ? !Arrays.equals(payload, jwsJson.payload) : jwsJson.payload != null) {
       return false;

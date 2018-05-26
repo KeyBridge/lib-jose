@@ -1,18 +1,24 @@
 package org.ietf.jose.jws;
 
-import org.ietf.jose.JoseBase;
-import org.ietf.jose.JoseCryptoHeader;
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonMarshaller;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.ietf.jose.JoseBase;
+import org.ietf.jose.JoseCryptoHeader;
+import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.util.Base64Utility;
+import org.ietf.jose.util.JsonMarshaller;
 
 /**
+ * RFC 7515 JSON Web Signature (JWS)
+ * <p>
+ * JSON Web Signature (JWS) represents content secured with digital signatures
+ * or Message Authentication Codes (MACs) using JSON-based [RFC7159] data
+ * structures.
+ * <p>
  * 7.2.2. Flattened JWS JSON Serialization Syntax
  * <p>
  * The flattened JWS JSON Serialization syntax is based upon the general syntax
@@ -41,10 +47,27 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JwsJsonFlattened extends JwsJsonBase {
 
+  /**
+   * The "protected" member MUST be present and contain the value
+   * BASE64URL(UTF8(JWS Protected Header)) when the JWS Protected Header value
+   * is non-empty; otherwise, it MUST be absent. These Header Parameter values
+   * are integrity protected.
+   */
   @XmlElement(name = "protected")
   private JoseCryptoHeader protectedHeader;
+  /**
+   * The "header" member MUST be present and contain the value JWS Unprotected
+   * Header when the JWS Unprotected Header value is non- empty; otherwise, it
+   * MUST be absent. This value is represented as an unencoded JSON object,
+   * rather than as a string. These Header Parameter values are not integrity
+   * protected.
+   */
   @XmlElement(name = "header")
   private JoseCryptoHeader unprotectedHeader;
+  /**
+   * The "signature" member MUST be present and contain the value BASE64URL(JWS
+   * Signature).
+   */
   @XmlElement(name = "signature")
   @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] signature;
@@ -121,12 +144,12 @@ public class JwsJsonFlattened extends JwsJsonBase {
   }
 
   /**
-   * Get the signature as a JwsSignature instance
+   * Get the signature as a JwsJsonSignature instance
    *
-   * @return a JwsSignature instance
+   * @return a JwsJsonSignature instance
    */
-  public JwsSignature getJwsSignature() {
-    return JwsSignature.getInstance(protectedHeader, unprotectedHeader, signature);
+  public JwsJsonSignature getJwsSignature() {
+    return JwsJsonSignature.getInstance(protectedHeader, unprotectedHeader, signature);
   }
 
   /**
@@ -140,8 +163,7 @@ public class JwsJsonFlattened extends JwsJsonBase {
    *                                  signature
    */
   public boolean isSignatureValid(String base64UrlEncodedSecret) throws IOException, GeneralSecurityException {
-    JwsSignature signature = getJwsSignature();
-    return signature.isValidSignature(payload, base64UrlEncodedSecret);
+    return getJwsSignature().isValidSignature(payload, base64UrlEncodedSecret);
   }
 
   /**

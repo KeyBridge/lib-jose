@@ -2,7 +2,7 @@ package org.ietf.jose.jws;
 
 import org.ietf.jose.jwa.JWSAlgorithmType;
 import org.ietf.jose.JoseCryptoHeader;
-import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.jwk.JWK;
 import org.ietf.jose.util.Base64Utility;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -21,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class JwsBuilder {
 
   private byte[] payload;
-  private List<JwsSignature> signatures = new ArrayList<>();
+  private List<JwsJsonSignature> signatures = new ArrayList<>();
   private JoseCryptoHeader protectedHeader;
   private JoseCryptoHeader unprotectedHeader;
 
@@ -82,16 +82,16 @@ public class JwsBuilder {
   }
 
   /**
-   * Sign using a JsonWebKey
+   * Sign using a JWK
    *
-   * @param key a JsonWebKey instance
+   * @param key a JWK instance
    * @return this builder
    * @throws IOException              in case of failure to serialise the
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public JwsBuilder sign(JsonWebKey key) throws IOException, GeneralSecurityException {
-    signatures.add(JwsSignature.getInstance(payload, key));
+  public JwsBuilder sign(JWK key) throws IOException, GeneralSecurityException {
+    signatures.add(JwsJsonSignature.getInstance(payload, key));
     return this;
   }
 
@@ -110,7 +110,7 @@ public class JwsBuilder {
       protectedHeader = new JoseCryptoHeader();
     }
     protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
-    signatures.add(JwsSignature.getInstance(payload, key, protectedHeader, unprotectedHeader));
+    signatures.add(JwsJsonSignature.getInstance(payload, key, protectedHeader, unprotectedHeader));
     return this;
   }
 
@@ -159,12 +159,12 @@ public class JwsBuilder {
   }
 
   /**
-   * Build a JwsJson instance: A JWS object with one or more signatures
+   * Build a JwsJsonObject instance: A JWS object with one or more signatures
    *
-   * @return a JwsJson instance
+   * @return a JwsJsonObject instance
    */
-  public JwsJson buildJson() {
-    return new JwsJson(payload, signatures);
+  public JwsJsonObject buildJson() {
+    return new JwsJsonObject(payload, signatures);
   }
 
   /**
@@ -173,7 +173,7 @@ public class JwsBuilder {
    * @return a JwsJsonFlattened instance
    */
   public JwsJsonFlattened buildJsonFlattened() {
-    return new JwsJson(payload, signatures).toFlattened();
+    return new JwsJsonObject(payload, signatures).toFlattened();
   }
 
   /**

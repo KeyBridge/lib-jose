@@ -1,10 +1,21 @@
 package org.ietf.jose.jws;
 
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.util.Base64Utility;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
+ * RFC 7515 JSON Web Signature (JWS)
+ * <p>
+ * <p>
+ * 7.2.1. General JWS JSON Serialization Syntax
+ * <p>
+ * The following members are defined for use in top-level JSON objects used for
+ * the fully general JWS JSON Serialization syntax:
+ * <p>
+ * payload: The "payload" member MUST be present and contain the value
+ * BASE64URL(JWS Payload).
+ * <p>
  * A base class for JWS subclasses. Contains fields common to all JWS objects.
  *
  * @author Andrius Druzinis-Vitkus
