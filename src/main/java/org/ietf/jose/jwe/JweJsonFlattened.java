@@ -43,12 +43,12 @@ public class JweJsonFlattened {
    * Integrity-protected header contents
    */
   @XmlElement(name = "protected", required = true)
-  private JweJoseHeader protectedHeader;
+  private JoseHeader protectedHeader;
   /**
    * Non-integrity-protected header contents
    */
   @XmlElement(name = "unprotected", required = true)
-  private JweJoseHeader unprotected;
+  private JoseHeader unprotected;
   /**
    * Encrypted key contents
    */
@@ -111,7 +111,7 @@ public class JweJsonFlattened {
     }
     JweJsonFlattened jwe = new JweJsonFlattened();
     String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
-    jwe.protectedHeader = fromJson(protectedHeaderJson, JweJoseHeader.class);
+    jwe.protectedHeader = fromJson(protectedHeaderJson, JoseHeader.class);
     jwe.encryptedKey = fromBase64Url(tokenizer.nextToken());
     jwe.initializationVector = fromBase64Url(tokenizer.nextToken());
     jwe.ciphertext = fromBase64Url(tokenizer.nextToken());
@@ -143,8 +143,8 @@ public class JweJsonFlattened {
                                              final JWEEncryptionAlgorithmType contentEnc,
                                              JWEKeyAlgorithmType keyMgmt,
                                              Key key,
-                                             JweJoseHeader protectedHeader,
-                                             JweJoseHeader uprotected) throws IOException, GeneralSecurityException {
+                                             JoseHeader protectedHeader,
+                                             JoseHeader uprotected) throws IOException, GeneralSecurityException {
     JweJsonFlattened jwe = new JweJsonFlattened();
     /**
      * Populate the protected header with mandatory information on how the
@@ -175,7 +175,7 @@ public class JweJsonFlattened {
    *
    * @return integrity-protected header
    */
-  public JweJoseHeader getProtectedHeader() {
+  public JoseHeader getProtectedHeader() {
     return protectedHeader;
   }
 
@@ -184,7 +184,7 @@ public class JweJsonFlattened {
    *
    * @return non-integrity-protected header
    */
-  public JweJoseHeader getUnprotected() {
+  public JoseHeader getUnprotected() {
     return unprotected;
   }
 

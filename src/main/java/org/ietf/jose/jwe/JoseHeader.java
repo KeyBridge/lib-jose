@@ -48,7 +48,7 @@ import org.ietf.jose.jwa.JWEEncryptionAlgorithmType;
  * @author Key Bridge
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JweJoseHeader extends JoseBase {
+public class JoseHeader extends JoseBase {
 
   /**
    * 4.1.2. "enc" (Encryption Algorithm) Header Parameter
@@ -111,7 +111,7 @@ public class JweJoseHeader extends JoseBase {
       return false;
     }
 
-    JweJoseHeader that = (JweJoseHeader) o;
+    JoseHeader that = (JoseHeader) o;
 
     return contentEncryptionAlgorithm == that.contentEncryptionAlgorithm;
   }
