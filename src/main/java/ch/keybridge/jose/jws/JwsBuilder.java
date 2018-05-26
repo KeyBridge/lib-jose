@@ -3,14 +3,13 @@ package ch.keybridge.jose.jws;
 import ch.keybridge.jose.JoseCryptoHeader;
 import ch.keybridge.jose.jwk.JsonWebKey;
 import ch.keybridge.jose.util.Base64Utility;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * A builder for JSON Web Signature objects.
@@ -19,6 +18,7 @@ import java.util.List;
  * @since 0.0.1 created 14/02/2018
  */
 public class JwsBuilder {
+
   private byte[] payload;
   private List<JwsSignature> signatures = new ArrayList<>();
   private JoseCryptoHeader protectedHeader;
@@ -49,6 +49,7 @@ public class JwsBuilder {
 
   /**
    * Add string payload for signing or HMAC calculation
+   *
    * @param payload string to sign
    * @return this builder
    */
@@ -59,6 +60,7 @@ public class JwsBuilder {
 
   /**
    * Add a protected header
+   *
    * @param header a JoseCryptoHeader instance
    * @return this builder
    */
@@ -69,6 +71,7 @@ public class JwsBuilder {
 
   /**
    * Add an unprotected header
+   *
    * @param header a JoseCryptoHeader instance
    * @return this builder
    */
@@ -79,9 +82,11 @@ public class JwsBuilder {
 
   /**
    * Sign using a JsonWebKey
+   *
    * @param key a JsonWebKey instance
    * @return this builder
-   * @throws IOException in case of failure to serialise the protected header to JSON
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
   public JwsBuilder sign(JsonWebKey key) throws IOException, GeneralSecurityException {
@@ -91,14 +96,18 @@ public class JwsBuilder {
 
   /**
    * Sign using a Key instance and specific algorithm
-   * @param key Key instance
+   *
+   * @param key       Key instance
    * @param algorithm a signature algorithm suitable for the provided key
    * @return this builder
-   * @throws IOException in case of failure to serialise the protected header to JSON
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
   public JwsBuilder sign(Key key, ESignatureAlgorithm algorithm) throws IOException, GeneralSecurityException {
-    if (protectedHeader == null) protectedHeader = new JoseCryptoHeader();
+    if (protectedHeader == null) {
+      protectedHeader = new JoseCryptoHeader();
+    }
     protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
     signatures.add(JwsSignature.getInstance(payload, key, protectedHeader, unprotectedHeader));
     return this;
@@ -106,10 +115,12 @@ public class JwsBuilder {
 
   /**
    * Sign with a keyed hash (HMAC)
-   * @param secret a base64URL-encoded secret
+   *
+   * @param secret    a base64URL-encoded secret
    * @param algorithm a signature algorithm suitable for the provided key
    * @return this builder
-   * @throws IOException in case of failure to serialise the protected header to JSON
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
   public JwsBuilder sign(String secret, ESignatureAlgorithm algorithm) throws IOException, GeneralSecurityException {
@@ -119,9 +130,11 @@ public class JwsBuilder {
 
   /**
    * Sign with a keyed hash (HMAC)
+   *
    * @param secret a base64URL-encoded secret
    * @return this builder
-   * @throws IOException in case of failure to serialise the protected header to JSON
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
   public JwsBuilder sign(String secret) throws IOException, GeneralSecurityException {
@@ -146,6 +159,7 @@ public class JwsBuilder {
 
   /**
    * Build a JwsJson instance: A JWS object with one or more signatures
+   *
    * @return a JwsJson instance
    */
   public JwsJson buildJson() {
@@ -154,6 +168,7 @@ public class JwsBuilder {
 
   /**
    * Build a JwsJsonFlattened instance: A JWS object with a single signature.
+   *
    * @return a JwsJsonFlattened instance
    */
   public JwsJsonFlattened buildJsonFlattened() {
@@ -161,7 +176,9 @@ public class JwsBuilder {
   }
 
   /**
-   * Build a JWS compact string: a string which contains the payload and a single signature.
+   * Build a JWS compact string: a string which contains the payload and a
+   * single signature.
+   *
    * @return a JWS compact string
    */
   public String buildCompact() throws IOException {

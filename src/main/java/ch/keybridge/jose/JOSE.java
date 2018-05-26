@@ -7,7 +7,6 @@ import ch.keybridge.jose.jws.ESignatureAlgorithm;
 import ch.keybridge.jose.jws.JwsBuilder;
 import ch.keybridge.jose.jws.JwsJsonFlattened;
 import ch.keybridge.jose.util.JsonMarshaller;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
@@ -16,27 +15,30 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Utility class for convenient object signing and encryption as per the SAS-ESC Protocol.
+ * Utility class for convenient object signing and encryption as per the SAS-ESC
+ * Protocol.
  *
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 14/02/2018
  */
 public class JOSE {
+
   private final static Logger LOG = Logger.getLogger(JOSE.class.getCanonicalName());
 
   /**
-   * Reads string as a JWE flattened object that has as its payload a JWS Flattened object, which in turn
-   * contains the end payload object of type T.
-   * Validates digital signature using the public key of the sender and uses the recipients private
-   * key to decrypt.
+   * Reads string as a JWE flattened object that has as its payload a JWS
+   * Flattened object, which in turn contains the end payload object of type T.
+   * Validates digital signature using the public key of the sender and uses the
+   * recipients private key to decrypt.
    *
    * @param json        JSON string which is valid JWE flattened JSON
    * @param type        class of object contained.
    * @param receiverKey recipient's private key; it is used to decrypt message
-   * @param senderKey   sender's public key; it is used to validate the digital signature
+   * @param senderKey   sender's public key; it is used to validate the digital
+   *                    signature
    * @param <T>         class of the object contained in the message
-   * @return decrypted object. null is returned in the case of invalid signature, failure to decrypt or deserialise
-   * JSON.
+   * @return decrypted object. null is returned in the case of invalid
+   *         signature, failure to decrypt or deserialise JSON.
    */
   public static <T> T read(String json, Class<T> type, PrivateKey receiverKey, PublicKey senderKey) {
     try {
@@ -61,16 +63,17 @@ public class JOSE {
   }
 
   /**
-   * Reads string as a JWE flattened object that has as its payload a JWS Flattened object, which in turn
-   * contains the end payload object of type T.
-   * Decrypts message and validates the keyed message authetication token using the shared secret.
+   * Reads string as a JWE flattened object that has as its payload a JWS
+   * Flattened object, which in turn contains the end payload object of type T.
+   * Decrypts message and validates the keyed message authetication token using
+   * the shared secret.
    *
    * @param json                   JSON string which is valid JWE flattened JSON
    * @param type                   class of object contained.
    * @param base64UrlEncodedSecret base64URL-encoded bytes of the shared secret
    * @param <T>                    class of the object contained in the message
-   * @return decrypted object. null is returned in the case of invalid signature, failure to decrypt or deserialise
-   * JSON.
+   * @return decrypted object. null is returned in the case of invalid
+   *         signature, failure to decrypt or deserialise JSON.
    */
   public static <T> T read(String json, Class<T> type, String base64UrlEncodedSecret) {
     try {
@@ -98,12 +101,16 @@ public class JOSE {
    * Write object as a signed and encrypted JSON string.
    *
    * @param object           the object to be signed and encrypted
-   * @param senderPrivateKey the private key of the sender; it is used to digitally sign the message
-   * @param publicKey        the public key of the recipient; it is used to encrypt the message
-   * @param senderId         an identifier of the sender to be written as the 'kid' (key ID) field of the JOSE
-   *                         protected header.
-   *                         Can be null if an unset 'kid' protected header value is sufficient.
-   * @return a valid JSON string if the operation is successful; null in case of failure
+   * @param senderPrivateKey the private key of the sender; it is used to
+   *                         digitally sign the message
+   * @param publicKey        the public key of the recipient; it is used to
+   *                         encrypt the message
+   * @param senderId         an identifier of the sender to be written as the
+   *                         'kid' (key ID) field of the JOSE protected header.
+   *                         Can be null if an unset 'kid' protected header
+   *                         value is sufficient.
+   * @return a valid JSON string if the operation is successful; null in case of
+   *         failure
    */
   public static String write(Object object, PrivateKey senderPrivateKey, PublicKey publicKey, String senderId) {
     try {
@@ -113,19 +120,19 @@ public class JOSE {
       jwsHeader.setKid(senderId);
 
       JwsJsonFlattened jws = JwsBuilder.getInstance()
-          .withStringPayload(jsonPayload)
-          .withProtectedHeader(jwsHeader)
-          .sign(senderPrivateKey, ESignatureAlgorithm.RS256)
-          .buildJsonFlattened();
+        .withStringPayload(jsonPayload)
+        .withProtectedHeader(jwsHeader)
+        .sign(senderPrivateKey, ESignatureAlgorithm.RS256)
+        .buildJsonFlattened();
 
       JweJoseHeader jweHeader = new JweJoseHeader();
       jweHeader.setKid(senderId);
 
       return JweBuilder.getInstance()
-          .withStringPayload(jws.toJson())
-          .withProtectedHeader(jweHeader)
-          .buildJweJsonFlattened(publicKey)
-          .toJson();
+        .withStringPayload(jws.toJson())
+        .withProtectedHeader(jweHeader)
+        .buildJweJsonFlattened(publicKey)
+        .toJson();
     } catch (IOException | GeneralSecurityException e) {
       LOG.log(Level.SEVERE, null, e);
     }
@@ -136,12 +143,16 @@ public class JOSE {
    * Write object as a signed and encrypted JSON string.
    *
    * @param object                 the object to be signed and encrypted
-   * @param base64UrlEncodedSecret base64URL-encoded bytes of the shared secret; it is used to generate a keyed message
-   *                               authentication code (HMAC) and to encrypt the message.
-   * @param senderId               an identifier of the sender to be written as the 'kid' (key ID) field of the JOSE
-   *                               protected header.
-   *                               Can be null if an unset 'kid' protected header value is sufficient.
-   * @return a valid JSON string if the operation is successful; null in case of failure
+   * @param base64UrlEncodedSecret base64URL-encoded bytes of the shared secret;
+   *                               it is used to generate a keyed message
+   *                               authentication code (HMAC) and to encrypt the
+   *                               message.
+   * @param senderId               an identifier of the sender to be written as
+   *                               the 'kid' (key ID) field of the JOSE
+   *                               protected header. Can be null if an unset
+   *                               'kid' protected header value is sufficient.
+   * @return a valid JSON string if the operation is successful; null in case of
+   *         failure
    */
   public static String write(Object object, String base64UrlEncodedSecret, String senderId) {
     try {
@@ -151,19 +162,19 @@ public class JOSE {
       jwsHeader.setKid(senderId);
 
       JwsJsonFlattened jws = JwsBuilder.getInstance()
-          .withStringPayload(jsonPayload)
-          .withProtectedHeader(jwsHeader)
-          .sign(base64UrlEncodedSecret)
-          .buildJsonFlattened();
+        .withStringPayload(jsonPayload)
+        .withProtectedHeader(jwsHeader)
+        .sign(base64UrlEncodedSecret)
+        .buildJsonFlattened();
 
       JweJoseHeader jweHeader = new JweJoseHeader();
       jweHeader.setKid(senderId);
 
       return JweBuilder.getInstance()
-          .withStringPayload(jws.toJson())
-          .withProtectedHeader(jweHeader)
-          .buildJweJsonFlattened(base64UrlEncodedSecret)
-          .toJson();
+        .withStringPayload(jws.toJson())
+        .withProtectedHeader(jweHeader)
+        .buildJweJsonFlattened(base64UrlEncodedSecret)
+        .toJson();
     } catch (IOException | GeneralSecurityException e) {
       LOG.log(Level.SEVERE, null, e);
     }

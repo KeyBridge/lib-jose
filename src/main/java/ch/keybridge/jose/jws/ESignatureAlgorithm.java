@@ -3,9 +3,9 @@ package ch.keybridge.jose.jws;
 /**
  * RFC 7518 § 3.1. "alg" (Algorithm) Header Parameter Values for JWS
  * <p>
- * The table below is the set of "alg" (algorithm) Header Parameter
- * values defined by this specification for use with JWS, each of which
- * is explained in more detail in the following sections:
+ * The table below is the set of "alg" (algorithm) Header Parameter values
+ * defined by this specification for use with JWS, each of which is explained in
+ * more detail in the following sections:
  */
 public enum ESignatureAlgorithm {
   /**
@@ -61,7 +61,8 @@ public enum ESignatureAlgorithm {
    */
   NONE("none", null),
   /**
-   * A special value for cases when the signature algorithm is not supported or implemented
+   * A special value for cases when the signature algorithm is not supported or
+   * implemented
    */
   UNKNOWN(null, null);
 
@@ -73,8 +74,8 @@ public enum ESignatureAlgorithm {
    * RFC-7518 § A.1. Content Encryption Algorithm Identifier Cross-Reference
    * <p>
    * This field cross-references the JWS digital signature and MAC "enc"
-   * (algorithm) values defined in the JWS specification with the
-   * equivalent identifier in JCA.
+   * (algorithm) values defined in the JWS specification with the equivalent
+   * identifier in JCA.
    */
   private final String javaAlgorithmName;
 

@@ -1,24 +1,22 @@
 package ch.keybridge.jose.jwe.encryption;
 
 import ch.keybridge.jose.util.SecureRandomUtility;
-
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.util.Arrays;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.util.Arrays;
 
 /**
  * A content encrypter that uses AES as the block cipher and Galois/Counter mode
  * as the mode of operation.
  * <p>
- * RFC 7518 § 5.3.  Content Encryption with AES GCM
+ * RFC 7518 § 5.3. Content Encryption with AES GCM
  * <p>
- * This section defines the specifics of performing authenticated
- * encryption with AES in Galois/Counter Mode (GCM) ([AES] and
- * [NIST.800-38D]).
+ * This section defines the specifics of performing authenticated encryption
+ * with AES in Galois/Counter Mode (GCM) ([AES] and [NIST.800-38D]).
  * <p>
  * The CEK is used as the encryption key.
  * <p>
@@ -27,10 +25,9 @@ import java.util.Arrays;
  * The requested size of the Authentication Tag output MUST be 128 bits,
  * regardless of the key size.
  * <p>
- * The following "enc" (encryption algorithm) Header Parameter values
- * are used to indicate that the JWE Ciphertext and JWE Authentication
- * Tag values have been computed using the corresponding algorithm and
- * key size:
+ * The following "enc" (encryption algorithm) Header Parameter values are used
+ * to indicate that the JWE Ciphertext and JWE Authentication Tag values have
+ * been computed using the corresponding algorithm and key size:
  * <pre>
  * +-------------------+------------------------------+
  * | "enc" Param Value | Content Encryption Algorithm |
@@ -46,8 +43,10 @@ import java.util.Arrays;
  */
 @Deprecated // May not be included in all JVMs and hence not recommended
 public class AesGcmEncrypter implements Encrypter {
+
   /**
-   * Use of an initialization vector (IV) of size 96 bits is REQUIRED with this algorithm.
+   * Use of an initialization vector (IV) of size 96 bits is REQUIRED with this
+   * algorithm.
    */
   private final static int IV_LENGTH = 96;
   /**
@@ -60,10 +59,13 @@ public class AesGcmEncrypter implements Encrypter {
    */
   private final static int AUTH_TAG_LEN = 128 / 8;
   /**
-   * The transformation name for this encryption scheme as per the Java Cryptographic Extension (JCE) framework
+   * The transformation name for this encryption scheme as per the Java
+   * Cryptographic Extension (JCE) framework
    *
    * @see Cipher
-   * @see <a href="https://docs.oracle.com/javase/7/docs/api/javax/crypto/Cipher.html">Cipher documentation</a>
+   * @see
+   * <a href="https://docs.oracle.com/javase/7/docs/api/javax/crypto/Cipher.html">Cipher
+   * documentation</a>
    */
   private static final String CIPHER_ALGORITHM = "AES/GCM/NoPadding";
   /**
@@ -76,30 +78,36 @@ public class AesGcmEncrypter implements Encrypter {
   private final int ENC_KEY_LEN;
 
   /**
-   * Create an instance of a content encrypter that uses AES as the block cipher and Galois/Counter mode
-   * as the mode of operation.
+   * Create an instance of a content encrypter that uses AES as the block cipher
+   * and Galois/Counter mode as the mode of operation.
    *
-   * @param encryptionKeySize Size (in bits) of the AES key size. Must be 128, 192, or 256 bits.
+   * @param encryptionKeySize Size (in bits) of the AES key size. Must be 128,
+   *                          192, or 256 bits.
    */
   public AesGcmEncrypter(int encryptionKeySize) {
     if (!(encryptionKeySize == 128 || encryptionKeySize == 192 || encryptionKeySize == 256)) {
-      throw new IllegalArgumentException("An AES encryption key must be 128, 192, or 256 bits in length. Length " +
-          "provided: " + encryptionKeySize);
+      throw new IllegalArgumentException("An AES encryption key must be 128, 192, or 256 bits in length. Length "
+        + "provided: " + encryptionKeySize);
     }
     this.ENC_KEY_LEN = encryptionKeySize;
   }
 
   /**
-   * A utility method for array concatenation. Used to concatenate the ciphertext and authentication tag bytes
-   * before decrypting.
+   * A utility method for array concatenation. Used to concatenate the
+   * ciphertext and authentication tag bytes before decrypting.
    *
    * @param array1 first byte array
    * @param array2 second byte array
-   * @return byte array with all elements from the first array, the those of the second array
+   * @return byte array with all elements from the first array, the those of the
+   *         second array
    */
   public static byte[] concatenateArrays(byte[] array1, byte[] array2) {
-    if (array1 == null || array1.length == 0) return array2;
-    if (array2 == null || array2.length == 0) return array1;
+    if (array1 == null || array1.length == 0) {
+      return array2;
+    }
+    if (array2 == null || array2.length == 0) {
+      return array1;
+    }
     byte[] merged = new byte[array1.length + array2.length];
     System.arraycopy(array1, 0, merged, 0, array1.length);
     System.arraycopy(array2, 0, merged, array1.length, array2.length);
@@ -110,7 +118,8 @@ public class AesGcmEncrypter implements Encrypter {
    * Generate a secret key (encryption key) which is valid for this encrypter.
    *
    * @return a valid AES key
-   * @throws GeneralSecurityException if AES is not available as the SecretKeySpec algorithm
+   * @throws GeneralSecurityException if AES is not available as the
+   *                                  SecretKeySpec algorithm
    */
   @Override
   public Key generateKey() throws GeneralSecurityException {
@@ -119,20 +128,25 @@ public class AesGcmEncrypter implements Encrypter {
 
   /**
    * @param payload bytes of the plaintext (data that is to be encrypted)
-   * @param iv      Initialization vector: random bytes used to initialise the encryption algorithm.
-   * @param aad     Additional authenticated data: bytes of data that is not encrypted (i.e. remains in plaintext)
-   *                but its integrity is ensured by the authenticated encryption algorithm.
+   * @param iv      Initialization vector: random bytes used to initialise the
+   *                encryption algorithm.
+   * @param aad     Additional authenticated data: bytes of data that is not
+   *                encrypted (i.e. remains in plaintext) but its integrity is
+   *                ensured by the authenticated encryption algorithm.
    * @param key     An AES secret key
-   * @return A DTO containing the initialisation vector (IV), the addidional authenticated data (same as input)
+   * @return A DTO containing the initialisation vector (IV), the addidional
+   *         authenticated data (same as input)
    * @throws GeneralSecurityException
    */
   @Override
   public EncryptionResult encrypt(final byte[] payload, byte[] iv, byte[] aad, final Key key)
-      throws GeneralSecurityException {
+    throws GeneralSecurityException {
     /**
      * Automatically generate an initialisation vector of the correct length.
      */
-    if (iv == null) iv = SecureRandomUtility.generateBytes(IV_BYTE_LENGTH);
+    if (iv == null) {
+      iv = SecureRandomUtility.generateBytes(IV_BYTE_LENGTH);
+    }
     validateInputs(key, aad, iv);
     Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
     cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(IV_LENGTH, iv));
@@ -152,23 +166,27 @@ public class AesGcmEncrypter implements Encrypter {
    * @param iv  initialisation vector
    */
   private void validateInputs(Key key, byte[] aad, byte[] iv) {
-    if (key.getEncoded().length != ENC_KEY_LEN / 8)
+    if (key.getEncoded().length != ENC_KEY_LEN / 8) {
       throw new IllegalArgumentException("Key must be " + ENC_KEY_LEN / 8 + " bytes in length. Key length:" + key
-          .getEncoded().length);
-    if (!key.getAlgorithm().equals(SECRET_KEY_ALGORITHM))
-      throw new IllegalArgumentException("SecretKey must be an AES key");
-    if (iv == null || iv.length != IV_BYTE_LENGTH) {
-      throw new IllegalArgumentException("Initialisation vector must be " + IV_BYTE_LENGTH + " bytes long. " +
-          "Provided IV: " + (iv == null ? null : (iv.length + " bytes. ")));
+        .getEncoded().length);
     }
-    if (aad == null || aad.length == 0)
-      throw new IllegalArgumentException("Additional authenticated data must not be empty! " +
-          "Provided AAD: " + (aad == null ? null : (aad.length + " bytes. ")));
+    if (!key.getAlgorithm().equals(SECRET_KEY_ALGORITHM)) {
+      throw new IllegalArgumentException("SecretKey must be an AES key");
+    }
+    if (iv == null || iv.length != IV_BYTE_LENGTH) {
+      throw new IllegalArgumentException("Initialisation vector must be " + IV_BYTE_LENGTH + " bytes long. "
+        + "Provided IV: " + (iv == null ? null : (iv.length + " bytes. ")));
+    }
+    if (aad == null || aad.length == 0) {
+      throw new IllegalArgumentException("Additional authenticated data must not be empty! "
+        + "Provided AAD: " + (aad == null ? null : (aad.length + " bytes. ")));
+    }
   }
 
   /**
-   * Decrypt the ciphertext to retrieve the original plaintext. Additional authenticated data and an
-   * authentication tag are used as an extra validation step.
+   * Decrypt the ciphertext to retrieve the original plaintext. Additional
+   * authenticated data and an authentication tag are used as an extra
+   * validation step.
    *
    * @param ciphertext ciphertext bytes
    * @param iv         initialisation vector bytes
@@ -180,7 +198,7 @@ public class AesGcmEncrypter implements Encrypter {
    */
   @Override
   public byte[] decrypt(byte[] ciphertext, byte[] iv, byte[] aad, byte[] authTag, Key key) throws
-      GeneralSecurityException {
+    GeneralSecurityException {
     validateInputs(key, aad, iv);
     Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
     cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(IV_LENGTH, iv));

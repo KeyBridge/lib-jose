@@ -16,12 +16,12 @@
 package ch.keybridge.jose.adapter;
 
 import ch.keybridge.jose.jwk.WktX509Certificate;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.Base64;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * Converts WktX509Certificate instances into Base64URL-encoded strings and vice versa
+ * Converts WktX509Certificate instances into Base64URL-encoded strings and vice
+ * versa
  */
 public class XmlAdapterX509Certificate extends XmlAdapter<String, WktX509Certificate> {
 

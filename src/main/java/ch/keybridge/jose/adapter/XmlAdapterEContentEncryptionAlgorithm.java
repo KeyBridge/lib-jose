@@ -16,11 +16,11 @@
 package ch.keybridge.jose.adapter;
 
 import ch.keybridge.jose.jwe.encryption.EEncryptionAlgo;
-
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * Converts EContentEncyptionAlgorithm enum values into Base64URL-encoded strings and vice versa
+ * Converts EContentEncyptionAlgorithm enum values into Base64URL-encoded
+ * strings and vice versa
  */
 public class XmlAdapterEContentEncryptionAlgorithm extends XmlAdapter<String, EEncryptionAlgo> {
 

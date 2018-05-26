@@ -3,17 +3,17 @@ package ch.keybridge.jose.jwe;
 import ch.keybridge.jose.jwe.encryption.EEncryptionAlgo;
 import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
 import ch.keybridge.jose.util.Base64Utility;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import static ch.keybridge.jose.util.Base64Utility.toBase64Url;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 public class JweBuilder {
+
   /**
    * Default algorithms
    */
@@ -22,8 +22,9 @@ public class JweBuilder {
 
   private EEncryptionAlgo encryptionAlgo = CONTENT_ENC_ALGO;
   /**
-   * Cannot set a default Key Management algorithm at this point because we don't know if
-   * a symmetric or asymmetric key will be used for payload encryption.
+   * Cannot set a default Key Management algorithm at this point because we
+   * don't know if a symmetric or asymmetric key will be used for payload
+   * encryption.
    */
   private EKeyManagementAlgorithm keyMgmtAlgo;
   private JweJoseHeader protectedHeader = new JweJoseHeader();
@@ -54,8 +55,9 @@ public class JweBuilder {
   }
 
   /**
-   * Resolve the Key Management algorithm from the SecretKey length (16, 24, or 32).
-   * This only applies for symmetric encryption (wrapping) of encryption keys.
+   * Resolve the Key Management algorithm from the SecretKey length (16, 24, or
+   * 32). This only applies for symmetric encryption (wrapping) of encryption
+   * keys.
    *
    * @param key non-nul SecretKey instance
    * @return EKeyManagementAlgorithm
@@ -86,6 +88,7 @@ public class JweBuilder {
 
   /**
    * Add string payload for signing or HMAC calculation
+   *
    * @param payload string to sign
    * @return this builder
    */
@@ -96,6 +99,7 @@ public class JweBuilder {
 
   /**
    * Add a protected header
+   *
    * @param header a JoseCryptoHeader instance
    * @return this builder
    */
@@ -106,6 +110,7 @@ public class JweBuilder {
 
   /**
    * Add an unprotected header
+   *
    * @param header a JoseCryptoHeader instance
    * @return this builder
    */
@@ -116,6 +121,7 @@ public class JweBuilder {
 
   /**
    * Set the encryption algorithm
+   *
    * @param algorithm EEncryptionAlgo
    * @return this builder
    */
@@ -126,6 +132,7 @@ public class JweBuilder {
 
   /**
    * Set the key management algorithm
+   *
    * @param algorithm EKeyManagementAlgorithm
    * @return this builder
    */
@@ -136,39 +143,47 @@ public class JweBuilder {
 
   /**
    * Encrypt the payload with the provided recipient's PublicKey
+   *
    * @param key public key
    * @return a JweJsonFlattened instance
-   * @throws IOException in case of failure to serialise the protected header to JSON
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
   public JweJsonFlattened buildJweJsonFlattened(PublicKey key) throws IOException, GeneralSecurityException {
-    if (keyMgmtAlgo == null) keyMgmtAlgo = KEY_MGMT_ALGO_ASYM;
+    if (keyMgmtAlgo == null) {
+      keyMgmtAlgo = KEY_MGMT_ALGO_ASYM;
+    }
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
-        protectedHeader, unprotectedHeader);
+                                        protectedHeader, unprotectedHeader);
   }
 
   /**
    * Encrypt the payload with the shared SecretKey
+   *
    * @param key secret key
    * @return a JweJsonFlattened instance
-   * @throws IOException in case of failure to serialise the protected header to JSON
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
   public JweJsonFlattened buildJweJsonFlattened(SecretKey key) throws IOException, GeneralSecurityException {
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
-        protectedHeader, unprotectedHeader);
+                                        protectedHeader, unprotectedHeader);
   }
 
   /**
    * Encrypt the payload with the shared secret
+   *
    * @param base64UrlEncodedSecret base64URL-encoded bytes of the shared secret
    * @return a JweJsonFlattened instance
-   * @throws IOException in case of failure to serialise the protected header to JSON
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
   public JweJsonFlattened buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException,
-      GeneralSecurityException {
+    GeneralSecurityException {
     SecretKey key = createSecretKey(base64UrlEncodedSecret);
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);

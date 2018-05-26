@@ -7,13 +7,16 @@ package ch.keybridge.jose.jwe.encryption;
  * @since 0.0.1 created 03/01/2018
  */
 public class EncryptionResult {
+
   /**
-   * Initialization vector: random bytes used to initialise the encryption algorithm.
+   * Initialization vector: random bytes used to initialise the encryption
+   * algorithm.
    */
   private final byte[] iv;
   /**
-   * Additional authenticated data: bytes of data that is not encrypted (i.e. remains in plaintext)
-   * but its integrity is ensured by the authenticated encryption algorithm.
+   * Additional authenticated data: bytes of data that is not encrypted (i.e.
+   * remains in plaintext) but its integrity is ensured by the authenticated
+   * encryption algorithm.
    */
   private final byte[] aad;
   /**
@@ -21,8 +24,9 @@ public class EncryptionResult {
    */
   private final byte[] ciphertext;
   /**
-   * Authentication tag: a message authentication code used to verify that the ciphertext and additional authenticated
-   * data have not been tampered with. This is performed automatically as part of the decryption algorithm.
+   * Authentication tag: a message authentication code used to verify that the
+   * ciphertext and additional authenticated data have not been tampered with.
+   * This is performed automatically as part of the decryption algorithm.
    */
   private final byte[] authTag;
 
@@ -34,7 +38,8 @@ public class EncryptionResult {
   }
 
   /**
-   * Initialization vector: random bytes used to initialise the encryption algorithm.
+   * Initialization vector: random bytes used to initialise the encryption
+   * algorithm.
    *
    * @return Initialization vector bytes
    */
@@ -43,8 +48,9 @@ public class EncryptionResult {
   }
 
   /**
-   * Additional authenticated data: bytes of data that is not encrypted (i.e. remains in plaintext)
-   * but its integrity is ensured by the authenticated encryption algorithm.
+   * Additional authenticated data: bytes of data that is not encrypted (i.e.
+   * remains in plaintext) but its integrity is ensured by the authenticated
+   * encryption algorithm.
    *
    * @return Additional authenticated data bytes
    */
@@ -54,6 +60,7 @@ public class EncryptionResult {
 
   /**
    * The encrypted data (ciphertext)
+   *
    * @return Ciphertext bytes
    */
   public byte[] getCiphertext() {
@@ -61,8 +68,10 @@ public class EncryptionResult {
   }
 
   /**
-   * Authentication tag: a message authentication code used to verify that the ciphertext and additional authenticated
-   * data have not been tampered with. This is performed automatically as part of the decryption algorithm.
+   * Authentication tag: a message authentication code used to verify that the
+   * ciphertext and additional authenticated data have not been tampered with.
+   * This is performed automatically as part of the decryption algorithm.
+   *
    * @return Authentication tag bytes
    */
   public byte[] getAuthTag() {

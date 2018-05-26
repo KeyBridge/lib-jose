@@ -4,29 +4,28 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
-
 import java.io.IOException;
 
 /**
- * A JSON serialization utility. Uses Jackson JSON serializer with reasonable configuration,
- * see the "static" code block for details.
+ * A JSON serialization utility. Uses Jackson JSON serializer with reasonable
+ * configuration, see the "static" code block for details.
  */
 public class JsonMarshaller {
+
   private final static ObjectMapper mapper = new ObjectMapper();
 
   static {
     /**
-     * Set the serializer to not output empty fields. That is, instead of
-     * having
-     * <pre>{"field1":10,"field2":null}</pre>
-     * we will have
+     * Set the serializer to not output empty fields. That is, instead of having
+     * <pre>{"field1":10,"field2":null}</pre> we will have
      * <pre>{"field1":10}</pre>
      */
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     /**
-     * Enable the Jackson annotation introspector. The only instance where Jackson
-     * annotations are used, is in the JsonWebKey class, in order to distinguish
-     * between concrete JsonWebKey types.
+     * Enable the Jackson annotation introspector. The only instance where
+     * Jackson annotations are used, is in the JsonWebKey class, in order to
+     * distinguish between concrete JsonWebKey types.
+     *
      * @see ch.keybridge.jose.jwk.JsonWebKey
      */
     mapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector());
@@ -39,6 +38,7 @@ public class JsonMarshaller {
 
   /**
    * Serialize object to JSON.
+   *
    * @param value object to serialize
    * @return A JSON string representing the object
    * @throws IOException Error encountered while serializing

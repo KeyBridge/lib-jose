@@ -7,40 +7,38 @@ import ch.keybridge.jose.jwe.encryption.EncryptionResult;
 import ch.keybridge.jose.jwe.keymgmt.EKeyManagementAlgorithm;
 import ch.keybridge.jose.util.CryptographyUtility;
 import ch.keybridge.jose.util.JsonMarshaller;
-
-import javax.crypto.SecretKey;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.StringTokenizer;
+import javax.crypto.SecretKey;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import static ch.keybridge.jose.util.Base64Utility.*;
 import static ch.keybridge.jose.util.JsonMarshaller.fromJson;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
 /**
- * 7.2.2.  Flattened JWE JSON Serialization Syntax
+ * 7.2.2. Flattened JWE JSON Serialization Syntax
  * <p>
- * The flattened JWE JSON Serialization syntax is based upon the general
- * syntax, but flattens it, optimizing it for the single-recipient case.
- * It flattens it by removing the "recipients" member and instead
- * placing those members defined for use in the "recipients" array (the
- * "header" and "encrypted_key" members) in the top-level JSON object
- * (at the same level as the "ciphertext" member).
+ * The flattened JWE JSON Serialization syntax is based upon the general syntax,
+ * but flattens it, optimizing it for the single-recipient case. It flattens it
+ * by removing the "recipients" member and instead placing those members defined
+ * for use in the "recipients" array (the "header" and "encrypted_key" members)
+ * in the top-level JSON object (at the same level as the "ciphertext" member).
  * <p>
- * The "recipients" member MUST NOT be present when using this syntax.
- * Other than this syntax difference, JWE JSON Serialization objects
- * using the flattened syntax are processed identically to those using
- * the general syntax.
+ * The "recipients" member MUST NOT be present when using this syntax. Other
+ * than this syntax difference, JWE JSON Serialization objects using the
+ * flattened syntax are processed identically to those using the general syntax.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JweJsonFlattened {
+
   /**
    * Integrity-protected header contents
    */
@@ -88,30 +86,29 @@ public class JweJsonFlattened {
   /**
    * Converts a JWE compact serialization string into a JWE instance
    * <p>
-   * In the JWE Compact Serialization, no JWE Shared Unprotected Header or
-   * JWE Per-Recipient Unprotected Header are used.  In this case, the
-   * JOSE Header and the JWE Protected Header are the same.
-   * In the JWE Compact Serialization, a JWE is represented as the
-   * concatenation:
+   * In the JWE Compact Serialization, no JWE Shared Unprotected Header or JWE
+   * Per-Recipient Unprotected Header are used. In this case, the JOSE Header
+   * and the JWE Protected Header are the same. In the JWE Compact
+   * Serialization, a JWE is represented as the concatenation:
    * <pre>
    * BASE64URL(UTF8(JWE Protected Header)) || ’.’ ||
    * BASE64URL(JWE Encrypted Key) || ’.’ ||
    * BASE64URL(JWE Initialization Vector) || ’.’ ||
    * BASE64URL(JWE Ciphertext) || ’.’ ||
    * BASE64URL(JWE Authentication Tag)
-   * </pre>
-   * See RFC 7516 Section 7.1 for more information about the JWE Compact
+   * </pre> See RFC 7516 Section 7.1 for more information about the JWE Compact
    * Serialization.
    *
    * @param text a valid compact JWE string
    * @return non-null JWE instance
-   * @throws IllegalArgumentException if the provided input is not a valid compact JWE string
+   * @throws IllegalArgumentException if the provided input is not a valid
+   *                                  compact JWE string
    */
   public static JweJsonFlattened fromCompactForm(String text) throws IOException {
     StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
     if (tokenizer.countTokens() != 5) {
-      throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string " +
-          "has " + tokenizer.countTokens() + ".");
+      throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string "
+        + "has " + tokenizer.countTokens() + ".");
     }
     JweJsonFlattened jwe = new JweJsonFlattened();
     String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
@@ -127,17 +124,20 @@ public class JweJsonFlattened {
   /**
    * Creates a JWE instance for the payload using the provided public key
    *
-   * @param payload    byte array representing the data that is to be JWE-encrypted
+   * @param payload    byte array representing the data that is to be
+   *                   JWE-encrypted
    * @param contentEnc Content encryption algorithm
    * @param keyMgmt    key management algorithm
-   * @param key        a Key instance which is used to encrypt the random data encryption key
+   * @param key        a Key instance which is used to encrypt the random data
+   *                   encryption key
    * @return a valid JWE instance
-   * @throws GeneralSecurityException thrown if requested algorithms are not available
+   * @throws GeneralSecurityException thrown if requested algorithms are not
+   *                                  available
    */
   public static JweJsonFlattened getInstance(final byte[] payload, final EEncryptionAlgo contentEnc,
                                              EKeyManagementAlgorithm keyMgmt, Key key, JweJoseHeader protectedHeader,
                                              JweJoseHeader uprotected) throws IOException,
-      GeneralSecurityException {
+    GeneralSecurityException {
     JweJsonFlattened jwe = new JweJsonFlattened();
     // Populate the protected header with mandatory information on how the content and the content encryption key are
     // encrypted
@@ -154,8 +154,7 @@ public class JweJsonFlattened {
      */
     String headerJson = JsonMarshaller.toJson(protectedHeader);
     jwe.additionalAuthenticationData = toBase64Url(headerJson).getBytes(US_ASCII);
-    EncryptionResult encryptionResult = contentEnc.getEncrypter().encrypt(payload, null, jwe
-        .additionalAuthenticationData, contentEncryptionKey);
+    EncryptionResult encryptionResult = contentEnc.getEncrypter().encrypt(payload, null, jwe.additionalAuthenticationData, contentEncryptionKey);
     jwe.ciphertext = encryptionResult.getCiphertext();
     jwe.authenticationTag = encryptionResult.getAuthTag();
     jwe.initializationVector = encryptionResult.getIv();
@@ -183,39 +182,37 @@ public class JweJsonFlattened {
   /**
    * Converts a JWE instance into a single URL-safe string
    * <p>
-   * In the JWE Compact Serialization, no JWE Shared Unprotected Header or
-   * JWE Per-Recipient Unprotected Header are used.  In this case, the
-   * JOSE Header and the JWE Protected Header are the same.
-   * In the JWE Compact Serialization, a JWE is represented as the
-   * concatenation:
+   * In the JWE Compact Serialization, no JWE Shared Unprotected Header or JWE
+   * Per-Recipient Unprotected Header are used. In this case, the JOSE Header
+   * and the JWE Protected Header are the same. In the JWE Compact
+   * Serialization, a JWE is represented as the concatenation:
    * <pre>
    * BASE64URL(UTF8(JWE Protected Header)) || ’.’ ||
    * BASE64URL(JWE Encrypted Key) || ’.’ ||
    * BASE64URL(JWE Initialization Vector) || ’.’ ||
    * BASE64URL(JWE Ciphertext) || ’.’ ||
    * BASE64URL(JWE Authentication Tag)
-   * </pre>
-   * See RFC 7516 Section 7.1 for more information about the JWE Compact
+   * </pre> See RFC 7516 Section 7.1 for more information about the JWE Compact
    * Serialization.
    *
    * @return non-null string
    */
   public String toCompactForm() throws IOException {
     return toBase64Url(JsonMarshaller.toJson(protectedHeader)) + '.'
-        + toBase64Url(encryptedKey) + '.'
-        + toBase64Url(initializationVector) + '.'
-        + toBase64Url(ciphertext) + '.'
-        + toBase64Url(authenticationTag);
+      + toBase64Url(encryptedKey) + '.'
+      + toBase64Url(initializationVector) + '.'
+      + toBase64Url(ciphertext) + '.'
+      + toBase64Url(authenticationTag);
   }
 
   public byte[] decryptPayload(Key key) throws GeneralSecurityException {
     final EKeyManagementAlgorithm keyManagementAlgorithm = EKeyManagementAlgorithm.resolveAlgorithm(protectedHeader
-        .getAlg());
+      .getAlg());
     final SecretKey aesKey = (SecretKey) CryptographyUtility.unwrapKey(encryptedKey, key, keyManagementAlgorithm
-        .getJavaAlgorithm(), "AES"); //todo
+                                                                       .getJavaAlgorithm(), "AES"); //todo
     /**
-     * Developer note:
-     * Additional files may need to be downloaded and copied into the Java installation security directory
+     * Developer note: Additional files may need to be downloaded and copied
+     * into the Java installation security directory
      * https://stackoverflow.com/questions/6481627/java-security-illegal-key-size-or-default-parameters
      */
     Encrypter encrypter = protectedHeader.getContentEncryptionAlgorithm().getEncrypter();
@@ -229,18 +226,33 @@ public class JweJsonFlattened {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     JweJsonFlattened that = (JweJsonFlattened) o;
 
-    if (protectedHeader != null ? !protectedHeader.equals(that.protectedHeader) : that.protectedHeader != null)
+    if (protectedHeader != null ? !protectedHeader.equals(that.protectedHeader) : that.protectedHeader != null) {
       return false;
-    if (unprotected != null ? !unprotected.equals(that.unprotected) : that.unprotected != null) return false;
-    if (!Arrays.equals(encryptedKey, that.encryptedKey)) return false;
-    if (!Arrays.equals(initializationVector, that.initializationVector)) return false;
-    if (!Arrays.equals(ciphertext, that.ciphertext)) return false;
-    if (!Arrays.equals(authenticationTag, that.authenticationTag)) return false;
+    }
+    if (unprotected != null ? !unprotected.equals(that.unprotected) : that.unprotected != null) {
+      return false;
+    }
+    if (!Arrays.equals(encryptedKey, that.encryptedKey)) {
+      return false;
+    }
+    if (!Arrays.equals(initializationVector, that.initializationVector)) {
+      return false;
+    }
+    if (!Arrays.equals(ciphertext, that.ciphertext)) {
+      return false;
+    }
+    if (!Arrays.equals(authenticationTag, that.authenticationTag)) {
+      return false;
+    }
     return Arrays.equals(additionalAuthenticationData, that.additionalAuthenticationData);
   }
 
@@ -262,14 +274,14 @@ public class JweJsonFlattened {
 
   @Override
   public String toString() {
-    return "JweJsonFlattened{" +
-        "protectedHeader=" + protectedHeader +
-        ", unprotected=" + unprotected +
-        ", encryptedKey=" + Arrays.toString(encryptedKey) +
-        ", initializationVector=" + Arrays.toString(initializationVector) +
-        ", ciphertext=" + Arrays.toString(ciphertext) +
-        ", authenticationTag=" + Arrays.toString(authenticationTag) +
-        ", additionalAuthenticationData=" + Arrays.toString(additionalAuthenticationData) +
-        '}';
+    return "JweJsonFlattened{"
+      + "protectedHeader=" + protectedHeader
+      + ", unprotected=" + unprotected
+      + ", encryptedKey=" + Arrays.toString(encryptedKey)
+      + ", initializationVector=" + Arrays.toString(initializationVector)
+      + ", ciphertext=" + Arrays.toString(ciphertext)
+      + ", authenticationTag=" + Arrays.toString(authenticationTag)
+      + ", additionalAuthenticationData=" + Arrays.toString(additionalAuthenticationData)
+      + '}';
   }
 }
