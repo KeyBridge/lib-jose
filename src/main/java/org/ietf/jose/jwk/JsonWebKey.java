@@ -8,9 +8,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import org.ietf.jose.JoseBase;
 
 /**
- * RFC-7517 § 4
+ * RFC-7517 JSON Web Key (JWK)
  * <p>
- * JSON Web Key (JWK) Format
+ * 4. JSON Web Key (JWK) Format
  * <p>
  * A JWK is a JSON object that represents a cryptographic key. The members of
  * the object represent properties of the key, including its value. This JSON
@@ -19,9 +19,7 @@ import org.ietf.jose.JoseBase;
  * <a href="https://tools.ietf.org/pdf/rfc7159#section-2">
  * Section 2 of RFC 7159 [RFC7159]</a>. This document defines the key parameters
  * that are not algorithm specific and, thus, common to many keys.
- */
-@XmlAccessorType(XmlAccessType.FIELD)
-/**
+ * <p>
  * 4.1. "kty" (Key Type) Parameter
  * <p>
  * The "kty" (key type) parameter identifies the cryptographic algorithm family
@@ -38,19 +36,19 @@ import org.ietf.jose.JoseBase;
  * those key types. Members used with specific "kty" values can be found in the
  * IANA "JSON Web Key Parameters" registry established by Section 8.1.
  * <p>
- * Developer note: the kty field is used by JAXB to determine which sub-class to
- * unmarshal to.
+ * Developer note: JsonTypeInfo specifies the kty field used by JAXB to
+ * determine which sub-class to unmarshal to.
+ * <p>
+ * Developer note: all sub-classes, which need to be the output of unmarshalling
+ * a JWK JSON string, must be listed in JsonSubTypes.
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kty")
-/**
- * Developer note: all sub-classes, which need to be the output of unmarshalling
- * a JWK JSON string, must be listed here.
- */
 @JsonSubTypes({
   @JsonSubTypes.Type(value = JwkEcKey.class, name = "EC")
   , @JsonSubTypes.Type(value = JwkRsaPrivateKey.class, name = "RSA")
   , @JsonSubTypes.Type(value = JwkSymmetricKey.class, name = "oct")}
 )
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class JsonWebKey extends JoseBase {
 
   /**
@@ -82,7 +80,7 @@ public abstract class JsonWebKey extends JoseBase {
    * values can be used in closed environments, in which the producing and
    * consuming organization will always be the same.
    */
-  private String use;
+  private PublicKeyUseType use;
 
   /**
    * 4.3. "key_ops" (Key Operations) Parameter
@@ -129,7 +127,7 @@ public abstract class JsonWebKey extends JoseBase {
    * Applications should specify which of these members they use, if either is
    * to be used by the application.
    */
-  private List<String> key_ops;
+  private List<KeyOperationType> key_ops;
 
   /**
    * 4.4. "alg" (Algorithm) Parameter
@@ -140,7 +138,7 @@ public abstract class JsonWebKey extends JoseBase {
    * be a value that contains a Collision- Resistant Name. The "alg" value is a
    * case-sensitive ASCII string. Use of this member is OPTIONAL.
    * <p>
-   * Developer note: inherited from JoseHeader
+   * Developer note: inherited from JoseBase
    */
   /**
    * 4.5. "kid" (Key ID) Parameter
@@ -156,7 +154,7 @@ public abstract class JsonWebKey extends JoseBase {
    * OPTIONAL. When used with JWS or JWE, the "kid" value is used to match a JWS
    * or JWE "kid" Header Parameter value.
    * <p>
-   * Developer note: inherited from JoseHeader
+   * Developer note: inherited from JoseBase
    */
   /**
    * 4.6. "x5u" (X.509 URL) Parameter
@@ -184,7 +182,7 @@ public abstract class JsonWebKey extends JoseBase {
    * member is present, it MUST correspond to the algorithm specified in the
    * certificate.
    * <p>
-   * Developer note: inherited from JoseHeader
+   * Developer note: inherited from JoseBase
    */
   /**
    * 4.7. "x5c" (X.509 Certificate Chain) Parameter
@@ -207,7 +205,7 @@ public abstract class JsonWebKey extends JoseBase {
    * certificate. See the last paragraph of Section 4.6 for additional guidance
    * on this.
    * <p>
-   * Developer note: inherited from JoseHeader
+   * Developer note: inherited from JoseBase
    */
   /**
    * 4.8. "x5t" (X.509 Certificate SHA-1 Thumbprint) Parameter
@@ -226,39 +224,29 @@ public abstract class JsonWebKey extends JoseBase {
    * certificate. See the last paragraph of Section 4.6 for additional guidance
    * on this.
    * <p>
-   * Developer note: inherited from JoseHeader
+   * Developer note: inherited from JoseBase
    */
   public JsonWebKey() {
   }
 
   /**
-   * 4.9. "x5t#S256" (X.509 Certificate SHA-256 Thumbprint) Parameter
+   * 4.2. "use" (Public Key Use) Parameter
    * <p>
-   * The "x5t#S256" (X.509 certificate SHA-256 thumbprint) parameter is a
-   * base64url-encoded SHA-256 thumbprint (a.k.a. digest) of the DER encoding of
-   * an X.509 certificate [RFC5280]. Note that certificate thumbprints are also
-   * sometimes known as certificate fingerprints. The key in the certificate
-   * MUST match the public key represented by other members of the JWK. Use of
-   * this member is OPTIONAL.
-   * <p>
-   * As with the "x5u" member, optional JWK members providing key usage,
-   * algorithm, or other information MAY also be present when the "x5t#S256"
-   * member is used. If other members are present, the contents of those members
-   * MUST be semantically consistent with the related fields in the referenced
-   * certificate. See the last paragraph of Section 4.6 for additional guidance
-   * on this.
-   * <p>
-   * Developer note: inherited from JoseHeader
+   * The "use" (public key use) parameter identifies the intended use of the
+   * public key. The "use" parameter is employed to indicate whether a public
+   * key is used for encrypting data or verifying the signature on data.
+   *
+   * @return the "use" (Public Key Use) Parameter
    */
-  public String getUse() {
+  public PublicKeyUseType getUse() {
     return use;
   }
 
-  public void setUse(String use) {
+  public void setUse(PublicKeyUseType use) {
     this.use = use;
   }
 
-  public List<String> getKey_ops() {
+  public List<KeyOperationType> getKey_ops() {
     return key_ops;
   }
 
