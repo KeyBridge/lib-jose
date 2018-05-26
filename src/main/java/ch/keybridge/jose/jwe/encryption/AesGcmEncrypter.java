@@ -40,6 +40,8 @@ import javax.crypto.spec.SecretKeySpec;
  *
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 03/01/2018
+ * @deprecated v0.3.0 AES+GCM may not be included in all JVMs and is not
+ * recommended unless specifically required.
  */
 @Deprecated // May not be included in all JVMs and hence not recommended
 public class AesGcmEncrypter implements Encrypter {
