@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,6 @@
  */
 package org.ietf.jose.util;
 
-import org.ietf.jose.jwk.JWK;
-import org.ietf.jose.jwk.key.EcKey;
-import org.ietf.jose.jwk.key.RsaPrivateKey;
-import org.ietf.jose.jwk.key.SymmetricKey;
-import org.ietf.jose.jwa.JwsAlgorithmType;
 import java.security.*;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
@@ -27,6 +22,11 @@ import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.jwk.key.EllipticCurveJwk;
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
+import org.ietf.jose.jwk.key.SymmetricJwk;
 
 /**
  * A utility class for common cryptographic operations
@@ -227,15 +227,15 @@ public class CryptographyUtility {
    * @throws GeneralSecurityException in case of failure
    */
   public static byte[] sign(byte[] payloadBytes, JWK jwk) throws GeneralSecurityException {
-    final JwsAlgorithmType algorithm = JwsAlgorithmType.resolveAlgorithm(jwk.getAlg());
-    if (jwk instanceof SymmetricKey) {
-      SymmetricKey symmetricKey = (SymmetricKey) jwk;
+    final JwsAlgorithmType algorithm = jwk.getJwsAlgorithmType();
+    if (jwk instanceof SymmetricJwk) {
+      SymmetricJwk symmetricKey = (SymmetricJwk) jwk;
       return sign(payloadBytes, new SecretKeySpec(symmetricKey.getK(), algorithm.getJavaAlgorithmName()), algorithm
                   .getJavaAlgorithmName());
-    } else if (jwk instanceof RsaPrivateKey) {
-      RsaPrivateKey rsaKey = (RsaPrivateKey) jwk;
+    } else if (jwk instanceof RsaPrivateJwk) {
+      RsaPrivateJwk rsaKey = (RsaPrivateJwk) jwk;
       return sign(payloadBytes, rsaKey.getPrivateKey(), algorithm.getJavaAlgorithmName());
-    } else if (jwk instanceof EcKey) {
+    } else if (jwk instanceof EllipticCurveJwk) {
       throw new UnsupportedOperationException("Elliptic curve keys are not supported");
     }
     return null;

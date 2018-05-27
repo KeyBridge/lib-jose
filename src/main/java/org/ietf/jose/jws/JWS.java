@@ -154,7 +154,7 @@ public class JWS {
     JWS signature = new JWS();
     signature.protectedHeader = protectedHeader;
     signature.header = unprotectedHeader;
-    JwsAlgorithmType algorithm = JwsAlgorithmType.resolveAlgorithm(protectedHeader.getAlg());
+    JwsAlgorithmType algorithm = protectedHeader.getJwsAlgorithmType();
 
     String protectedHeaderJson = JsonMarshaller.toJson(signature.protectedHeader);
     String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
@@ -227,7 +227,7 @@ public class JWS {
   public boolean isValidSignature(byte[] payload, Key key) throws IOException, GeneralSecurityException {
     String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
     String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
-    JwsAlgorithmType algorithm = JwsAlgorithmType.resolveAlgorithm(protectedHeader.getAlg());
+    JwsAlgorithmType algorithm = protectedHeader.getJwsAlgorithmType();
     return CryptographyUtility.validateSignature(signature, fullPayload.getBytes(US_ASCII), key, algorithm
                                                  .getJavaAlgorithmName());
   }
@@ -247,8 +247,7 @@ public class JWS {
     throws IOException, GeneralSecurityException {
     String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
     String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
-    JwsAlgorithmType algorithm = JwsAlgorithmType.resolveAlgorithm(protectedHeader.getAlg());
-
+    JwsAlgorithmType algorithm = protectedHeader.getJwsAlgorithmType();
     SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(base64UrlEncodedSecret), algorithm.getJavaAlgorithmName());
     return CryptographyUtility.validateSignature(signature, fullPayload.getBytes(US_ASCII), key, algorithm
                                                  .getJavaAlgorithmName());
