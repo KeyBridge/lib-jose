@@ -20,8 +20,8 @@ import org.ietf.jose.jwe.encryption.AesGcmEncrypter;
 import org.ietf.jose.jwe.encryption.DefaultEncrypter;
 import org.ietf.jose.jwe.encryption.Encrypter;
 import org.ietf.jose.jwe.encryption.EncryptionResult;
-import org.ietf.jose.jwk.key.RsaPrivateKey;
-import org.ietf.jose.jwk.key.SymmetricKey;
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
+import org.ietf.jose.jwk.key.SymmetricJwk;
 import org.junit.Test;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -179,7 +179,7 @@ public class JWETest {
      */
     final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/rsa-private-key.json");
 
-    RsaPrivateKey key = fromJson(jwkJson, RsaPrivateKey.class);
+    RsaPrivateJwk key = fromJson(jwkJson, RsaPrivateJwk.class);
     Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
     cipher.init(Cipher.ENCRYPT_MODE, key.getPublicKey());
     byte[] encryptedKey = cipher.doFinal(cekBytes);
@@ -343,7 +343,7 @@ public class JWETest {
      */
     final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/rsa-private-key-appendix-a2.json");
 
-    RsaPrivateKey key = fromJson(jwkJson, RsaPrivateKey.class);
+    RsaPrivateJwk key = fromJson(jwkJson, RsaPrivateJwk.class);
 
     Cipher cipher = Cipher.getInstance(keyManagementAlgorithm.getJavaAlgorithm());
     cipher.init(Cipher.ENCRYPT_MODE, key.getPublicKey());
@@ -518,7 +518,7 @@ public class JWETest {
      */
     final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/symmetric-key-appendix-a3.json");
 
-    SymmetricKey key = fromJson(jwkJson, SymmetricKey.class);
+    SymmetricJwk key = fromJson(jwkJson, SymmetricJwk.class);
 
     SecretKey secretKey = new SecretKeySpec(key.getK(), "AES");
 

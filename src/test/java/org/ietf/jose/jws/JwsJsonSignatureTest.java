@@ -8,9 +8,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.crypto.KeyGenerator;
+import org.ietf.jose.jwa.JwkType;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JWK;
-import org.ietf.jose.jwk.key.RsaPrivateKey;
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.util.Base64Utility;
 import org.junit.Test;
 
@@ -24,9 +25,9 @@ import static org.junit.Assert.*;
 
 public class JwsJsonSignatureTest {
 
-  private static void testSingAndVerifyRSA(byte[] payload, PublicKey publicKey, PrivateKey privateKey,
-                                           JwsAlgorithmType alg,
-                                           List<PublicKey> wrongPublicKeys) {
+  private static void testSignAndVerify(byte[] payload, PublicKey publicKey, PrivateKey privateKey,
+                                        JwsAlgorithmType alg,
+                                        List<PublicKey> wrongPublicKeys) {
     try {
       JwsHeader header = new JwsHeader();
       header.setAlg(alg.getJoseAlgorithmName());
@@ -71,55 +72,56 @@ public class JwsJsonSignatureTest {
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
     generator.initialize(2048);
     KeyPair keyPair = generator.generateKeyPair();
-    JWK keyOne = RsaPrivateKey.getInstance(keyPair);
-    JWK keyTwo = RsaPrivateKey.getInstance(keyPair);
+    JWK jwkOne = RsaPrivateJwk.getInstance(keyPair);
+    JWK jwkTwo = RsaPrivateJwk.getInstance(keyPair);
 
-    keyOne.setAlg(RS256.getJoseAlgorithmName());
-    keyTwo.setAlg(RS512.getJoseAlgorithmName());
+    jwkOne.setJwsAlgorithmType(RS256);
+    jwkTwo.setJwsAlgorithmType(RS512);
 
-    JWS signature = JWS.getInstance("sign this".getBytes(), keyOne);
-    JWS signature2 = JWS.getInstance("sign this".getBytes(), keyTwo);
+    JWS signature = JWS.getInstance("sign this".getBytes(), jwkOne);
+    JWS signature2 = JWS.getInstance("sign this".getBytes(), jwkTwo);
 
     System.out.println(toBase64Url(signature.getSignatureBytes()));
     System.out.println(toBase64Url(signature2.getSignatureBytes()));
 
     String longString = createRandomString(10000);
-    JWS signature3 = JWS.getInstance(longString.getBytes(), keyTwo);
+    JWS signature3 = JWS.getInstance(longString.getBytes(), jwkTwo);
     System.out.println(toBase64Url(signature3.getSignatureBytes()));
   }
 
   @Test
   public void testRsaSignatures() throws Exception {
-    KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-    generator.initialize(2048);
-    KeyPair keyPair = generator.generateKeyPair();
+    KeyPairGenerator rsaGenerator = KeyPairGenerator.getInstance(JwkType.RSA.name());
+    rsaGenerator.initialize(2048);
+    KeyPair rsaKeyPair = rsaGenerator.generateKeyPair();
     final byte[] payload = "sign this".getBytes();
 
     List<PublicKey> wrongPublicKeys = IntStream.range(0, 5)
-      .mapToObj(i -> generator.generateKeyPair().getPublic()).collect(Collectors.toList());
+      .mapToObj(i -> rsaGenerator.generateKeyPair().getPublic()).collect(Collectors.toList());
+
     for (JwsAlgorithmType algorithm : asList(RS256, RS384, RS512)) {
-      System.out.println(algorithm.getJoseAlgorithmName());
-      testSingAndVerifyRSA(payload, keyPair.getPublic(), keyPair.getPrivate(), algorithm, wrongPublicKeys);
+      System.out.println("  testSignAndVerify RSA " + algorithm.getJoseAlgorithmName());
+      testSignAndVerify(payload, rsaKeyPair.getPublic(), rsaKeyPair.getPrivate(), algorithm, wrongPublicKeys);
     }
   }
 
   @Test
   public void testEllipticCurveSignatures() throws Exception {
-    KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
+    KeyPairGenerator ecGenerator = KeyPairGenerator.getInstance(JwkType.EC.name());
     /**
      * Developer note: maximum number of bits for the key is 571. Otherwise, the
      * following is thrown: java.security.InvalidParameterException: Key size
      * must be at most 571 bits
      */
-    generator.initialize(571);
-    KeyPair keyPair = generator.generateKeyPair();
+    ecGenerator.initialize(571);
+    KeyPair keyPair = ecGenerator.generateKeyPair();
     final byte[] payload = "sign this".getBytes();
 
     List<PublicKey> wrongPublicKeys = IntStream.range(0, 5)
-      .mapToObj(i -> generator.generateKeyPair().getPublic()).collect(Collectors.toList());
+      .mapToObj(i -> ecGenerator.generateKeyPair().getPublic()).collect(Collectors.toList());
     for (JwsAlgorithmType algorithm : asList(ES256, ES384, ES512)) {
-      System.out.println(algorithm.getJoseAlgorithmName());
-      testSingAndVerifyRSA(payload, keyPair.getPublic(), keyPair.getPrivate(), algorithm, wrongPublicKeys);
+      System.out.println("  testSignAndVerify EC " + algorithm.getJoseAlgorithmName());
+      testSignAndVerify(payload, keyPair.getPublic(), keyPair.getPrivate(), algorithm, wrongPublicKeys);
     }
   }
 
@@ -128,7 +130,7 @@ public class JwsJsonSignatureTest {
 
     final byte[] payload = "sign this".getBytes();
     for (JwsAlgorithmType algorithm : asList(HS256, HS384, HS512)) {
-      System.out.println(algorithm.getJoseAlgorithmName());
+      System.out.println("  testSignAndVerify HMAC " + algorithm.getJoseAlgorithmName());
       testSingAndVerifySymmetric(payload, toBase64Url(createRandomString(20)), algorithm);
     }
   }

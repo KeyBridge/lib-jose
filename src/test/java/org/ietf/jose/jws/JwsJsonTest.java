@@ -4,7 +4,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.ietf.TestUtil;
 import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.key.SymmetricKey;
+import org.ietf.jose.jwk.key.SymmetricJwk;
 import org.ietf.jose.util.CryptographyUtility;
 import org.junit.Test;
 
@@ -134,9 +134,9 @@ public class JwsJsonTest {
      * "k":"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75
      * aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow" }
      */
-    SymmetricKey key = fromJson("{\"kty\":\"oct\",\n"
+    SymmetricJwk key = fromJson("{\"kty\":\"oct\",\n"
       + "\"k\":\"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow\"}",
-                                SymmetricKey.class);
+                                SymmetricJwk.class);
 
     Mac mac = Mac.getInstance("HmacSHA256");
     SecretKeySpec secretKeySpec = new SecretKeySpec(key.getK(), "HmacSHA256");
