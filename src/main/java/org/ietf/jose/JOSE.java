@@ -20,7 +20,7 @@ import org.ietf.jose.jwe.JoseHeader;
 import org.ietf.jose.jwe.JweJsonFlattened;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jws.JwsBuilder;
-import org.ietf.jose.jws.FlattendedSignature;
+import org.ietf.jose.jws.FlattendedJsonSignature;
 import org.ietf.jose.util.JsonMarshaller;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -60,7 +60,7 @@ public class JOSE {
       JweJsonFlattened jwe = JsonMarshaller.fromJson(json, JweJsonFlattened.class);
       String payload = jwe.decryptAsString(receiverKey);
 
-      FlattendedSignature jws = JsonMarshaller.fromJson(payload, FlattendedSignature.class);
+      FlattendedJsonSignature jws = JsonMarshaller.fromJson(payload, FlattendedJsonSignature.class);
 
       /**
        * The payload is rejected if the digital signature cannot be validated.
@@ -98,7 +98,7 @@ public class JOSE {
       /**
        * The payload is rejected if the digital signature cannot be validated.
        */
-      FlattendedSignature jws = JsonMarshaller.fromJson(payload, FlattendedSignature.class);
+      FlattendedJsonSignature jws = JsonMarshaller.fromJson(payload, FlattendedJsonSignature.class);
 
       boolean signatureValid = jws.getJwsSignature().isValidSignature(jws.getPayload(), base64UrlEncodedSecret);
       if (!signatureValid) {
@@ -134,7 +134,7 @@ public class JOSE {
       JoseCryptoHeader jwsHeader = new JoseCryptoHeader();
       jwsHeader.setKid(senderId);
 
-      FlattendedSignature jws = JwsBuilder.getInstance()
+      FlattendedJsonSignature jws = JwsBuilder.getInstance()
         .withStringPayload(jsonPayload)
         .withProtectedHeader(jwsHeader)
         .sign(senderPrivateKey, JwsAlgorithmType.RS256)
@@ -176,7 +176,7 @@ public class JOSE {
       JoseCryptoHeader jwsHeader = new JoseCryptoHeader();
       jwsHeader.setKid(senderId);
 
-      FlattendedSignature jws = JwsBuilder.getInstance()
+      FlattendedJsonSignature jws = JwsBuilder.getInstance()
         .withStringPayload(jsonPayload)
         .withProtectedHeader(jwsHeader)
         .sign(base64UrlEncodedSecret)
