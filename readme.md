@@ -20,48 +20,43 @@ A number of examples are defined in:
  
  * [7520 JOSE](https://tools.ietf.org/html/rfc7520)    Examples of Protecting Content Using JOSE
 
-## Implementation
+## Installation and key length errors
+
+OpenJDK, Oracle JDK, and some non-US JDK distributions have JCE policy files that do not allow strong encryption. For these JDKs you must [install JCE policy files](docs/jce-installation.md) that support full length encryption keys.
+
+## Implementation profile
 
 This implementation includes a default profile with algorithms selected to run on all JVM instances. 
 
 See the [Java Cryptography Architecture (JCA) Documentation](https://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html) for more information about algorithm selection.
 
-## Use
+
+# Hello World JWE example
+
+**Clear text input**
+
+```java
+String sampleText = "sample text to sign and encrypt";
+String signedAndEcryptedText = JOSE.write(sampleText, senderPrivateKey, recipientPublicKey, "myKeyId");
+```
+
+**Encryption and signing**
+
+```json
+{"protected":{"alg":"RSA1_5","kid":"myKeyId","enc":"A128CBC-HS256"},"encrypted_key":"jgz9i1TlyMINzo33qbdyjiNfYFx_hGWZXl9jwfHPwnsNze9usppOtuIgNFde8z0BHuJTDZz7TN7Ogi0ZmTnUV2NGlMxX9MbU1ZcqaIhx9ODJbQ7r61ow10pAZpHJOdPWNlGf06fsUhRsteZH-fbR978FM67_7T_K1aaIcZhW1zKkyXNSiUFMjPi66MtGjqH1gb72CCerq_GyI-BrD_A1XCj2DF78-b6h475LerWxEJGXaZs_48EJwB4zvMp3fK0xygg4BPFjJO0xSUVqqmz70w0W4sOKc5V7_JmvTMXoSuuuKHwuGq9r77p0eKUnr5U0DzMUKqTlxRsMtoNcT0OLtQ","iv":"Nn9CsSi0-tacUZEQ-vDC0w","ciphertext":"GYYpUaQwnV1jNDmwOTpQ6k3P5iCMMSju2x462YMiQsmboKnDMfxn-948Rs17SKwI4NGH8kB0zXVEDiiBSPEZnfcntt42txlFcFLwA7zzv1dj5tMUhQZoa3WvffMhugsOwmammM9FwKEq9Gi6U06JXSV8e9DmyvFRfGnNSnVgMO97P7_63tMpqiAjJJsqVfxdTgUj8rP0UV8V-QkQaDon01wCnwDP436GniCXYdfmH0MM9ExNwrtQL3VFZCAxDz6ZkaHi4S93KGNYtCtSYFQ_Gpk9c_82Mxerb5aATaVx9dGSAQcK5OIzwYEDB-QH2jXjxd68Z9LV86UNRWkx-MmRSLC2qjywR0qsLcZh4lZedk1bRJK3rPkP1NsvV3F30b-Y2vWfoSKufTTMjOD2Z20GdkakZ1H1r1YjO9sXfqEses0VhP_rfNdfgk-9zqxgyu2z5HY88m4rDn5zZXP4wlSGwvymOTFm8FSSUP_k96Jk_61Xhcyo5kGuAccoMwzGPBYmnHNyAUQRDUdxNtAx5o-fXNR58YdMEPEoog7zBj9usJJmh74pYtYt9OBbWLEWW9SOM-z6zICWgW3mM9I8erDaRU1x3UNYRLuTwUZU6brrh9E_yPReajLXxEaWid46qjF926mOGv7OvTKnB43PshY8N7hYPQZCSj-Pvelb61uINuH8AsN6fQV-_s_Gs8qjVM1Cy7_F0pdSVLo14ehZlpZKe7xbOw51-TJLnPAExWGQqq2L-I_s_YRQoY_HpoL4HepMO90dlrr0reKw6N0scQAQGq23P-1EwJvH375l3bEW1gemJkf2a8Z_FOiuvmCw69kq","tag":"s66_5GYp9UecmT2G76y7jA","aad":"ZXlKaGJHY2lPaUpTVTBFeFh6VWlMQ0pyYVdRaU9pSnRlVXRsZVVsa0lpd2laVzVqSWpvaVFURXlPRU5DUXkxSVV6STFOaUo5"}
+```
+
+**Decryption**
+
+```java
+JOSE.read(json, String.class, base64UrlEncodedSecret);
+```
+
+
+# More examples
 
 See the [examples](doc/examples.md) for sample code.
 
-## Installation and key length errors
-
-**Note**: The following instructions are NOT necessary for Oracle JRE/JDK distributions in the US.
-
-For OpenJDK or for Non-US distributions: _Due to import control restrictions of some countries, the version of the JCE policy files that are bundled in the Java Runtime Environment allow "strong" but limited cryptography to be used. JCE has been through the U.S. export review process.  The JCE framework, along with the various JCE providers that come standard with it (SunJCE, SunEC, SunPKCS11, SunMSCAPI, etc), is exportable._
-
-Basically: The default JRE supports encryption using up to 128 bit keys due to some foreign jurisdiction import restrictions. To support larger encryption keys (e.g. 256 bit) you must update your JRE with a policy file for your jurisdiction.
-
-For JRE versions less than 9:
-
-You must add (or replace) the files `local_policy.jar` and `US_export_policy.jar` to to suppport unlimited strength encryption. These are available for donwload from Oracle.
-
-**Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files**
-
-  * [JDK 6](http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html)
-  * [JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html)
-  * [JDK 8](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
-  
-Extract the jar files from the zip archive and save them in `${java.home}/jre/lib/security/`.
-
-See the [StackOverflow thread](https://stackoverflow.com/questions/6481627/java-security-illegal-key-size-or-default-parameters) for additional narrative on this issue.
-
-For JDK versions 9 and above:
-
-This is implemented using a configuration change. Either:
-
-  * Uncomment line `#crypto.policy=unlimited` in `lib\security\java.security`. [Release notes](http://oracle.com/technetwork/java/javase/8u151-relnotes-3850493.html)
-  * Call `Security.setProperty("crypto.policy", "unlimited")` in your application.
-
-## Examples
-
-Usage examples are available [here](examples.md). 
 
 ## JWK - JSON Web Key
 

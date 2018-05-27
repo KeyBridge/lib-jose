@@ -1,6 +1,6 @@
 # Usage examples
 
-This page provides some code examples. The full code is available in [this test class](src/test/java/ch/keybridge/jose/demo/DemoTest.java).
+This page provides some code examples. The full code is available in [this test class](../src/test/java/ch/keybridge/jose/demo/DemoTest.java).
 
 ## Signing and encryption
 
