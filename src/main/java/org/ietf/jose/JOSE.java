@@ -15,8 +15,9 @@
  */
 package org.ietf.jose;
 
+import org.ietf.jose.jws.JwsHeader;
 import org.ietf.jose.jwe.JweBuilder;
-import org.ietf.jose.jwe.JoseHeader;
+import org.ietf.jose.jwe.JweHeader;
 import org.ietf.jose.jwe.JweJsonFlattened;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jws.JwsBuilder;
@@ -131,7 +132,7 @@ public class JOSE {
     try {
       String jsonPayload = JsonMarshaller.toJson(object);
 
-      JoseCryptoHeader jwsHeader = new JoseCryptoHeader();
+      JwsHeader jwsHeader = new JwsHeader();
       jwsHeader.setKid(senderId);
 
       FlattendedJsonSignature jws = JwsBuilder.getInstance()
@@ -140,7 +141,7 @@ public class JOSE {
         .sign(senderPrivateKey, JwsAlgorithmType.RS256)
         .buildJsonFlattened();
 
-      JoseHeader jweHeader = new JoseHeader();
+      JweHeader jweHeader = new JweHeader();
       jweHeader.setKid(senderId);
 
       return JweBuilder.getInstance()
@@ -173,7 +174,7 @@ public class JOSE {
     try {
       String jsonPayload = JsonMarshaller.toJson(object);
 
-      JoseCryptoHeader jwsHeader = new JoseCryptoHeader();
+      JwsHeader jwsHeader = new JwsHeader();
       jwsHeader.setKid(senderId);
 
       FlattendedJsonSignature jws = JwsBuilder.getInstance()
@@ -182,7 +183,7 @@ public class JOSE {
         .sign(base64UrlEncodedSecret)
         .buildJsonFlattened();
 
-      JoseHeader jweHeader = new JoseHeader();
+      JweHeader jweHeader = new JweHeader();
       jweHeader.setKid(senderId);
 
       return JweBuilder.getInstance()

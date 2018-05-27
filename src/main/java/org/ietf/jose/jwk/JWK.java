@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import org.ietf.jose.AbstractJoseObject;
+import org.ietf.jose.jws.AbstractHeader;
 import org.ietf.jose.jwk.key.EcKey;
 import org.ietf.jose.jwk.key.RsaPrivateKey;
 import org.ietf.jose.jwk.key.SymmetricKey;
@@ -67,7 +67,7 @@ import org.ietf.jose.jwk.key.SymmetricKey;
   , @JsonSubTypes.Type(value = SymmetricKey.class, name = "oct")}
 )
 @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class JWK extends AbstractJoseObject {
+public abstract class JWK extends AbstractHeader {
 
   /**
    * 4.2. "use" (Public Key Use) Parameter
@@ -242,7 +242,7 @@ public abstract class JWK extends AbstractJoseObject {
    * certificate. See the last paragraph of Section 4.6 for additional guidance
    * on this.
    * <p>
-   * Developer note: inherited from AbstractJoseObject
+ Developer note: inherited from AbstractHeader
    */
   public JWK() {
   }

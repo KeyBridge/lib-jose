@@ -144,7 +144,7 @@ public class JWETest {
      * algorithm with a 256-bit key to produce the ciphertext and the
      * Authentication Tag. {"alg":"RSA-OAEP","enc":"A256GCM"}
      */
-    JoseHeader joseHeader = new JoseHeader();
+    JweHeader joseHeader = new JweHeader();
     joseHeader.setAlg("RSA-OAEP");
     joseHeader.setEnc(JweEncryptionAlgorithmType.A256GCM);
 
@@ -309,7 +309,7 @@ public class JWETest {
      */
     final JweKeyAlgorithmType keyManagementAlgorithm = JweKeyAlgorithmType.RSA1_5;
     final JweEncryptionAlgorithmType contentEncyptionAlgorithm = JweEncryptionAlgorithmType.A128CBC_HS256;
-    JoseHeader joseHeader = new JoseHeader();
+    JweHeader joseHeader = new JweHeader();
     joseHeader.setAlg(keyManagementAlgorithm.getJoseAlgorithmName());
     joseHeader.setEnc(contentEncyptionAlgorithm);
 
@@ -479,7 +479,7 @@ public class JWETest {
      */
     final JweKeyAlgorithmType keyManagementAlgorithm = JweKeyAlgorithmType.A128KW;
     final JweEncryptionAlgorithmType contentEncyptionAlgorithm = JweEncryptionAlgorithmType.A128CBC_HS256;
-    JoseHeader joseHeader = new JoseHeader();
+    JweHeader joseHeader = new JweHeader();
     joseHeader.setAlg(keyManagementAlgorithm.getJoseAlgorithmName());
     joseHeader.setEnc(contentEncyptionAlgorithm);
 

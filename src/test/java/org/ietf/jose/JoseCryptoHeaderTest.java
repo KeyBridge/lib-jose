@@ -1,5 +1,6 @@
 package org.ietf.jose;
 
+import org.ietf.jose.jws.JwsHeader;
 import java.io.IOException;
 import org.ietf.TestFileReader;
 import org.ietf.jose.util.JsonMarshaller;
@@ -12,7 +13,7 @@ public class JoseCryptoHeaderTest {
   @Test
   public void critFieldTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7515/section4-jose-header/jose-header-crit-field-example.json");
-    JoseCryptoHeader header = JsonMarshaller.fromJson(json, JoseCryptoHeader.class);
+    JwsHeader header = JsonMarshaller.fromJson(json, JwsHeader.class);
     /**
      * {
      * "alg":"ES256", "crit":["exp"], "exp":1363284000 }

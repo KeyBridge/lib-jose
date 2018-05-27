@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.crypto.KeyGenerator;
-import org.ietf.jose.JoseCryptoHeader;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JWK;
 import org.ietf.jose.jwk.key.RsaPrivateKey;
@@ -29,7 +28,7 @@ public class JwsJsonSignatureTest {
                                            JwsAlgorithmType alg,
                                            List<PublicKey> wrongPublicKeys) {
     try {
-      JoseCryptoHeader header = new JoseCryptoHeader();
+      JwsHeader header = new JwsHeader();
       header.setAlg(alg.getJoseAlgorithmName());
       GeneralJsonSignature jws = JwsBuilder.getInstance().withBinaryPayload(payload).sign(privateKey, alg).buildJson();
       JWS signature = jws.getSignatures().get(0); //JwsSignature.getInstance(payload, privateKey, header);
@@ -50,7 +49,7 @@ public class JwsJsonSignatureTest {
 
   private static void testSingAndVerifySymmetric(byte[] payload, String secret, JwsAlgorithmType alg) {
     try {
-      JoseCryptoHeader header = new JoseCryptoHeader();
+      JwsHeader header = new JwsHeader();
       header.setAlg(alg.getJoseAlgorithmName());
       GeneralJsonSignature jws = JwsBuilder.getInstance().withBinaryPayload(payload).sign(secret, alg).buildJson();
       JWS signature = jws.getSignatures().get(0); //JwsSignature.getInstance(payload, privateKey, header);

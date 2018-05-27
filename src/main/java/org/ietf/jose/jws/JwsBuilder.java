@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import org.ietf.jose.JoseCryptoHeader;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JWK;
 import org.ietf.jose.util.Base64Utility;
@@ -35,10 +34,31 @@ import org.ietf.jose.util.Base64Utility;
  */
 public class JwsBuilder {
 
+  /**
+   * The JWS payload.
+   */
   private byte[] payload;
+  /**
+   * The "signature" member MUST be present and contain the value BASE64URL(JWS
+   * Signature).
+   */
   private List<JWS> signatures = new ArrayList<>();
-  private JoseCryptoHeader protectedHeader;
-  private JoseCryptoHeader unprotectedHeader;
+
+  /**
+   * The "protected" member MUST be present and contain the value
+   * BASE64URL(UTF8(JWS Protected Header)) when the JWS Protected Header value
+   * is non-empty; otherwise, it MUST be absent. These Header Parameter values
+   * are integrity protected.
+   */
+  private JwsHeader protectedHeader;
+  /**
+   * The "header" member MUST be present and contain the value JWS Unprotected
+   * Header when the JWS Unprotected Header value is non- empty; otherwise, it
+   * MUST be absent. This value is represented as an unencoded JSON object,
+   * rather than as a string. These Header Parameter values are not integrity
+   * protected.
+   */
+  private JwsHeader header;
 
   private JwsBuilder() {
   }
@@ -77,22 +97,22 @@ public class JwsBuilder {
   /**
    * Add a protected header
    *
-   * @param header a JoseCryptoHeader instance
+   * @param header a JwsHeader instance
    * @return this builder
    */
-  public JwsBuilder withProtectedHeader(JoseCryptoHeader header) {
-    protectedHeader = header;
+  public JwsBuilder withProtectedHeader(JwsHeader header) {
+    this.protectedHeader = header;
     return this;
   }
 
   /**
    * Add an unprotected header
    *
-   * @param header a JoseCryptoHeader instance
+   * @param header a JwsHeader instance
    * @return this builder
    */
-  public JwsBuilder withUnprotectedHeader(JoseCryptoHeader header) {
-    unprotectedHeader = header;
+  public JwsBuilder withHeader(JwsHeader header) {
+    this.header = header;
     return this;
   }
 
@@ -106,7 +126,7 @@ public class JwsBuilder {
    * @throws GeneralSecurityException in case of failure to sign
    */
   public JwsBuilder sign(JWK key) throws IOException, GeneralSecurityException {
-    signatures.add(JWS.getInstance(payload, key));
+    this.signatures.add(JWS.getInstance(payload, key));
     return this;
   }
 
@@ -122,17 +142,17 @@ public class JwsBuilder {
    */
   public JwsBuilder sign(Key key, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
     if (protectedHeader == null) {
-      protectedHeader = new JoseCryptoHeader();
+      this.protectedHeader = new JwsHeader();
     }
-    protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
-    signatures.add(JWS.getInstance(payload, key, protectedHeader, unprotectedHeader));
+    this.protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
+    this.signatures.add(JWS.getInstance(payload, key, protectedHeader, header));
     return this;
   }
 
   /**
    * Sign with a keyed hash (HMAC)
    *
-   * @param secret    a base64URL-encoded secret
+   * @param secret    a base64URL-encoded secret (e.g. a passphrase)
    * @param algorithm a signature algorithm suitable for the provided key
    * @return this builder
    * @throws IOException              in case of failure to serialise the
@@ -174,7 +194,8 @@ public class JwsBuilder {
   }
 
   /**
-   * Build a GeneralJsonSignature instance: A GeneralJsonSignature object with one or more signatures
+   * Build a GeneralJsonSignature instance: A GeneralJsonSignature object with
+   * one or more signatures
    *
    * @return a GeneralJsonSignature instance
    */
@@ -183,7 +204,8 @@ public class JwsBuilder {
   }
 
   /**
-   * Build a FlattendedJsonSignature instance: A GeneralJsonSignature object with a single signature.
+   * Build a FlattendedJsonSignature instance: A GeneralJsonSignature object
+   * with a single signature.
    *
    * @return a FlattendedJsonSignature instance
    */
@@ -192,8 +214,8 @@ public class JwsBuilder {
   }
 
   /**
-   * Build a GeneralJsonSignature compact string: a string which contains the payload and a
- single signature.
+   * Build a GeneralJsonSignature compact string: a string which contains the
+   * payload and a single signature.
    *
    * @return a GeneralJsonSignature compact string
    * @throws java.io.IOException on error

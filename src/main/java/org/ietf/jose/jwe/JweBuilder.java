@@ -57,8 +57,8 @@ public class JweBuilder {
    * encryption.
    */
   private JweKeyAlgorithmType keyMgmtAlgo;
-  private JoseHeader protectedHeader = new JoseHeader();
-  private JoseHeader unprotectedHeader;
+  private JweHeader protectedHeader = new JweHeader();
+  private JweHeader unprotectedHeader;
   private byte[] payload;
 
   private JweBuilder() {
@@ -133,7 +133,7 @@ public class JweBuilder {
    * @param header a JoseCryptoHeader instance
    * @return this builder
    */
-  public JweBuilder withProtectedHeader(JoseHeader header) {
+  public JweBuilder withProtectedHeader(JweHeader header) {
     protectedHeader = header;
     return this;
   }
@@ -144,7 +144,7 @@ public class JweBuilder {
    * @param header a JoseCryptoHeader instance
    * @return this builder
    */
-  public JweBuilder withUnprotectedHeader(JoseHeader header) {
+  public JweBuilder withUnprotectedHeader(JweHeader header) {
     unprotectedHeader = header;
     return this;
   }

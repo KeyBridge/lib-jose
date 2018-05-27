@@ -58,12 +58,12 @@ public class JweJsonFlattened {
    * Integrity-protected header contents
    */
   @XmlElement(name = "protected", required = true)
-  private JoseHeader protectedHeader;
+  private JweHeader protectedHeader;
   /**
    * Non-integrity-protected header contents
    */
   @XmlElement(name = "unprotected", required = true)
-  private JoseHeader unprotected;
+  private JweHeader unprotected;
   /**
    * Encrypted key contents
    */
@@ -126,7 +126,7 @@ public class JweJsonFlattened {
     }
     JweJsonFlattened jwe = new JweJsonFlattened();
     String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
-    jwe.protectedHeader = fromJson(protectedHeaderJson, JoseHeader.class);
+    jwe.protectedHeader = fromJson(protectedHeaderJson, JweHeader.class);
     jwe.encryptedKey = fromBase64Url(tokenizer.nextToken());
     jwe.initializationVector = fromBase64Url(tokenizer.nextToken());
     jwe.ciphertext = fromBase64Url(tokenizer.nextToken());
@@ -158,8 +158,8 @@ public class JweJsonFlattened {
                                              final JweEncryptionAlgorithmType contentEnc,
                                              JweKeyAlgorithmType keyMgmt,
                                              Key key,
-                                             JoseHeader protectedHeader,
-                                             JoseHeader uprotected) throws IOException, GeneralSecurityException {
+                                             JweHeader protectedHeader,
+                                             JweHeader uprotected) throws IOException, GeneralSecurityException {
     JweJsonFlattened jwe = new JweJsonFlattened();
     /**
      * Populate the protected header with mandatory information on how the
@@ -190,7 +190,7 @@ public class JweJsonFlattened {
    *
    * @return integrity-protected header
    */
-  public JoseHeader getProtectedHeader() {
+  public JweHeader getProtectedHeader() {
     return protectedHeader;
   }
 
@@ -199,7 +199,7 @@ public class JweJsonFlattened {
    *
    * @return non-integrity-protected header
    */
-  public JoseHeader getUnprotected() {
+  public JweHeader getUnprotected() {
     return unprotected;
   }
 

@@ -116,7 +116,7 @@ public class GeneralJsonSignature extends AbstractJws {
     }
     JWS signature = signatures.get(0);
     return new FlattendedJsonSignature(
-      signature.getProtectedHeader(), signature.getUnprotectedHeader(), payload, signature.getSignatureBytes());
+      signature.getProtectedHeader(), signature.getHeader(), payload, signature.getSignatureBytes());
   }
 
   /**

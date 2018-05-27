@@ -24,7 +24,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.JoseCryptoHeader;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JWK;
@@ -77,7 +76,7 @@ public class JWS {
    * are integrity protected.
    */
   @XmlElement(name = "protected")
-  private JoseCryptoHeader protectedHeader;
+  private JwsHeader protectedHeader;
   /**
    * The "header" member MUST be present and contain the value JWS Unprotected
    * Header when the JWS Unprotected Header value is non- empty; otherwise, it
@@ -86,7 +85,7 @@ public class JWS {
    * protected.
    */
   @XmlElement(name = "header")
-  private JoseCryptoHeader unprotectedHeader;
+  private JwsHeader header;
   /**
    * The "signature" member MUST be present and contain the value BASE64URL(JWS
    * Signature).
@@ -106,7 +105,7 @@ public class JWS {
    */
   public static JWS getInstance(byte[] payload, JWK key) throws IOException, GeneralSecurityException {
     JWS signature = new JWS();
-    JoseCryptoHeader ph = new JoseCryptoHeader();
+    JwsHeader ph = new JwsHeader();
     ph.setAlg(key.getAlg());
     ph.setX5c(key.getX5c());
     ph.setX5t(key.getX5t());
@@ -127,13 +126,13 @@ public class JWS {
    * @param payload         data to sign
    * @param key             a valid key. Must be an instance of
    *                        javax.crypto.SecretKey or java.security.PrivateKey
-   * @param protectedHeader a JoseCryptoHeader that will be integrity-protected
-   *                        by the signature
+   * @param protectedHeader a JwsHeader that will be integrity-protected by the
+   *                        signature
    * @return JWS instance
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  public static JWS getInstance(byte[] payload, Key key, JoseCryptoHeader protectedHeader) throws IOException,
+  public static JWS getInstance(byte[] payload, Key key, JwsHeader protectedHeader) throws IOException,
     GeneralSecurityException {
     return getInstance(payload, key, protectedHeader, null);
   }
@@ -144,18 +143,17 @@ public class JWS {
    * @param payload           data to sign
    * @param key               a valid key. Must be an instance of
    *                          javax.crypto.SecretKey or java.security.PrivateKey
-   * @param protectedHeader   a JoseCryptoHeader that will be
-   *                          integrity-protected
-   * @param unprotectedHeader a JoseCryptoHeader that will not be
-   *                          integrity-protected by the signature
+   * @param protectedHeader   a JwsHeader that will be integrity-protected
+   * @param unprotectedHeader a JwsHeader that will not be integrity-protected
+   *                          by the signature
    * @return JWS instance
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  public static JWS getInstance(byte[] payload, Key key, JoseCryptoHeader protectedHeader, JoseCryptoHeader unprotectedHeader) throws IOException, GeneralSecurityException {
+  public static JWS getInstance(byte[] payload, Key key, JwsHeader protectedHeader, JwsHeader unprotectedHeader) throws IOException, GeneralSecurityException {
     JWS signature = new JWS();
     signature.protectedHeader = protectedHeader;
-    signature.unprotectedHeader = unprotectedHeader;
+    signature.header = unprotectedHeader;
     JwsAlgorithmType algorithm = JwsAlgorithmType.resolveAlgorithm(protectedHeader.getAlg());
 
     String protectedHeaderJson = JsonMarshaller.toJson(signature.protectedHeader);
@@ -169,15 +167,15 @@ public class JWS {
    * Create instance using provided headers and signature bytes. Should be used
    * only by classes within the library.
    *
-   * @param protectedHeader   a JoseCryptoHeader instance
-   * @param unprotectedHeader a JoseCryptoHeader instance
+   * @param protectedHeader   a JwsHeader instance
+   * @param unprotectedHeader a JwsHeader instance
    * @param signatureBytes    signature or HMAC
    * @return a JWS signature
    */
-  static JWS getInstance(JoseCryptoHeader protectedHeader, JoseCryptoHeader unprotectedHeader, byte[] signatureBytes) {
+  static JWS getInstance(JwsHeader protectedHeader, JwsHeader unprotectedHeader, byte[] signatureBytes) {
     JWS signature = new JWS();
     signature.protectedHeader = protectedHeader;
-    signature.unprotectedHeader = unprotectedHeader;
+    signature.header = unprotectedHeader;
     signature.signature = signatureBytes;
     return signature;
   }
@@ -187,7 +185,7 @@ public class JWS {
    *
    * @return the protected JOSE header
    */
-  public JoseCryptoHeader getProtectedHeader() {
+  public JwsHeader getProtectedHeader() {
     return protectedHeader;
   }
 
@@ -196,8 +194,8 @@ public class JWS {
    *
    * @return the unprotected JOSE header
    */
-  public JoseCryptoHeader getUnprotectedHeader() {
-    return unprotectedHeader;
+  public JwsHeader getHeader() {
+    return header;
   }
 
   /**

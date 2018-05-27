@@ -21,8 +21,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.AbstractJoseObject;
-import org.ietf.jose.JoseCryptoHeader;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.util.Base64Utility;
 import org.ietf.jose.util.JsonMarshaller;
@@ -66,7 +64,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    * are integrity protected.
    */
   @XmlElement(name = "protected")
-  private JoseCryptoHeader protectedHeader;
+  private JwsHeader protectedHeader;
   /**
    * The "header" member MUST be present and contain the value JWS Unprotected
    * Header when the JWS Unprotected Header value is non- empty; otherwise, it
@@ -75,7 +73,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    * protected.
    */
   @XmlElement(name = "header")
-  private JoseCryptoHeader unprotectedHeader;
+  private JwsHeader unprotectedHeader;
   /**
    * The "signature" member MUST be present and contain the value BASE64URL(JWS
    * Signature).
@@ -90,8 +88,8 @@ public class FlattendedJsonSignature extends AbstractJws {
   public FlattendedJsonSignature() {
   }
 
-  public FlattendedJsonSignature(JoseCryptoHeader protectedHeader,
-                                 JoseCryptoHeader unprotectedHeader,
+  public FlattendedJsonSignature(JwsHeader protectedHeader,
+                                 JwsHeader unprotectedHeader,
                                  byte[] payload,
                                  byte[] signature) {
     this.protectedHeader = protectedHeader;
@@ -116,7 +114,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    *
    * @return protected header
    */
-  public AbstractJoseObject getProtectedHeader() {
+  public AbstractHeader getProtectedHeader() {
     return protectedHeader;
   }
 
@@ -125,7 +123,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    *
    * @return unprotected header
    */
-  public AbstractJoseObject getUnprotectedHeader() {
+  public AbstractHeader getUnprotectedHeader() {
     return unprotectedHeader;
   }
 
