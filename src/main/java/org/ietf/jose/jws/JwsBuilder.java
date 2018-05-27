@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +15,6 @@
  */
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.JoseCryptoHeader;
-import org.ietf.jose.jwk.JWK;
-import org.ietf.jose.util.Base64Utility;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -26,6 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import org.ietf.jose.JoseCryptoHeader;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.util.Base64Utility;
 
 /**
  * A builder for JSON Web Signature objects.
@@ -36,7 +36,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class JwsBuilder {
 
   private byte[] payload;
-  private List<GeneralSignature> signatures = new ArrayList<>();
+  private List<JWS> signatures = new ArrayList<>();
   private JoseCryptoHeader protectedHeader;
   private JoseCryptoHeader unprotectedHeader;
 
@@ -106,7 +106,7 @@ public class JwsBuilder {
    * @throws GeneralSecurityException in case of failure to sign
    */
   public JwsBuilder sign(JWK key) throws IOException, GeneralSecurityException {
-    signatures.add(GeneralSignature.getInstance(payload, key));
+    signatures.add(JWS.getInstance(payload, key));
     return this;
   }
 
@@ -125,7 +125,7 @@ public class JwsBuilder {
       protectedHeader = new JoseCryptoHeader();
     }
     protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
-    signatures.add(GeneralSignature.getInstance(payload, key, protectedHeader, unprotectedHeader));
+    signatures.add(JWS.getInstance(payload, key, protectedHeader, unprotectedHeader));
     return this;
   }
 
@@ -174,28 +174,29 @@ public class JwsBuilder {
   }
 
   /**
-   * Build a JWS instance: A JWS object with one or more signatures
+   * Build a GeneralJsonSignature instance: A GeneralJsonSignature object with one or more signatures
    *
-   * @return a JWS instance
+   * @return a GeneralJsonSignature instance
    */
-  public JWS buildJson() {
-    return new JWS(payload, signatures);
+  public GeneralJsonSignature buildJson() {
+    return new GeneralJsonSignature(payload, signatures);
   }
 
   /**
-   * Build a FlattendedSignature instance: A JWS object with a single signature.
+   * Build a FlattendedJsonSignature instance: A GeneralJsonSignature object with a single signature.
    *
-   * @return a FlattendedSignature instance
+   * @return a FlattendedJsonSignature instance
    */
-  public FlattendedSignature buildJsonFlattened() {
-    return new JWS(payload, signatures).toFlattened();
+  public FlattendedJsonSignature buildJsonFlattened() {
+    return new GeneralJsonSignature(payload, signatures).toFlattened();
   }
 
   /**
-   * Build a JWS compact string: a string which contains the payload and a
-   * single signature.
+   * Build a GeneralJsonSignature compact string: a string which contains the payload and a
+ single signature.
    *
-   * @return a JWS compact string
+   * @return a GeneralJsonSignature compact string
+   * @throws java.io.IOException on error
    */
   public String buildCompact() throws IOException {
     return buildJsonFlattened().getCompactForm();

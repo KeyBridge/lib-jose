@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,16 +47,17 @@ import org.ietf.jose.util.JsonMarshaller;
  * as follows:
  * <pre>
  * {
- *  "payload":"[[payload contents]]",
- *  "protected":"[[integrity-protected header contents]]",
- *  "header":[[non-integrity-protected header contents]],
- *  "signature":"[[signature contents]]"
- * }
- * </pre> See Appendix A.7 for an example JWS using the flattened JWS JSON
+ *  "payload":"_payload contents_",
+ *  "protected":"_integrity-protected header contents_",
+ *   "header":_non-integrity-protected header contents_,
+ *   "signature":"_signature contents_"
+ *  }</pre>
+ * <p>
+ * See Appendix A.7 for an example JWS using the flattened JWS JSON
  * Serialization syntax.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class FlattendedSignature extends AbstractJws {
+public class FlattendedJsonSignature extends AbstractJws {
 
   /**
    * The "protected" member MUST be present and contain the value
@@ -86,13 +87,13 @@ public class FlattendedSignature extends AbstractJws {
   /**
    * Default constructor; required for JSON/XML serializers
    */
-  public FlattendedSignature() {
+  public FlattendedJsonSignature() {
   }
 
-  public FlattendedSignature(JoseCryptoHeader protectedHeader,
-                             JoseCryptoHeader unprotectedHeader,
-                             byte[] payload,
-                             byte[] signature) {
+  public FlattendedJsonSignature(JoseCryptoHeader protectedHeader,
+                                 JoseCryptoHeader unprotectedHeader,
+                                 byte[] payload,
+                                 byte[] signature) {
     this.protectedHeader = protectedHeader;
     this.unprotectedHeader = unprotectedHeader;
     this.payload = payload;
@@ -103,11 +104,11 @@ public class FlattendedSignature extends AbstractJws {
    * Create instance from JSON string
    *
    * @param json JSON string
-   * @return a FlattendedSignature instace
+   * @return a FlattendedJsonSignature instace
    * @throws IOException in case of failure to deserialise the JSON string
    */
-  public static FlattendedSignature fromJson(String json) throws IOException {
-    return JsonMarshaller.fromJson(json, FlattendedSignature.class);
+  public static FlattendedJsonSignature fromJson(String json) throws IOException {
+    return JsonMarshaller.fromJson(json, FlattendedJsonSignature.class);
   }
 
   /**
@@ -152,17 +153,18 @@ public class FlattendedSignature extends AbstractJws {
    * @return this JWS object encoded in compact serialization
    */
   public String getCompactForm() throws IOException {
-    return Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader)) + '.'
-      + Base64Utility.toBase64Url(payload) + '.' + Base64Utility.toBase64Url(signature);
+    return Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader))
+      + '.' + Base64Utility.toBase64Url(payload)
+      + '.' + Base64Utility.toBase64Url(signature);
   }
 
   /**
-   * Get the signature as a GeneralSignature instance
+   * Get the signature as a JWS instance
    *
-   * @return a GeneralSignature instance
+   * @return a JWS instance
    */
-  public GeneralSignature getJwsSignature() {
-    return GeneralSignature.getInstance(protectedHeader, unprotectedHeader, signature);
+  public JWS getJwsSignature() {
+    return JWS.getInstance(protectedHeader, unprotectedHeader, signature);
   }
 
   /**

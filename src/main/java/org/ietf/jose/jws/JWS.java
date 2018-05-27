@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,151 +16,253 @@
 package org.ietf.jose.jws;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.ietf.jose.JoseCryptoHeader;
+import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.JWK;
 import org.ietf.jose.util.Base64Utility;
+import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
+
+import static java.nio.charset.StandardCharsets.US_ASCII;
+import static org.ietf.jose.util.Base64Utility.toBase64Url;
 
 /**
  * RFC 7515 JSON Web Signature (JWS)
  * <p>
- * JSON Web Signature (JWS) represents content secured with digital signatures
- * or Message Authentication Codes (MACs) using JSON-based data structures.
- * Cryptographic algorithms and identifiers for use with this specification are
- * described in the separate JSON Web Algorithms (JWA) specification and an IANA
- * registry defined by that specification. Related encryption capabilities are
- * described in the separate JSON Web Encryption (JWE) specification.
- * <p>
- * 7.2. JWS JSON Serialization
- * <p>
- * The JWS JSON Serialization represents digitally signed or MACed content as a
- * JSON object. This representation is neither optimized for compactness nor
- * URL-safe.
- * <p>
  * 7.2.1. General JWS JSON Serialization Syntax
  * <p>
- * The following members are defined for use in top-level JSON objects used for
- * the fully general JWS JSON Serialization syntax:
+ * The following members are defined for use in the JSON objects that are
+ * elements of the "signatures" array:
  * <p>
- * 7.2.1. General JWS JSON Serialization Syntax The following members are
- * defined for use in top-level JSON objects used for the fully general JWS JSON
- * Serialization syntax:
+ * protected: The "protected" member MUST be present and contain the value
+ * BASE64URL(UTF8(JWS Protected Header)) when the JWS Protected Header value is
+ * non-empty; otherwise, it MUST be absent. These Header Parameter values are
+ * integrity protected.
  * <p>
- * In summary, the syntax of a JWS using the general JWS JSON Serialization is
+ * header: The "header" member MUST be present and contain the value JWS
+ * Unprotected Header when the JWS Unprotected Header value is non- empty;
+ * otherwise, it MUST be absent. This value is represented as an unencoded JSON
+ * object, rather than as a string. These Header Parameter values are not
+ * integrity protected.
+ * <p>
+ * signature: The "signature" member MUST be present and contain the value
+ * BASE64URL(JWS Signature).
+ * <p>
+ * In summary, the syntax of a JWS using the flattened JWS JSON Serialization is
  * as follows:
  * <pre>
  * {
- *  "payload":"<payload contents>",
- *  "signatures":[
- *   {"protected":"<integrity-protected header 1 contents>",
- *    "header":<non-integrity-protected header 1 contents>,
- *    "signature":"<signature 1 contents>"},
- *    ...
- *   {"protected":"<integrity-protected header N contents>",
- *    "header":<non-integrity-protected header N contents>,
- *    "signature":"<signature N contents>"}]
+ *  "payload":"_payload contents_",
+ *  "protected":"_integrity-protected header contents_",
+ *  "header":_non-integrity-protected header contents_,
+ *  "signature":"_signature contents_"
  * }</pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JWS extends AbstractJws {
+public class JWS {
 
   /**
-   * The "signatures" member value MUST be an array of JSON objects. Each object
-   * represents a signature or MAC over the JWS Payload and the JWS Protected
-   * Header.
+   * The "protected" member MUST be present and contain the value
+   * BASE64URL(UTF8(JWS Protected Header)) when the JWS Protected Header value
+   * is non-empty; otherwise, it MUST be absent. These Header Parameter values
+   * are integrity protected.
    */
-  private List<GeneralSignature> signatures;
-
+  @XmlElement(name = "protected")
+  private JoseCryptoHeader protectedHeader;
   /**
-   * Default constructor. Used by JSON (de)serialisers.
+   * The "header" member MUST be present and contain the value JWS Unprotected
+   * Header when the JWS Unprotected Header value is non- empty; otherwise, it
+   * MUST be absent. This value is represented as an unencoded JSON object,
+   * rather than as a string. These Header Parameter values are not integrity
+   * protected.
    */
-  private JWS() {
-  }
-
-  public JWS(byte[] payload, List<GeneralSignature> signatures) {
-    this.payload = payload;
-    this.signatures = signatures;
-  }
+  @XmlElement(name = "header")
+  private JoseCryptoHeader unprotectedHeader;
+  /**
+   * The "signature" member MUST be present and contain the value BASE64URL(JWS
+   * Signature).
+   */
+  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
+  private byte[] signature;
 
   /**
-   * Create instance from JSON string
+   * Create signature for the provided payload and JSON Web Key
    *
-   * @param json JSON string
-   * @return a FlattendedSignature instace
-   * @throws IOException in case of failure to deserialise the JSON string
+   * @param payload data to sign
+   * @param key     a valid JWK instance
+   * @return a JWS instance
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
+   * @throws GeneralSecurityException in case of failure to sign
    */
-  public static JWS fromJson(String json) throws IOException {
-    return JsonMarshaller.fromJson(json, JWS.class);
+  public static JWS getInstance(byte[] payload, JWK key) throws IOException, GeneralSecurityException {
+    JWS signature = new JWS();
+    JoseCryptoHeader ph = new JoseCryptoHeader();
+    ph.setAlg(key.getAlg());
+    ph.setX5c(key.getX5c());
+    ph.setX5t(key.getX5t());
+    ph.setX5tS256(key.getX5tS256());
+    ph.setX5u(key.getX5u());
+    ph.setKid(key.getKid());
+    signature.protectedHeader = ph;
+
+    String protectedHeaderJson = JsonMarshaller.toJson(ph);
+    String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
+    signature.signature = CryptographyUtility.sign(fullPayload.getBytes(US_ASCII), key);
+    return signature;
   }
 
   /**
-   * Get the signatures as list
+   * Create signature for the provided payload, key, and protected header
    *
-   * @return signature list
+   * @param payload         data to sign
+   * @param key             a valid key. Must be an instance of
+   *                        javax.crypto.SecretKey or java.security.PrivateKey
+   * @param protectedHeader a JoseCryptoHeader that will be integrity-protected
+   *                        by the signature
+   * @return JWS instance
+   * @throws IOException
+   * @throws GeneralSecurityException
    */
-  public List<GeneralSignature> getSignatures() {
-    return new ArrayList<>(signatures);
+  public static JWS getInstance(byte[] payload, Key key, JoseCryptoHeader protectedHeader) throws IOException,
+    GeneralSecurityException {
+    return getInstance(payload, key, protectedHeader, null);
   }
 
   /**
-   * Convert to FlattendedSignature. Must contain a single signature.
+   * Create signature for the provided payload, key, and headers
    *
-   * @return a FlattendedSignature instance
+   * @param payload           data to sign
+   * @param key               a valid key. Must be an instance of
+   *                          javax.crypto.SecretKey or java.security.PrivateKey
+   * @param protectedHeader   a JoseCryptoHeader that will be
+   *                          integrity-protected
+   * @param unprotectedHeader a JoseCryptoHeader that will not be
+   *                          integrity-protected by the signature
+   * @return JWS instance
+   * @throws IOException
+   * @throws GeneralSecurityException
    */
-  public FlattendedSignature toFlattened() {
-    if (signatures.isEmpty()) {
-      throw new IllegalArgumentException("Must sign data!");
-    }
-    if (signatures.size() > 1) {
-      throw new IllegalArgumentException("JWS Flattened format support only one signature.");
-    }
-    GeneralSignature signature = signatures.get(0);
-    return new FlattendedSignature(
-      signature.getProtectedHeader(), signature.getUnprotectedHeader(), payload, signature.getSignatureBytes());
+  public static JWS getInstance(byte[] payload, Key key, JoseCryptoHeader protectedHeader, JoseCryptoHeader unprotectedHeader) throws IOException, GeneralSecurityException {
+    JWS signature = new JWS();
+    signature.protectedHeader = protectedHeader;
+    signature.unprotectedHeader = unprotectedHeader;
+    JwsAlgorithmType algorithm = JwsAlgorithmType.resolveAlgorithm(protectedHeader.getAlg());
+
+    String protectedHeaderJson = JsonMarshaller.toJson(signature.protectedHeader);
+    String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
+    signature.signature = CryptographyUtility.sign(fullPayload.getBytes(US_ASCII), key, algorithm
+                                                   .getJavaAlgorithmName());
+    return signature;
   }
 
   /**
-   * Serialise to JSON.
+   * Create instance using provided headers and signature bytes. Should be used
+   * only by classes within the library.
    *
-   * @return JSON string
-   * @throws IOException in case of failure to serialise the object to JSON
+   * @param protectedHeader   a JoseCryptoHeader instance
+   * @param unprotectedHeader a JoseCryptoHeader instance
+   * @param signatureBytes    signature or HMAC
+   * @return a JWS signature
    */
-  public String toJson() throws IOException {
-    return JsonMarshaller.toJson(this);
+  static JWS getInstance(JoseCryptoHeader protectedHeader, JoseCryptoHeader unprotectedHeader, byte[] signatureBytes) {
+    JWS signature = new JWS();
+    signature.protectedHeader = protectedHeader;
+    signature.unprotectedHeader = unprotectedHeader;
+    signature.signature = signatureBytes;
+    return signature;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    JWS jwsJson = (JWS) o;
-
-    if (payload != null ? !Arrays.equals(payload, jwsJson.payload) : jwsJson.payload != null) {
-      return false;
-    }
-    return signatures != null ? signatures.equals(jwsJson.signatures) : jwsJson.signatures == null;
+  /**
+   * Get the protected JOSE header
+   *
+   * @return the protected JOSE header
+   */
+  public JoseCryptoHeader getProtectedHeader() {
+    return protectedHeader;
   }
 
-  @Override
-  public int hashCode() {
-    int result = payload != null ? Arrays.hashCode(payload) : 0;
-    result = 31 * result + (signatures != null ? signatures.hashCode() : 0);
-    return result;
+  /**
+   * Get the unprotected JOSE header
+   *
+   * @return the unprotected JOSE header
+   */
+  public JoseCryptoHeader getUnprotectedHeader() {
+    return unprotectedHeader;
   }
 
-  @Override
-  public String toString() {
-    return "JWSJson{"
-      + "payload='" + Base64Utility.toBase64Url(payload) + '\''
-      + ", signatures=" + signatures
-      + '}';
+  /**
+   * Validate signature using a Key instance
+   *
+   * @param payload a String that was signed
+   * @param key     a Key instance
+   * @return true if signature is valid
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
+   * @throws GeneralSecurityException in case of failure to validate the
+   *                                  signature
+   */
+  public boolean isValidSignature(String payload, Key key) throws IOException, GeneralSecurityException {
+    return isValidSignature(payload.getBytes(Base64Utility.DEFAULT_CHARSET), key);
   }
+
+  /**
+   * Validate signature using a Key instance
+   *
+   * @param payload data that was signed
+   * @param key     a Key instance
+   * @return true if signature is valid
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
+   * @throws GeneralSecurityException in case of failure to validate the
+   *                                  signature
+   */
+  public boolean isValidSignature(byte[] payload, Key key) throws IOException, GeneralSecurityException {
+    String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
+    String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
+    JwsAlgorithmType algorithm = JwsAlgorithmType.resolveAlgorithm(protectedHeader.getAlg());
+    return CryptographyUtility.validateSignature(signature, fullPayload.getBytes(US_ASCII), key, algorithm
+                                                 .getJavaAlgorithmName());
+  }
+
+  /**
+   * Validate signature using shared secret
+   *
+   * @param payload                data that was signed
+   * @param base64UrlEncodedSecret base64Url-encoded bytes of the shared secret
+   * @return true if signature is valid
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
+   * @throws GeneralSecurityException in case of failure to validate the
+   *                                  signature
+   */
+  public boolean isValidSignature(byte[] payload, String base64UrlEncodedSecret)
+    throws IOException, GeneralSecurityException {
+    String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
+    String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
+    JwsAlgorithmType algorithm = JwsAlgorithmType.resolveAlgorithm(protectedHeader.getAlg());
+
+    SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(base64UrlEncodedSecret), algorithm.getJavaAlgorithmName());
+    return CryptographyUtility.validateSignature(signature, fullPayload.getBytes(US_ASCII), key, algorithm
+                                                 .getJavaAlgorithmName());
+  }
+
+  /**
+   * Get the signature byte array
+   *
+   * @return signature byte array
+   */
+  public byte[] getSignatureBytes() {
+    return signature;
+  }
+
 }
