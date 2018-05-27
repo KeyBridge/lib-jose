@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +15,6 @@
  */
 package org.ietf.jose.jwe;
 
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.jwe.encryption.Encrypter;
-import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
-import org.ietf.jose.jwe.encryption.EncryptionResult;
-import org.ietf.jose.jwa.JweKeyAlgorithmType;
-import org.ietf.jose.util.CryptographyUtility;
-import org.ietf.jose.util.JsonMarshaller;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -33,10 +26,17 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
+import org.ietf.jose.jwe.encryption.Encrypter;
+import org.ietf.jose.jwe.encryption.EncryptionResult;
+import org.ietf.jose.util.CryptographyUtility;
+import org.ietf.jose.util.JsonMarshaller;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.ietf.jose.util.Base64Utility.*;
 import static org.ietf.jose.util.JsonMarshaller.fromJson;
-import static java.nio.charset.StandardCharsets.US_ASCII;
 
 /**
  * 7.2.2. Flattened JWE JSON Serialization Syntax
@@ -231,8 +231,7 @@ public class JweJsonFlattened {
   }
 
   public byte[] decryptPayload(Key key) throws GeneralSecurityException {
-    final JweKeyAlgorithmType keyManagementAlgorithm = JweKeyAlgorithmType.resolveAlgorithm(protectedHeader
-      .getAlg());
+    final JweKeyAlgorithmType keyManagementAlgorithm = protectedHeader.getJweKeyAlgorithmType();
     final SecretKey aesKey = (SecretKey) CryptographyUtility.unwrapKey(encryptedKey, key, keyManagementAlgorithm
                                                                        .getJavaAlgorithm(), "AES"); //todo
     /**
