@@ -1,6 +1,5 @@
 package org.ietf.jose.jwe;
 
-import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -15,8 +14,12 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.ietf.TestFileReader;
 import org.ietf.TestUtil;
-import org.ietf.jose.jwe.encryption.*;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
+import org.ietf.jose.jwe.encryption.AesGcmEncrypter;
+import org.ietf.jose.jwe.encryption.DefaultEncrypter;
+import org.ietf.jose.jwe.encryption.Encrypter;
+import org.ietf.jose.jwe.encryption.EncryptionResult;
 import org.ietf.jose.jwk.key.RsaPrivateKey;
 import org.ietf.jose.jwk.key.SymmetricKey;
 import org.junit.Test;
@@ -53,18 +56,17 @@ public class JWETest {
     generator.initialize(2048);
     KeyPair pair = generator.generateKeyPair();
 
-    System.out.println(pair.getPrivate().getAlgorithm());
-    System.out.println(pair.getPrivate().getFormat());
-    System.out.println(pair.getPublic().getAlgorithm());
-    System.out.println(pair.getPublic().getFormat());
-
+//    System.out.println(pair.getPrivate().getAlgorithm());
+//    System.out.println(pair.getPrivate().getFormat());
+//    System.out.println(pair.getPublic().getAlgorithm());
+//    System.out.println(pair.getPublic().getFormat());
     JweJsonFlattened jwe = JweBuilder.getInstance()
       .withBinaryPayload(payload)
       .buildJweJsonFlattened(pair.getPublic());
 
     String compactForm = jwe.toCompactForm();
 
-    System.out.println(compactForm);
+//    System.out.println(compactForm);
     JweJsonFlattened fromCompact = JweJsonFlattened.fromCompactForm(compactForm);
 
     assertEquals(jwe, fromCompact);
@@ -147,7 +149,7 @@ public class JWETest {
     joseHeader.setEnc(JweEncryptionAlgorithmType.A256GCM);
 
     String joseHeaderJson = toJson(joseHeader);
-    System.out.println(joseHeaderJson);
+//    System.out.println(joseHeaderJson);
     /**
      * Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
      * Header)) gives this value: eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ
@@ -312,7 +314,7 @@ public class JWETest {
     joseHeader.setEnc(contentEncyptionAlgorithm);
 
     String joseHeaderJson = toJson(joseHeader);
-    System.out.println(joseHeaderJson);
+//    System.out.println(joseHeaderJson);
     /**
      * Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
      * Header)) gives this value:
@@ -482,7 +484,7 @@ public class JWETest {
     joseHeader.setEnc(contentEncyptionAlgorithm);
 
     final String joseHeaderJson = toJson(joseHeader);
-    System.out.println(joseHeaderJson);
+//    System.out.println(joseHeaderJson);
     /**
      * Encoding this JWE Protected Header as BASE64URL(UTF8(JWE Protected
      * Header)) gives this value:
@@ -673,7 +675,7 @@ public class JWETest {
       if (eEncryptionAlgo == JweEncryptionAlgorithmType.UNKNOWN) {
         continue;
       }
-      System.out.println(eEncryptionAlgo);
+//      System.out.println(eEncryptionAlgo);
       final Encrypter encrypter = eEncryptionAlgo.getEncrypter();
       try {
         Key key = encrypter.generateKey();

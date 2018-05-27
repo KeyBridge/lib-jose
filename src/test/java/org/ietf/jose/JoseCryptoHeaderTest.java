@@ -1,15 +1,13 @@
-package org.ietf.jose.jws;
+package org.ietf.jose;
 
+import java.io.IOException;
 import org.ietf.TestFileReader;
-import org.ietf.jose.JoseCryptoHeader;
 import org.ietf.jose.util.JsonMarshaller;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static org.junit.Assert.assertEquals;
 
-public class JoseHeaderTest {
+public class JoseCryptoHeaderTest {
 
   @Test
   public void critFieldTest() throws IOException {
@@ -17,18 +15,15 @@ public class JoseHeaderTest {
     JoseCryptoHeader header = JsonMarshaller.fromJson(json, JoseCryptoHeader.class);
     /**
      * {
-     *  "alg":"ES256",
-     *  "crit":["exp"],
-     *  "exp":1363284000
-     * }
+     * "alg":"ES256", "crit":["exp"], "exp":1363284000 }
      */
     assertEquals("ES256", header.getAlg());
     assertEquals(1, header.getCrit().size());
     assertEquals("exp", header.getCrit().get(0));
     /**
-     * Developer note:
-     * The extra field 'exp', listed in the 'crit' list is not supported by the implementation,
-     * therefore this object should be discarded.
+     * Developer note: The extra field 'exp', listed in the 'crit' list is not
+     * supported by the implementation, therefore this object should be
+     * discarded.
      */
   }
 

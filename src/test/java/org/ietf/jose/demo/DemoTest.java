@@ -3,7 +3,7 @@ package org.ietf.jose.demo;
 import org.ietf.jose.JOSE;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jws.JwsBuilder;
-import org.ietf.jose.jws.FlattendedSignature;
+import org.ietf.jose.jws.FlattendedJsonSignature;
 import org.ietf.jose.util.Base64Utility;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -100,7 +100,7 @@ public class DemoTest {
     /**
      * Signature validation
      */
-    FlattendedSignature jws = FlattendedSignature.fromJson(json);
+    FlattendedJsonSignature jws = FlattendedJsonSignature.fromJson(json);
     Assert.assertTrue(jws.getJwsSignature().isValidSignature(jws.getPayload(), base64UrlEncodedSecret));
   }
 
@@ -131,7 +131,7 @@ public class DemoTest {
     /**
      * Signature validation
      */
-    FlattendedSignature jws = FlattendedSignature.fromJson(json);
+    FlattendedJsonSignature jws = FlattendedJsonSignature.fromJson(json);
     Assert.assertTrue(jws.getJwsSignature().isValidSignature(jws.getPayload(), senderKeyPair.getPublic()));
   }
 }

@@ -1,10 +1,10 @@
 package org.ietf.jose.jwk;
 
-import org.ietf.jose.jwk.key.EcKey;
-import org.ietf.jose.jwk.key.RsaPrivateKey;
 import java.io.IOException;
 import java.math.BigInteger;
 import org.ietf.TestFileReader;
+import org.ietf.jose.jwk.key.EcKey;
+import org.ietf.jose.jwk.key.RsaPrivateKey;
 import org.ietf.jose.util.Base64Utility;
 import org.ietf.jose.util.JsonMarshaller;
 import org.junit.Test;
@@ -17,7 +17,7 @@ public class JwkTest {
   @Test
   public void ecPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-public-key.json");
-    System.out.println(json);
+//    System.out.println(json);
     JWK key = JsonMarshaller.fromJson(json, JWK.class);
     assertTrue(key instanceof EcKey);
     EcKey ecKey = (EcKey) key;
@@ -35,7 +35,7 @@ public class JwkTest {
   @Test
   public void ecPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-private-key.json");
-    System.out.println(json);
+//    System.out.println(json);
     JWK key = JsonMarshaller.fromJson(json, JWK.class);
     assertTrue(key instanceof EcKey);
     EcKey ecKey = (EcKey) key;
@@ -53,7 +53,7 @@ public class JwkTest {
   @Test
   public void rsaPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-public-key.json");
-    System.out.println(json);
+//    System.out.println(json);
     JWK key = JsonMarshaller.fromJson(json, JWK.class);
     assertTrue(key instanceof RsaPrivateKey);
     RsaPrivateKey rsaKey = (RsaPrivateKey) key;
@@ -74,7 +74,7 @@ public class JwkTest {
   @Test
   public void rsaPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    System.out.println(json);
+//    System.out.println(json);
     JWK key = JsonMarshaller.fromJson(json, JWK.class);
     assertTrue(key instanceof RsaPrivateKey);
     RsaPrivateKey rsaKey = (RsaPrivateKey) key;
@@ -100,7 +100,7 @@ public class JwkTest {
   @Test
   public void jwkPublicKeySetTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7517/appendix-a/public-keys.json");
-    System.out.println(json);
+//    System.out.println(json);
     JwkSet deserialized = JsonMarshaller.fromJson(json, JwkSet.class);
     assertEquals(2, deserialized.keys.size());
     assertTrue(deserialized.keys.get(0) instanceof EcKey);
@@ -127,7 +127,7 @@ public class JwkTest {
   @Test
   public void jwkPrivateKeySetTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7517/appendix-a/private-keys.json");
-    System.out.println(json);
+//    System.out.println(json);
     JwkSet deserialized = JsonMarshaller.fromJson(json, JwkSet.class);
     assertEquals(2, deserialized.keys.size());
     assertTrue(deserialized.keys.get(0) instanceof EcKey);

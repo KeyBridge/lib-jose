@@ -1,19 +1,18 @@
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JwsAlgorithmType;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.spec.RSAPrivateKeySpec;
 import org.ietf.TestFileReader;
+import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.key.RsaPrivateKey;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
 import org.junit.Test;
 
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.Signature;
-import java.security.spec.RSAPrivateKeySpec;
-
-import static org.ietf.jose.util.Base64Utility.toBase64Url;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.ietf.jose.util.Base64Utility.toBase64Url;
 import static org.junit.Assert.assertEquals;
 
 public class JwsJsonExamplesTest {
@@ -29,16 +28,14 @@ public class JwsJsonExamplesTest {
 
   @Test
   public void encodingTest() throws Exception {
-    String payload = "It\u2019s a dangerous business, Frodo, going out your " +
-    "door. You step onto the road, and if you don't keep your feet, " +
-    "there\u2019s no knowing where you might be swept off " +
-    "to.";
-    assertEquals
-        ("SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4",
-            toBase64Url(payload));
+    String payload = "It\u2019s a dangerous business, Frodo, going out your "
+      + "door. You step onto the road, and if you don't keep your feet, "
+      + "there\u2019s no knowing where you might be swept off "
+      + "to.";
+    assertEquals("SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcmUgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4",
+                 toBase64Url(payload));
 
-    final String fullPayload = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZXhhbXBsZSJ9" +
-        '.' + toBase64Url(payload);
+    final String fullPayload = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZXhhbXBsZSJ9" + '.' + toBase64Url(payload);
 
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
     RsaPrivateKey key = JsonMarshaller.fromJson(json, RsaPrivateKey.class);
