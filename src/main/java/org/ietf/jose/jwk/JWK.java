@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,10 +20,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import org.ietf.jose.jwk.key.EllipticCurveJwk;
+import org.ietf.jose.jwk.key.RsaPublicJwk;
+import org.ietf.jose.jwk.key.SymmetricJwk;
 import org.ietf.jose.jws.AbstractHeader;
-import org.ietf.jose.jwk.key.EcKey;
-import org.ietf.jose.jwk.key.RsaPrivateKey;
-import org.ietf.jose.jwk.key.SymmetricKey;
 
 /**
  * RFC-7517 JSON Web Key (JWK)
@@ -62,9 +62,10 @@ import org.ietf.jose.jwk.key.SymmetricKey;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kty")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = EcKey.class, name = "EC")
-  , @JsonSubTypes.Type(value = RsaPrivateKey.class, name = "RSA")
-  , @JsonSubTypes.Type(value = SymmetricKey.class, name = "oct")}
+  @JsonSubTypes.Type(value = EllipticCurveJwk.class, name = "EC")
+//  , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
+  , @JsonSubTypes.Type(value = RsaPublicJwk.class, name = "RSA")
+  , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
 )
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class JWK extends AbstractHeader {
@@ -242,7 +243,7 @@ public abstract class JWK extends AbstractHeader {
    * certificate. See the last paragraph of Section 4.6 for additional guidance
    * on this.
    * <p>
- Developer note: inherited from AbstractHeader
+   * Developer note: inherited from AbstractHeader
    */
   public JWK() {
   }
