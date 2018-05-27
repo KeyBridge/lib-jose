@@ -37,7 +37,7 @@ import org.ietf.jose.jwk.JWK;
  * The following members MUST be present for RSA public keys.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RsaPublicKey extends JWK {
+public class RsaPublicJwk extends JWK {
 
   /**
    * 6.3.1.1. "n" (Modulus) Parameter
@@ -69,8 +69,8 @@ public class RsaPublicKey extends JWK {
   @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   protected BigInteger publicExponent;
 
-  public static RsaPublicKey getInstance(RSAPublicKey publicKey) {
-    RsaPublicKey jwkRsaKey = new RsaPrivateKey();
+  public static RsaPublicJwk getInstance(RSAPublicKey publicKey) {
+    RsaPublicJwk jwkRsaKey = new RsaPrivateJwk();
     jwkRsaKey.setPublicExponent(publicKey.getPublicExponent());
     jwkRsaKey.setModulus(publicKey.getModulus());
     return jwkRsaKey;
@@ -110,7 +110,7 @@ public class RsaPublicKey extends JWK {
       return false;
     }
 
-    RsaPublicKey that = (RsaPublicKey) o;
+    RsaPublicJwk that = (RsaPublicJwk) o;
 
     if (!modulus.equals(that.modulus)) {
       return false;

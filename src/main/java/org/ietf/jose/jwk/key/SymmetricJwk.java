@@ -35,7 +35,7 @@ import org.ietf.jose.jwk.JWK;
  * used.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SymmetricKey extends JWK {
+public class SymmetricJwk extends JWK {
 
   /**
    * 6.4.1. "k" (Key Value) Parameter
@@ -67,7 +67,7 @@ public class SymmetricKey extends JWK {
       return false;
     }
 
-    SymmetricKey that = (SymmetricKey) o;
+    SymmetricJwk that = (SymmetricJwk) o;
 
     return Arrays.equals(k, that.k);
   }

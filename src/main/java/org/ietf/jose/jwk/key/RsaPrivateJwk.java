@@ -46,7 +46,7 @@ import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
  * than two prime factors were used.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RsaPrivateKey extends RsaPublicKey {
+public class RsaPrivateJwk extends RsaPublicJwk {
 
   /**
    * 6.3.2.1. "d" (Private Exponent) Parameter
@@ -157,10 +157,10 @@ public class RsaPrivateKey extends RsaPublicKey {
    * @param keyPair a key pair (a public key and a private key).
    * @return a new RSA private key
    */
-  public static RsaPrivateKey getInstance(KeyPair keyPair) {
+  public static RsaPrivateJwk getInstance(KeyPair keyPair) {
     RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
     RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-    RsaPrivateKey jwkRsaKey = new RsaPrivateKey();
+    RsaPrivateJwk jwkRsaKey = new RsaPrivateJwk();
     jwkRsaKey.setPublicExponent(publicKey.getPublicExponent());
     jwkRsaKey.setModulus(publicKey.getModulus());
     jwkRsaKey.setPrivateExponent(privateKey.getPrivateExponent());
@@ -236,7 +236,7 @@ public class RsaPrivateKey extends RsaPublicKey {
       return false;
     }
 
-    RsaPrivateKey rsaKey = (RsaPrivateKey) o;
+    RsaPrivateJwk rsaKey = (RsaPrivateJwk) o;
 
     if (modulus != null ? !modulus.equals(rsaKey.modulus) : rsaKey.modulus != null) {
       return false;

@@ -47,7 +47,7 @@ import org.ietf.jose.jwk.JWK;
  * @author Key Bridge
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class EcKey extends JWK {
+public class EllipticCurveJwk extends JWK {
 
   /**
    * 6.2.1.1. "crv" (Curve) Parameter
@@ -133,7 +133,7 @@ public class EcKey extends JWK {
       return false;
     }
 
-    EcKey jwkEcKey = (EcKey) o;
+    EllipticCurveJwk jwkEcKey = (EllipticCurveJwk) o;
 
     if (crv != null ? !crv.equals(jwkEcKey.crv) : jwkEcKey.crv != null) {
       return false;
