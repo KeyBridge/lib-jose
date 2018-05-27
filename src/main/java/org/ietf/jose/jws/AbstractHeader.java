@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.ietf.jose.adapter.XmlAdapterX509Certificate;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
+import org.ietf.jose.jwa.JwsAlgorithmType;
 
 /**
  * An abstract JOSE object.
@@ -183,6 +185,22 @@ public abstract class AbstractHeader {
 
   public void setAlg(String alg) {
     this.alg = alg;
+  }
+
+  public JwsAlgorithmType getJwsAlgorithmType() {
+    return JwsAlgorithmType.resolveAlgorithm(alg);
+  }
+
+  public void setJwsAlgorithmType(JwsAlgorithmType alg) {
+    this.alg = alg.getJoseAlgorithmName();
+  }
+
+  public JweKeyAlgorithmType getJweKeyAlgorithmType() {
+    return JweKeyAlgorithmType.resolveAlgorithm(alg);
+  }
+
+  public void setJwsAlgorithmType(JweKeyAlgorithmType alg) {
+    this.alg = alg.getJoseAlgorithmName();
   }
 
   public String getKid() {
