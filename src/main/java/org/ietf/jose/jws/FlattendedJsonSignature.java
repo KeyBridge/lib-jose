@@ -15,15 +15,21 @@
  */
 package org.ietf.jose.jws;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
+import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.util.Base64Utility;
+import org.ietf.jose.util.JsonMarshaller;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonMarshaller;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Objects;
+import java.util.StringTokenizer;
+
+import static org.ietf.jose.util.Base64Utility.fromBase64Url;
+import static org.ietf.jose.util.Base64Utility.fromBase64UrlToString;
 
 /**
  * RFC 7515 JSON Web Signature (JWS)
@@ -137,6 +143,43 @@ public class FlattendedJsonSignature extends AbstractJws {
   }
 
   /**
+   * 3.1.  JWS Compact Serialization Overview
+   * <p>
+   * In the JWS Compact Serialization, no JWS Unprotected Header is used.
+   * In this case, the JOSE Header and the JWS Protected Header are the
+   * same.
+   * <p>
+   * In the JWS Compact Serialization, a JWS is represented as the
+   * concatenation:
+   * <pre>
+   *       BASE64URL(UTF8(JWS Protected Header)) || ’.’ ||
+   *       BASE64URL(JWS Payload) || ’.’ ||
+   *       BASE64URL(JWS Signature)
+   *       </pre>
+   * See RFC 7515 Section 7.1 for more information about the JWS Compact
+   * Serialization.
+   *
+   * @param text a valid compact JWS string
+   * @return non-null JWE instance
+   * @throws IOException
+   * @throws IllegalArgumentException if the provided input is not a valid
+   *                                  compact JWS string
+   */
+  public static FlattendedJsonSignature fromCompactForm(String text) throws IOException {
+    StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
+    if (tokenizer.countTokens() != 3) {
+      throw new IllegalArgumentException("JWS compact form must have 3 elements separated by dots. Supplied string " +
+          "has " + tokenizer.countTokens() + ".");
+    }
+    FlattendedJsonSignature jws = new FlattendedJsonSignature();
+    String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
+    jws.protectedHeader = JsonMarshaller.fromJson(protectedHeaderJson, JwsHeader.class);
+    jws.payload = fromBase64Url(tokenizer.nextToken());
+    jws.signature = fromBase64Url(tokenizer.nextToken());
+    return jws;
+  }
+
+  /**
    * 7.1. JWS Compact Serialization
    * <p>
    * The JWS Compact Serialization represents digitally signed or MACed content
@@ -152,8 +195,8 @@ public class FlattendedJsonSignature extends AbstractJws {
    */
   public String getCompactForm() throws IOException {
     return Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader))
-      + '.' + Base64Utility.toBase64Url(payload)
-      + '.' + Base64Utility.toBase64Url(signature);
+        + '.' + Base64Utility.toBase64Url(payload)
+        + '.' + Base64Utility.toBase64Url(signature);
   }
 
   /**
