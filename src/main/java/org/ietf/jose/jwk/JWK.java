@@ -21,6 +21,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.jwk.key.SymmetricJwk;
 import org.ietf.jose.jws.AbstractHeader;
@@ -63,8 +64,8 @@ import org.ietf.jose.jws.AbstractHeader;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kty")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = EllipticCurveJwk.class, name = "EC")
-//  , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
   , @JsonSubTypes.Type(value = RsaPublicJwk.class, name = "RSA")
+  , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
   , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
 )
 @XmlAccessorType(XmlAccessType.FIELD)
