@@ -4,6 +4,7 @@ import org.ietf.jose.JOSE;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jws.FlattendedJsonSignature;
 import org.ietf.jose.jws.JwsBuilder;
+import org.ietf.jose.jws.Signature;
 import org.ietf.jose.util.Base64Utility;
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.util.UUID;
 
 /**
  * @author Andrius Druzinis-Vitkus
@@ -93,7 +95,7 @@ public class DemoTest {
 
     String json = JwsBuilder.getInstance()
       .withStringPayload(sampleText)
-      .sign(base64UrlEncodedSecret)
+        .sign(base64UrlEncodedSecret, UUID.randomUUID().toString())
       .buildJsonFlattened()
       .toJson();
 
@@ -104,7 +106,7 @@ public class DemoTest {
      * Signature validation
      */
     FlattendedJsonSignature jws = FlattendedJsonSignature.fromJson(json);
-    Assert.assertTrue(jws.getJwsSignature().isValidSignature(jws.getPayload(), base64UrlEncodedSecret));
+    Assert.assertTrue(Signature.isValid(jws, base64UrlEncodedSecret));
   }
 
   @Test
@@ -117,14 +119,14 @@ public class DemoTest {
 
     String json = JwsBuilder.getInstance()
       .withStringPayload("sample text to sign")
-      .sign(senderKeyPair.getPrivate(), JwsAlgorithmType.RS256)
+        .sign(senderKeyPair.getPrivate(), JwsAlgorithmType.RS256, UUID.randomUUID().toString())
       .buildJsonFlattened()
       .toJson();
 
     System.out.println(json);
     json = JwsBuilder.getInstance()
       .withStringPayload("sample text to sign")
-      .sign(senderKeyPair.getPrivate(), JwsAlgorithmType.RS512)
+        .sign(senderKeyPair.getPrivate(), JwsAlgorithmType.RS512, UUID.randomUUID().toString())
       .buildJsonFlattened()
       .toJson();
 
@@ -135,6 +137,6 @@ public class DemoTest {
      * Signature validation
      */
     FlattendedJsonSignature jws = FlattendedJsonSignature.fromJson(json);
-    Assert.assertTrue(jws.getJwsSignature().isValidSignature(jws.getPayload(), senderKeyPair.getPublic()));
+    Assert.assertTrue(Signature.isValid(jws, senderKeyPair.getPublic()));
   }
 }

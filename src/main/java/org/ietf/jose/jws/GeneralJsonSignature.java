@@ -15,14 +15,15 @@
  */
 package org.ietf.jose.jws;
 
+import org.ietf.jose.util.Base64Utility;
+import org.ietf.jose.util.JsonMarshaller;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonMarshaller;
 
 /**
  * RFC 7515 JSON Web Signature (GeneralJsonSignature)
@@ -69,7 +70,7 @@ public class GeneralJsonSignature extends AbstractJws {
    * represents a signature or MAC over the GeneralJsonSignature Payload and the
    * GeneralJsonSignature Protected Header.
    */
-  private List<JWS> signatures;
+  private List<Signature> signatures;
 
   /**
    * Default constructor. Used by JSON (de)serialisers.
@@ -77,7 +78,7 @@ public class GeneralJsonSignature extends AbstractJws {
   private GeneralJsonSignature() {
   }
 
-  public GeneralJsonSignature(byte[] payload, List<JWS> signatures) {
+  public GeneralJsonSignature(byte[] payload, List<Signature> signatures) {
     this.payload = payload;
     this.signatures = signatures;
   }
@@ -98,7 +99,7 @@ public class GeneralJsonSignature extends AbstractJws {
    *
    * @return signature list
    */
-  public List<JWS> getSignatures() {
+  public List<Signature> getSignatures() {
     return new ArrayList<>(signatures);
   }
 
@@ -114,7 +115,7 @@ public class GeneralJsonSignature extends AbstractJws {
     if (signatures.size() > 1) {
       throw new IllegalArgumentException("JWS Flattened format support only one signature.");
     }
-    JWS signature = signatures.get(0);
+    Signature signature = signatures.get(0);
     return new FlattendedJsonSignature(
       signature.getProtectedHeader(), signature.getHeader(), payload, signature.getSignatureBytes());
   }

@@ -200,15 +200,6 @@ public class FlattendedJsonSignature extends AbstractJws {
   }
 
   /**
-   * Get the signature as a JWS instance
-   *
-   * @return a JWS instance
-   */
-  public JWS getJwsSignature() {
-    return JWS.getInstance(protectedHeader, unprotectedHeader, signature);
-  }
-
-  /**
    * Validate signature
    *
    * @param base64UrlEncodedSecret base64Url-encoded bytes of the shared secret
@@ -219,7 +210,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    *                                  signature
    */
   public boolean isSignatureValid(String base64UrlEncodedSecret) throws IOException, GeneralSecurityException {
-    return getJwsSignature().isValidSignature(payload, base64UrlEncodedSecret);
+    return Signature.isValid(this, base64UrlEncodedSecret);
   }
 
   /**

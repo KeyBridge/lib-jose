@@ -15,6 +15,12 @@
  */
 package org.ietf.jose.jwk.key;
 
+import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -26,11 +32,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -157,7 +158,7 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    * @param keyPair a key pair (a public key and a private key).
    * @return a new RSA private key
    */
-  public static RsaPrivateJwk getInstance(KeyPair keyPair) {
+  public static RsaPrivateJwk getInstance(KeyPair keyPair, String keyId) {
     RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
     RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
     RsaPrivateJwk jwkRsaKey = new RsaPrivateJwk();
@@ -165,6 +166,7 @@ public class RsaPrivateJwk extends RsaPublicJwk {
     jwkRsaKey.setModulus(publicKey.getModulus());
     jwkRsaKey.setPrivateExponent(privateKey.getPrivateExponent());
     jwkRsaKey.setAlg(privateKey.getAlgorithm());
+    jwkRsaKey.setKid(keyId);
     if (privateKey instanceof RSAPrivateCrtKey) {
       RSAPrivateCrtKey rsaPrivateCrtKey = (RSAPrivateCrtKey) privateKey;
       jwkRsaKey.setP(rsaPrivateCrtKey.getPrimeP());
