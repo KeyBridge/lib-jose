@@ -178,6 +178,7 @@ public class JwtClaims extends JsonSerializable {
 
   @XmlTransient
   private static final XmlAdapterInstantLong DATE_ADAPTER = new XmlAdapterInstantLong();
+  @XmlTransient
   private static final Class<?> UNMARSHALLING_CLASS = (new HashMap<String, Object>()).getClass();
   @XmlTransient
   private Map<String, Object> claims = new HashMap<>();
@@ -222,6 +223,12 @@ public class JwtClaims extends JsonSerializable {
     throw new IllegalArgumentException("Unsupported type for date field: " + value.getClass());
   }
 
+  /**
+   * Add a claim with an arbitrary name that does not clash with one of the standard claim names.
+   *
+   * @param claimName  claim name
+   * @param claimValue claim value
+   */
   public void addClaim(String claimName, Object claimValue) {
     if (RESERVED_CLAIM_NAMES.contains(claimName)) {
       throw new IllegalArgumentException("Cannot use reserved claim name " + claimName);

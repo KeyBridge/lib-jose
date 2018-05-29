@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -37,6 +38,7 @@ public class JwtClaimTest {
   public void testCustomClaims() throws IOException {
     JwtClaims claims = new JwtClaims();
     claims.addClaim("email", "foo@bar.com");
+    claims.addClaim("friends", Arrays.asList("John", "Jack", "Jeremy"));
 
     String json = claims.toJson();
     System.out.println(json);
