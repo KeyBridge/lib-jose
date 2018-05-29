@@ -210,7 +210,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    *                                  signature
    */
   public boolean isSignatureValid(String base64UrlEncodedSecret) throws IOException, GeneralSecurityException {
-    return Signature.isValid(this, base64UrlEncodedSecret);
+    return SignatureValidator.isValid(this, base64UrlEncodedSecret);
   }
 
   /**

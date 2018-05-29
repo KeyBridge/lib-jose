@@ -39,10 +39,10 @@ public class JwsJsonSignatureTest {
           .buildJson();
       assertEquals(1, jws.getSignatures().size());
       Signature signature = jws.getSignatures().get(0);
-      assertTrue(signature.isValid(payload, publicKey));
+      assertTrue(SignatureValidator.isValid(signature, payload, publicKey));
       wrongPublicKeys.forEach(key -> {
         try {
-          assertFalse(signature.isValid(payload, key));
+          assertFalse(SignatureValidator.isValid(signature, payload, key));
         } catch (Exception e) {
           e.printStackTrace();
           fail(e.getMessage());
@@ -64,11 +64,11 @@ public class JwsJsonSignatureTest {
           .buildJson();
       assertEquals(1, jws.getSignatures().size());
       Signature signature = jws.getSignatures().get(0);
-      assertTrue(signature.isValid(payload, secret));
+      assertTrue(SignatureValidator.isValid(signature, jws.getPayload(), secret));
 
       for (int i = 0; i < 100; i++) {
         String base64UrlEncodedWrongKey = toBase64Url(getAlteredBytes(fromBase64Url(secret)));
-        assertFalse(signature.isValid(payload, base64UrlEncodedWrongKey));
+        assertFalse(SignatureValidator.isValid(signature, jws.getPayload(), base64UrlEncodedWrongKey));
       }
 
     } catch (Exception e) {
@@ -155,6 +155,6 @@ public class JwsJsonSignatureTest {
         .sign(secret, UUID.randomUUID().toString())
       .buildJsonFlattened();
 
-    assertTrue(Signature.isValid(jws, secret));
+    assertTrue(SignatureValidator.isValid(jws, secret));
   }
 }

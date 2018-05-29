@@ -18,11 +18,9 @@ package org.ietf.jose.jws;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JWK;
-import org.ietf.jose.util.Base64Utility;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
 
-import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -196,38 +194,6 @@ public class Signature {
   }
 
   /**
-   * Validate signature using a Key instance
-   *
-   * @param protectedHeader a JwsHeader instance
-   * @param payload         data that was signed
-   * @param key             a Key instance
-   * @return true if signature is valid
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to validate the
-   *                                  signature
-   */
-  public static boolean isValid(AbstractHeader protectedHeader, byte[] payload, Key key, byte[] signature)
-      throws IOException, GeneralSecurityException {
-    String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
-    String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
-    JwsAlgorithmType algorithm = protectedHeader.getJwsAlgorithmType();
-    return CryptographyUtility.validateSignature(signature, fullPayload.getBytes(US_ASCII), key, algorithm
-        .getJavaAlgorithmName());
-  }
-
-  public static boolean isValid(FlattendedJsonSignature jws, String base64UrlEncodedSecret) throws IOException,
-      GeneralSecurityException {
-    Key key = Signature.convertSecretToKey(jws.getProtectedHeader().getJwsAlgorithmType(), base64UrlEncodedSecret);
-    return isValid(jws, key);
-  }
-
-  public static boolean isValid(FlattendedJsonSignature jws, Key key) throws IOException,
-      GeneralSecurityException {
-    return isValid(jws.getProtectedHeader(), jws.getPayload(), key, jws.getSignatureBytes());
-  }
-
-  /**
    * Get the protected JOSE header
    *
    * @return the protected JOSE header
@@ -243,62 +209,6 @@ public class Signature {
    */
   public JwsHeader getHeader() {
     return header;
-  }
-
-  private static Key convertSecretToKey(JwsAlgorithmType algorithm, String base64UrlEncodedSecret) {
-    byte[] secret = Base64Utility.fromBase64Url(base64UrlEncodedSecret);
-    return new SecretKeySpec(secret, algorithm.getJavaAlgorithmName());
-  }
-
-  /**
-   * Validate signature using a Key instance
-   *
-   * @param payload a String that was signed
-   * @param key     a Key instance
-   * @return true if signature is valid
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to validate the
-   *                                  signature
-   */
-  public boolean isValid(String payload, Key key) throws IOException, GeneralSecurityException {
-    return isValid(payload.getBytes(Base64Utility.DEFAULT_CHARSET), key);
-  }
-
-  /**
-   * Validate signature using a Key instance
-   *
-   * @param payload data that was signed
-   * @param key     a Key instance
-   * @return true if signature is valid
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to validate the
-   *                                  signature
-   */
-  public boolean isValid(byte[] payload, Key key) throws IOException, GeneralSecurityException {
-    return isValid(protectedHeader, payload, key, signature);
-  }
-
-  /**
-   * Validate signature using shared secret
-   *
-   * @param payload                data that was signed
-   * @param base64UrlEncodedSecret base64Url-encoded bytes of the shared secret
-   * @return true if signature is valid
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to validate the
-   *                                  signature
-   */
-  public boolean isValid(byte[] payload, String base64UrlEncodedSecret)
-      throws IOException, GeneralSecurityException {
-    String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
-    String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
-    JwsAlgorithmType algorithm = protectedHeader.getJwsAlgorithmType();
-    Key key = convertSecretToKey(algorithm, base64UrlEncodedSecret);
-    return CryptographyUtility.validateSignature(signature, fullPayload.getBytes(US_ASCII), key, algorithm
-        .getJavaAlgorithmName());
   }
 
   /**

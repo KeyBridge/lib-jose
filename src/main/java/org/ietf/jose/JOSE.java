@@ -21,7 +21,7 @@ import org.ietf.jose.jwe.JweHeader;
 import org.ietf.jose.jwe.JweJsonFlattened;
 import org.ietf.jose.jws.FlattendedJsonSignature;
 import org.ietf.jose.jws.JwsBuilder;
-import org.ietf.jose.jws.Signature;
+import org.ietf.jose.jws.SignatureValidator;
 import org.ietf.jose.util.JsonMarshaller;
 
 import java.io.IOException;
@@ -190,7 +190,7 @@ public class JOSE {
      *                                  signature
      */
     public static boolean verify(FlattendedJsonSignature jws, Key key) throws IOException, GeneralSecurityException {
-      return Signature.isValid(jws.getProtectedHeader(), jws.getPayload(), key, jws
+      return SignatureValidator.isValid(jws.getProtectedHeader(), jws.getPayload(), key, jws
           .getSignatureBytes());
     }
   }
@@ -224,7 +224,7 @@ public class JOSE {
         /**
          * The payload is rejected if the digital signature cannot be validated.
          */
-        boolean signatureValid = Signature.isValid(jws, senderKey);
+        boolean signatureValid = SignatureValidator.isValid(jws, senderKey);
         if (!signatureValid) {
           return null;
         }
@@ -259,7 +259,7 @@ public class JOSE {
          */
         FlattendedJsonSignature jws = JsonMarshaller.fromJson(payload, FlattendedJsonSignature.class);
 
-        boolean signatureValid = Signature.isValid(jws, base64UrlEncodedSecret);
+        boolean signatureValid = SignatureValidator.isValid(jws, base64UrlEncodedSecret);
         if (!signatureValid) {
           return null;
         }
