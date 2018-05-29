@@ -1,6 +1,6 @@
 package org.ietf.jose.demo;
 
-import org.ietf.jose.JOSE;
+import ch.keybridge.lib.jose.JOSE;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jws.FlattendedJsonSignature;
 import org.ietf.jose.jws.JwsBuilder;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ietf.jose;
+package ch.keybridge.lib.jose;
 
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JweBuilder;
