@@ -1,17 +1,5 @@
 package org.ietf.jose.jwe;
 
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.util.Arrays;
-import javax.crypto.Cipher;
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import org.ietf.TestFileReader;
 import org.ietf.TestUtil;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
@@ -23,6 +11,19 @@ import org.ietf.jose.jwe.encryption.EncryptionResult;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.SymmetricJwk;
 import org.junit.Test;
+
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -56,17 +57,12 @@ public class JWETest {
     generator.initialize(2048);
     KeyPair pair = generator.generateKeyPair();
 
-//    System.out.println(pair.getPrivate().getAlgorithm());
-//    System.out.println(pair.getPrivate().getFormat());
-//    System.out.println(pair.getPublic().getAlgorithm());
-//    System.out.println(pair.getPublic().getFormat());
     JweJsonFlattened jwe = JweBuilder.getInstance()
       .withBinaryPayload(payload)
       .buildJweJsonFlattened(pair.getPublic());
 
     String compactForm = jwe.toCompactForm();
 
-//    System.out.println(compactForm);
     JweJsonFlattened fromCompact = JweJsonFlattened.fromCompactForm(compactForm);
 
     assertEquals(jwe, fromCompact);

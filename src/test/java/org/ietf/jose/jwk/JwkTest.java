@@ -18,7 +18,6 @@ public class JwkTest {
   @Test
   public void ecPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-public-key.json");
-//    System.out.println(json);
     JWK key = JsonMarshaller.fromJson(json, JWK.class);
     assertTrue(key instanceof EllipticCurveJwk);
     EllipticCurveJwk ecKey = (EllipticCurveJwk) key;
@@ -36,7 +35,6 @@ public class JwkTest {
   @Test
   public void ecPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-private-key.json");
-//    System.out.println(json);
     JWK key = JsonMarshaller.fromJson(json, JWK.class);
     assertTrue(key instanceof EllipticCurveJwk);
     EllipticCurveJwk ecKey = (EllipticCurveJwk) key;
@@ -54,7 +52,6 @@ public class JwkTest {
   @Test
   public void rsaPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-public-key.json");
-//    System.out.println(json);
     JWK key = JsonMarshaller.fromJson(json, JWK.class);
     assertTrue(key instanceof RsaPublicJwk);
     RsaPublicJwk rsaKey = (RsaPublicJwk) key;
@@ -75,7 +72,6 @@ public class JwkTest {
   @Test
   public void rsaPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-//    System.out.println(json);
     JWK key = JsonMarshaller.fromJson(json, JWK.class);
     assertTrue(key instanceof RsaPrivateJwk);
     RsaPrivateJwk rsaKey = (RsaPrivateJwk) key;
@@ -101,7 +97,6 @@ public class JwkTest {
   @Test
   public void jwkPublicKeySetTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7517/appendix-a/public-keys.json");
-//    System.out.println(json);
     JwkSet deserialized = JsonMarshaller.fromJson(json, JwkSet.class);
     assertEquals(2, deserialized.getKeys().size());
     assertTrue(deserialized.getKeys().get(0) instanceof EllipticCurveJwk);
@@ -128,7 +123,6 @@ public class JwkTest {
   @Test
   public void jwkPrivateKeySetTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7517/appendix-a/private-keys.json");
-//    System.out.println(json);
     JwkSet deserialized = JsonMarshaller.fromJson(json, JwkSet.class);
     assertEquals(2, deserialized.getKeys().size());
     assertTrue(deserialized.getKeys().get(0) instanceof EllipticCurveJwk);

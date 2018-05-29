@@ -27,7 +27,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
@@ -186,29 +185,5 @@ public class FlattenedJsonSignature extends AbstractJws {
     return Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader))
         + '.' + Base64Utility.toBase64Url(payload)
         + '.' + Base64Utility.toBase64Url(signature);
-  }
-
-  /**
-   * Validate signature
-   *
-   * @param base64UrlEncodedSecret base64Url-encoded bytes of the shared secret
-   * @return true if the digital signature or HMAC is valid
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to validate the
-   *                                  signature
-   */
-  public boolean isSignatureValid(String base64UrlEncodedSecret) throws IOException, GeneralSecurityException {
-    return SignatureValidator.isValid(this, base64UrlEncodedSecret);
-  }
-
-  /**
-   * Serialise to JSON.
-   *
-   * @return JSON string
-   * @throws IOException in case of failure to serialise the object to JSON
-   */
-  public String toJson() throws IOException {
-    return JsonMarshaller.toJson(this);
   }
 }

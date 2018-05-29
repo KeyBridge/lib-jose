@@ -1,4 +1,4 @@
-package org.ietf.jose.io;
+package org.ietf.jose.util;
 
 import org.ietf.jose.jwe.JweBuilder;
 import org.ietf.jose.jwe.JweJsonFlattened;

@@ -16,6 +16,7 @@
 package org.ietf.jose.jws;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.util.Base64Utility;
 
@@ -39,7 +40,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * @since 0.0.1 created 02/01/2018
  */
 @Data
-public abstract class AbstractJws {
+@EqualsAndHashCode(callSuper = false)
+public abstract class AbstractJws extends JsonSerializable {
 
   /**
    * The "payload" member MUST be present and contain the value BASE64URL(JWS

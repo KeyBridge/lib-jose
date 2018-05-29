@@ -15,10 +15,8 @@
  */
 package org.ietf.jose.jwk.key;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -51,9 +49,7 @@ import java.security.spec.RSAPublicKeySpec;
  * than two prime factors were used.
  */
 @EqualsAndHashCode(callSuper = true)
-@ToString
-@Getter
-@Setter
+@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RsaPrivateJwk extends RsaPublicJwk {
 

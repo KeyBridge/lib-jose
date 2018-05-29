@@ -18,25 +18,15 @@
  */
 package org.ietf.jose.util;
 
-import java.security.NoSuchAlgorithmException;
-import org.junit.Before;
 import org.junit.Test;
+
+import java.security.NoSuchAlgorithmException;
 
 /**
  *
  * @author Key Bridge
  */
 public class SecureRandomUtilityTest {
-
-  private SecureRandomUtility sr;
-
-  public SecureRandomUtilityTest() {
-  }
-
-  @Before
-  public void setUp() {
-    this.sr = new SecureRandomUtility();
-  }
 
   @Test
   public void testGenerateBytes() throws NoSuchAlgorithmException {

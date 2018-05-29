@@ -15,10 +15,8 @@
  */
 package org.ietf.jose.jwk.key;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
 import org.ietf.jose.jwk.JWK;
 
@@ -42,9 +40,7 @@ import java.security.spec.RSAPublicKeySpec;
  * The following members MUST be present for RSA public keys.
  */
 @EqualsAndHashCode(callSuper = true)
-@ToString
-@Getter
-@Setter
+@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RsaPublicJwk extends JWK {
 

@@ -121,14 +121,4 @@ public class GeneralJsonSignature extends AbstractJws {
     return new FlattenedJsonSignature(
       signature.getProtectedHeader(), signature.getHeader(), payload, signature.getSignatureBytes());
   }
-
-  /**
-   * Serialise to JSON.
-   *
-   * @return JSON string
-   * @throws IOException in case of failure to serialise the object to JSON
-   */
-  public String toJson() throws IOException {
-    return JsonMarshaller.toJson(this);
-  }
 }

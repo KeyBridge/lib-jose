@@ -15,10 +15,8 @@
  */
 package org.ietf.jose.jwk.key;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.jwk.JWK;
 
@@ -39,9 +37,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * used.
  */
 @EqualsAndHashCode(callSuper = true)
-@ToString
-@Getter
-@Setter
+@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SymmetricJwk extends JWK {
 

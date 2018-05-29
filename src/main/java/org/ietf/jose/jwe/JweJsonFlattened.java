@@ -22,6 +22,7 @@ import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwe.encryption.Encrypter;
 import org.ietf.jose.jwe.encryption.EncryptionResult;
+import org.ietf.jose.jws.JsonSerializable;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
 
@@ -53,10 +54,10 @@ import static org.ietf.jose.util.JsonMarshaller.fromJson;
  * than this syntax difference, JWE JSON Serialization objects using the
  * flattened syntax are processed identically to those using the general syntax.
  */
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @ToString
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JweJsonFlattened {
+public class JweJsonFlattened extends JsonSerializable {
 
   /**
    * Integrity-protected header contents
@@ -250,9 +251,5 @@ public class JweJsonFlattened {
   public String decryptAsString(Key key) throws GeneralSecurityException {
     byte[] bytes = decryptPayload(key);
     return fromBase64UrlToString(new String(bytes, US_ASCII));
-  }
-
-  public String toJson() throws IOException {
-    return JsonMarshaller.toJson(this);
   }
 }

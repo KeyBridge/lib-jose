@@ -17,10 +17,8 @@ package org.ietf.jose.jwk;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
@@ -74,9 +72,7 @@ import java.util.List;
     , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
 )
 @EqualsAndHashCode(callSuper = true)
-@ToString
-@Getter
-@Setter
+@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class JWK extends AbstractHeader {
 

@@ -15,10 +15,8 @@
  */
 package org.ietf.jose.jwe;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterEContentEncryptionAlgorithm;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jws.AbstractHeader;
@@ -67,9 +65,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * @author Key Bridge
  */
 @EqualsAndHashCode(callSuper = true)
-@ToString
-@Getter
-@Setter
+@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JweHeader extends AbstractHeader {
 
