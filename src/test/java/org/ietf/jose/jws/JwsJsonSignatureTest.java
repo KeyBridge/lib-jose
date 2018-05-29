@@ -150,7 +150,7 @@ public class JwsJsonSignatureTest {
     final String payload = "payload";
     final String secret = Base64Utility.toBase64Url(KeyGenerator.getInstance("HmacSHA256").generateKey().getEncoded());
 
-    FlattendedJsonSignature jws = JwsBuilder.getInstance()
+    FlattenedJsonSignature jws = JwsBuilder.getInstance()
       .withStringPayload(payload)
         .sign(secret, UUID.randomUUID().toString())
       .buildJsonFlattened();

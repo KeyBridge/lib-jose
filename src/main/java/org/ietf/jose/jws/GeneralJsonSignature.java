@@ -110,7 +110,7 @@ public class GeneralJsonSignature extends AbstractJws {
    *
    * @return a FlattendedJsonSignature instance
    */
-  public FlattendedJsonSignature toFlattened() {
+  public FlattenedJsonSignature toFlattened() {
     if (signatures.isEmpty()) {
       throw new IllegalArgumentException("Must sign data!");
     }
@@ -118,7 +118,7 @@ public class GeneralJsonSignature extends AbstractJws {
       throw new IllegalArgumentException("JWS Flattened format support only one signature.");
     }
     Signature signature = signatures.get(0);
-    return new FlattendedJsonSignature(
+    return new FlattenedJsonSignature(
       signature.getProtectedHeader(), signature.getHeader(), payload, signature.getSignatureBytes());
   }
 

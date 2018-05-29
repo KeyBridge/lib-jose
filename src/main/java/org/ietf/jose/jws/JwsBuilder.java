@@ -216,7 +216,7 @@ public class JwsBuilder {
    *
    * @return a FlattendedJsonSignature instance
    */
-  public FlattendedJsonSignature buildJsonFlattened() {
+  public FlattenedJsonSignature buildJsonFlattened() {
     return new GeneralJsonSignature(payload, signatures).toFlattened();
   }
 

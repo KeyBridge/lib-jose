@@ -1,7 +1,7 @@
 package org.ietf.jose.jwk;
 
 import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jws.FlattendedJsonSignature;
+import org.ietf.jose.jws.FlattenedJsonSignature;
 import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.SignatureValidator;
 import org.ietf.jose.jwt.JwtClaims;
@@ -77,7 +77,7 @@ public class Examples {
     /**
      * Consume the JWT
      */
-    FlattendedJsonSignature decodedFromCompactForm = FlattendedJsonSignature.fromCompactForm(jwt);
+    FlattenedJsonSignature decodedFromCompactForm = FlattenedJsonSignature.fromCompactForm(jwt);
     String payload = decodedFromCompactForm.getStringPayload();
     System.out.println("JWT Claims as JSON: " + payload);
     JwtClaims claims = JsonMarshaller.fromJson(payload, JwtClaims.class);

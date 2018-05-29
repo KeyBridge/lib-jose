@@ -33,7 +33,7 @@ public class SignatureValidator {
    * @throws GeneralSecurityException in case signature algorithms are not available
    *                                  or another security-related issue
    */
-  public static boolean isValid(FlattendedJsonSignature jws, String base64UrlEncodedSecret) throws IOException,
+  public static boolean isValid(FlattenedJsonSignature jws, String base64UrlEncodedSecret) throws IOException,
       GeneralSecurityException {
     Key key = convertSecretToKey(jws.getProtectedHeader().getJwsAlgorithmType(), base64UrlEncodedSecret);
     return isValid(jws.getProtectedHeader(), jws.getPayload(), key, jws.getSignatureBytes());
@@ -49,7 +49,7 @@ public class SignatureValidator {
    * @throws GeneralSecurityException in case signature algorithms are not available
    *                                  or another security-related issue
    */
-  public static boolean isValid(FlattendedJsonSignature jws, PublicKey key) throws IOException,
+  public static boolean isValid(FlattenedJsonSignature jws, PublicKey key) throws IOException,
       GeneralSecurityException {
     return isValid(jws.getProtectedHeader(), jws.getPayload(), key, jws.getSignatureBytes());
   }

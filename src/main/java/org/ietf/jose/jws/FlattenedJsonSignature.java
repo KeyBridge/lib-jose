@@ -66,7 +66,7 @@ import static org.ietf.jose.util.Base64Utility.fromBase64UrlToString;
 @XmlAccessorType(XmlAccessType.FIELD)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class FlattendedJsonSignature extends AbstractJws {
+public class FlattenedJsonSignature extends AbstractJws {
 
   /**
    * The "protected" member MUST be present and contain the value
@@ -98,13 +98,13 @@ public class FlattendedJsonSignature extends AbstractJws {
   /**
    * Default constructor; required for JSON/XML serializers
    */
-  public FlattendedJsonSignature() {
+  public FlattenedJsonSignature() {
   }
 
-  public FlattendedJsonSignature(JwsHeader protectedHeader,
-                                 JwsHeader unprotectedHeader,
-                                 byte[] payload,
-                                 byte[] signature) {
+  public FlattenedJsonSignature(JwsHeader protectedHeader,
+                                JwsHeader unprotectedHeader,
+                                byte[] payload,
+                                byte[] signature) {
     this.protectedHeader = protectedHeader;
     this.unprotectedHeader = unprotectedHeader;
     this.payload = payload;
@@ -118,8 +118,8 @@ public class FlattendedJsonSignature extends AbstractJws {
    * @return a FlattendedJsonSignature instance
    * @throws IOException in case of failure to deserialise the JSON string
    */
-  public static FlattendedJsonSignature fromJson(String json) throws IOException {
-    return JsonMarshaller.fromJson(json, FlattendedJsonSignature.class);
+  public static FlattenedJsonSignature fromJson(String json) throws IOException {
+    return JsonMarshaller.fromJson(json, FlattenedJsonSignature.class);
   }
 
   /**
@@ -154,13 +154,13 @@ public class FlattendedJsonSignature extends AbstractJws {
    * @throws IllegalArgumentException if the provided input is not a valid
    *                                  compact JWS string
    */
-  public static FlattendedJsonSignature fromCompactForm(String text) throws IOException {
+  public static FlattenedJsonSignature fromCompactForm(String text) throws IOException {
     StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
     if (tokenizer.countTokens() != 3) {
       throw new IllegalArgumentException("JWS compact form must have 3 elements separated by dots. Supplied string " +
           "has " + tokenizer.countTokens() + ".");
     }
-    FlattendedJsonSignature jws = new FlattendedJsonSignature();
+    FlattenedJsonSignature jws = new FlattenedJsonSignature();
     String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
     jws.protectedHeader = JsonMarshaller.fromJson(protectedHeaderJson, JwsHeader.class);
     jws.payload = fromBase64Url(tokenizer.nextToken());
