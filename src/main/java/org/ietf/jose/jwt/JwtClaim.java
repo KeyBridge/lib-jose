@@ -15,32 +15,33 @@
  */
 package org.ietf.jose.jwt;
 
-import java.time.Instant;
+import org.ietf.jose.adapter.XmlAdapterInstantLong;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterInstantLong;
+import java.time.Instant;
 
 /**
- * RFC 7519 JSON Web Token (JwtClaim)
+ * RFC 7519 JSON Web Token (JWT)
  * <p>
- 4. JwtClaim Claims
+ 4. JWT Claims
  <p>
- The JwtClaim Claims Set represents a JSON object whose members are the claims
- conveyed by the JwtClaim. The Claim Names within a JwtClaim Claims Set MUST be unique;
- JwtClaim parsers MUST either reject JWTs with duplicate Claim Names or use a JSON
+ The JWT Claims Set represents a JSON object whose members are the claims
+ conveyed by the JWT. The Claim Names within a JWT Claims Set MUST be unique;
+ JWT parsers MUST either reject JWTs with duplicate Claim Names or use a JSON
  parser that returns only the lexically last duplicate member name, as
  specified in Section 15.12 ("The JSON Object") of ECMAScript 5.1
  [ECMAScript].
  <p>
- The set of claims that a JwtClaim must contain to be considered valid is context
+ The set of claims that a JWT must contain to be considered valid is context
  dependent and is outside the scope of this specification. Specific
  applications of JWTs will require implementations to understand and process
  some claims in particular ways. However, in the absence of such requirements,
  all claims that are not understood by implementations MUST be ignored.
  <p>
- There are three classes of JwtClaim Claim Names: Registered Claim Names, Public
+ There are three classes of JWT Claim Names: Registered Claim Names, Public
  Claim Names, and Private Claim Names.
  <p>
  * 4.1. Registered Claim Names
@@ -58,7 +59,7 @@ public class JwtClaim {
 
   /**
    * 4.1.1. "iss" (Issuer) Claim The "iss" (issuer) claim identifies the
- principal that issued the JwtClaim. The processing of this claim is generally
+   principal that issued the JWT. The processing of this claim is generally
  application specific. The "iss" value is a case-sensitive string containing
  a StringOrURI value. Use of this claim is OPTIONAL.
    */
@@ -66,7 +67,7 @@ public class JwtClaim {
   private String issuer;
   /**
    * 4.1.2. "sub" (Subject) Claim The "sub" (subject) claim identifies the
- principal that is the subject of the JwtClaim. The claims in a JwtClaim are normally
+   principal that is the subject of the JWT. The claims in a JWT are normally
  statements about the subject. The subject value MUST either be scoped to be
  locally unique in the context of the issuer or be globally unique. The
  processing of this claim is generally application specific. The "sub" value
@@ -77,12 +78,12 @@ public class JwtClaim {
   private String subject;
   /**
    * 4.1.3. "aud" (Audience) Claim The "aud" (audience) claim identifies the
- recipients that the JwtClaim is intended for. Each principal intended to process
- the JwtClaim MUST identify itself with a value in the audience claim. If the
+   recipients that the JWT is intended for. Each principal intended to process
+   the JWT MUST identify itself with a value in the audience claim. If the
  principal processing the claim does not identify itself with a value in the
- "aud" claim when this claim is present, then the JwtClaim MUST be rejected. In
+   "aud" claim when this claim is present, then the JWT MUST be rejected. In
  the general case, the "aud" value is an array of case- sensitive strings,
- each containing a StringOrURI value. In the special case when the JwtClaim has
+   each containing a StringOrURI value. In the special case when the JWT has
  one audience, the "aud" value MAY be a single case-sensitive string
  containing a StringOrURI value. The interpretation of audience values is
  generally application specific. Use of this claim is OPTIONAL.
@@ -91,7 +92,7 @@ public class JwtClaim {
   private String audience;
   /**
    * 4.1.4. "exp" (Expiration Time) Claim The "exp" (expiration time) claim
- identifies the expiration time on or after which the JwtClaim MUST NOT be
+   identifies the expiration time on or after which the JWT MUST NOT be
  accepted for processing. The processing of the "exp" claim requires that
  the current date/time MUST be before the expiration date/time listed in the
  "exp" claim. Implementers MAY provide for some small leeway, usually no
@@ -103,7 +104,7 @@ public class JwtClaim {
   private Instant expirationTime;
   /**
    * 4.1.5. "nbf" (Not Before) Claim The "nbf" (not before) claim identifies the
- time before which the JwtClaim MUST NOT be accepted for processing. The
+   time before which the JWT MUST NOT be accepted for processing. The
  processing of the "nbf" claim requires that the current date/time MUST be
  after or equal to the not-before date/time listed in the "nbf" claim.
  Implementers MAY provide for some small leeway, usually no more than a few
@@ -115,21 +116,21 @@ public class JwtClaim {
   private Instant notBefore;
   /**
    * 4.1.6. "iat" (Issued At) Claim The "iat" (issued at) claim identifies the
- time at which the JwtClaim was issued. This claim can be used to determine the
- age of the JwtClaim. Its value MUST be a number containing a NumericDate value.
+   time at which the JWT was issued. This claim can be used to determine the
+   age of the JWT. Its value MUST be a number containing a NumericDate value.
  Use of this claim is OPTIONAL.
    */
   @XmlElement(name = "iat")
   @XmlJavaTypeAdapter(type = Instant.class, value = XmlAdapterInstantLong.class)
   private Instant issuedAt;
   /**
-   * 4.1.7. "jti" (JwtClaim ID) Claim The "jti" (JwtClaim ID) claim provides a unique
- identifier for the JwtClaim. The identifier value MUST be assigned in a manner
+   * 4.1.7. "jti" (JWT ID) Claim The "jti" (JWT ID) claim provides a unique
+   identifier for the JWT. The identifier value MUST be assigned in a manner
  that ensures that there is a negligible probability that the same value
  will be accidentally assigned to a different data object; if the
  application uses multiple issuers, collisions MUST be prevented among
  values produced by different issuers as well. The "jti" claim can be used
- to prevent the JwtClaim from being replayed. The "jti" value is a case-
+   to prevent the JWT from being replayed. The "jti" value is a case-
  sensitive string. Use of this claim is OPTIONAL.
    */
   @XmlElement(name = "jti")
