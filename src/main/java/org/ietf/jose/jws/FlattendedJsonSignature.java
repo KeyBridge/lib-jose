@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
@@ -221,5 +222,37 @@ public class FlattendedJsonSignature extends AbstractJws {
    */
   public String toJson() throws IOException {
     return JsonMarshaller.toJson(this);
+  }
+
+  @Override
+  public String toString() {
+    return "FlattendedJsonSignature{" +
+        "protectedHeader=" + protectedHeader +
+        ", unprotectedHeader=" + unprotectedHeader +
+        ", signature=" + Arrays.toString(signature) +
+        ", payload=" + Arrays.toString(payload) +
+        '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    FlattendedJsonSignature that = (FlattendedJsonSignature) o;
+
+    if (protectedHeader != null ? !protectedHeader.equals(that.protectedHeader) : that.protectedHeader != null)
+      return false;
+    if (unprotectedHeader != null ? !unprotectedHeader.equals(that.unprotectedHeader) : that.unprotectedHeader != null)
+      return false;
+    return Arrays.equals(signature, that.signature);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = protectedHeader != null ? protectedHeader.hashCode() : 0;
+    result = 31 * result + (unprotectedHeader != null ? unprotectedHeader.hashCode() : 0);
+    result = 31 * result + Arrays.hashCode(signature);
+    return result;
   }
 }
