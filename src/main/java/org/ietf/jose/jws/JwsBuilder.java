@@ -206,7 +206,7 @@ public class JwsBuilder {
    *
    * @return a GeneralJsonSignature instance
    */
-  public GeneralJsonSignature buildJson() {
+  public GeneralJsonSignature buildJsonGeneral() {
     return new GeneralJsonSignature(payload, signatures);
   }
 

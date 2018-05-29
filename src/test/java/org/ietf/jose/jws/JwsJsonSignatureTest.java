@@ -36,7 +36,7 @@ public class JwsJsonSignatureTest {
       GeneralJsonSignature jws = JwsBuilder.getInstance()
           .withBinaryPayload(payload)
           .sign(privateKey, alg, UUID.randomUUID().toString())
-          .buildJson();
+          .buildJsonGeneral();
       assertEquals(1, jws.getSignatures().size());
       Signature signature = jws.getSignatures().get(0);
       assertTrue(SignatureValidator.isValid(signature, payload, publicKey));
@@ -61,7 +61,7 @@ public class JwsJsonSignatureTest {
       GeneralJsonSignature jws = JwsBuilder.getInstance()
           .withBinaryPayload(payload)
           .sign(secret, alg, UUID.randomUUID().toString())
-          .buildJson();
+          .buildJsonGeneral();
       assertEquals(1, jws.getSignatures().size());
       Signature signature = jws.getSignatures().get(0);
       assertTrue(SignatureValidator.isValid(signature, jws.getPayload(), secret));
