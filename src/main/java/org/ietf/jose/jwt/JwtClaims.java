@@ -16,6 +16,7 @@
 package org.ietf.jose.jwt;
 
 import lombok.Data;
+import lombok.Getter;
 import org.ietf.jose.adapter.XmlAdapterInstantLong;
 import org.ietf.jose.jws.JsonSerializable;
 import org.ietf.jose.util.JsonMarshaller;
@@ -181,6 +182,7 @@ public class JwtClaims extends JsonSerializable {
   @XmlTransient
   private static final Class<?> UNMARSHALLING_CLASS = (new HashMap<String, Object>()).getClass();
   @XmlTransient
+  @Getter
   private Map<String, Object> claims = new HashMap<>();
 
   /**
