@@ -137,7 +137,6 @@ public class JwsJsonSignatureTest {
 
   @Test
   public void testHmacSignatures() {
-
     final byte[] payload = "sign this".getBytes();
     for (JwsAlgorithmType algorithm : asList(HS256, HS384, HS512)) {
       System.out.println("  testSignAndVerify HMAC " + algorithm.getJoseAlgorithmName());
@@ -152,7 +151,7 @@ public class JwsJsonSignatureTest {
 
     FlattenedJsonSignature jws = JwsBuilder.getInstance()
       .withStringPayload(payload)
-        .sign(secret, UUID.randomUUID().toString())
+        .sign(secret, JwsAlgorithmType.HS256, UUID.randomUUID().toString())
       .buildJsonFlattened();
 
     assertTrue(SignatureValidator.isValid(jws, secret));

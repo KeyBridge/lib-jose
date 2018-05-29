@@ -171,36 +171,6 @@ public class JwsBuilder {
   }
 
   /**
-   * Sign with a keyed hash (HMAC)
-   *
-   * @param secret a base64URL-encoded secret
-   * @param keyId  a key ID which is put in the protected header's 'kid' field
-   * @return this builder
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to sign
-   */
-  public JwsBuilder sign(String secret, String keyId) throws IOException, GeneralSecurityException {
-    byte[] keyBytes = Base64Utility.fromBase64Url(secret);
-    JwsAlgorithmType algorithm;
-    switch (keyBytes.length) {
-      case 32:
-        algorithm = JwsAlgorithmType.HS256;
-        break;
-      case 48:
-        algorithm = JwsAlgorithmType.HS384;
-        break;
-      case 64:
-        algorithm = JwsAlgorithmType.HS512; //todo
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported key length: " + keyBytes.length);
-    }
-    SecretKey key = new SecretKeySpec(keyBytes, algorithm.getJavaAlgorithmName());
-    return sign(key, algorithm, keyId);
-  }
-
-  /**
    * Build a GeneralJsonSignature instance: A GeneralJsonSignature object with
    * one or more signatures
    *

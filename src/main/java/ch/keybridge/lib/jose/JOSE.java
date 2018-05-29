@@ -326,7 +326,7 @@ public class JOSE {
 
         FlattenedJsonSignature jws = JwsBuilder.getInstance()
             .withStringPayload(jsonPayload)
-            .sign(base64UrlEncodedSecret, senderId)
+            .sign(base64UrlEncodedSecret, JwsAlgorithmType.HS256, senderId)
             .buildJsonFlattened();
 
         JweHeader jweHeader = new JweHeader();
