@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.Instant;
+import java.time.temporal.ChronoField;
 
 /**
  * RFC 7519 JSON Web Token (JWT)
@@ -55,7 +56,7 @@ import java.time.Instant;
  * JWTs is for the representation to be compact.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JwtClaim {
+public class JwtClaims {
 
   /**
    * 4.1.1. "iss" (Issuer) Claim The "iss" (issuer) claim identifies the
@@ -164,24 +165,36 @@ public class JwtClaim {
     return expirationTime;
   }
 
-  public void setExpirationTime(Instant expirationTime) {
-    this.expirationTime = expirationTime;
+  /**
+   * Strip the sub-second component of a java.time.Instant to
+   * ensure conformance with the JWT NumericDate timestamp format
+   *
+   * @param instant non-null Instant
+   * @return an instance with sub-second component set to 0
+   * @see <a href="">RCF 7519 § 2. Terminology</a>
+   */
+  private static Instant removeSubseconds(Instant instant) {
+    return instant.with(ChronoField.MILLI_OF_SECOND, 0L);
   }
 
   public Instant getNotBefore() {
     return notBefore;
   }
 
-  public void setNotBefore(Instant notBefore) {
-    this.notBefore = notBefore;
+  public void setExpirationTime(Instant expirationTime) {
+    this.expirationTime = removeSubseconds(expirationTime);
   }
 
   public Instant getIssuedAt() {
     return issuedAt;
   }
 
+  public void setNotBefore(Instant notBefore) {
+    this.notBefore = removeSubseconds(notBefore);
+  }
+
   public void setIssuedAt(Instant issuedAt) {
-    this.issuedAt = issuedAt;
+    this.issuedAt = removeSubseconds(issuedAt);
   }
 
   public String getJwtId() {
@@ -201,7 +214,7 @@ public class JwtClaim {
       return false;
     }
 
-    JwtClaim jwtClaim = (JwtClaim) o;
+    JwtClaims jwtClaim = (JwtClaims) o;
 
     if (issuer != null ? !issuer.equals(jwtClaim.issuer) : jwtClaim.issuer != null) {
       return false;

@@ -17,7 +17,7 @@ public class JwtClaimTest {
 
   @Test
   public void equals() throws IOException {
-    JwtClaim claim = new JwtClaim();
+    JwtClaims claim = new JwtClaims();
     claim.setAudience("someAudience");
     ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
     claim.setIssuedAt(now.toInstant());
@@ -27,6 +27,6 @@ public class JwtClaimTest {
     String json = JsonMarshaller.toJson(claim);
     System.out.println(json);
 
-    assertEquals(claim, JsonMarshaller.fromJson(json, JwtClaim.class));
+    assertEquals(claim, JsonMarshaller.fromJson(json, JwtClaims.class));
   }
 }
