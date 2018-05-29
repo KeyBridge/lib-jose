@@ -8,8 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 
-import static org.ietf.jose.util.JsonMarshaller.fromJson;
-import static org.ietf.jose.util.JsonMarshaller.toJson;
+import static org.ietf.jose.util.JsonMarshaller.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -30,7 +29,11 @@ public class JsonMarshallerTest {
           .buildJweJsonFlattened(keyPair.getPublic());
 
       JweJsonFlattened unmarshalled = fromJson(toJson(original), JweJsonFlattened.class);
+      String jsonPretty = toJsonPrettyFormatted(original);
+      System.out.println(jsonPretty);
+      JweJsonFlattened unmarshalledFromPrettyJson = fromJson(jsonPretty, JweJsonFlattened.class);
       assertEquals(original, unmarshalled);
+      assertEquals(original, unmarshalledFromPrettyJson);
     } catch (Exception e) {
       e.printStackTrace();
       fail("Unexpected exception thrown in test");
