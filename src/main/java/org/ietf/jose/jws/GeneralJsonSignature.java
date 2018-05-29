@@ -15,14 +15,14 @@
  */
 package org.ietf.jose.jws;
 
-import org.ietf.jose.util.Base64Utility;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.ietf.jose.util.JsonMarshaller;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -63,6 +63,8 @@ import java.util.List;
  * }</pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@EqualsAndHashCode(callSuper = true)
+@ToString
 public class GeneralJsonSignature extends AbstractJws {
 
   /**
@@ -128,37 +130,5 @@ public class GeneralJsonSignature extends AbstractJws {
    */
   public String toJson() throws IOException {
     return JsonMarshaller.toJson(this);
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    GeneralJsonSignature jwsJson = (GeneralJsonSignature) o;
-
-    if (payload != null ? !Arrays.equals(payload, jwsJson.payload) : jwsJson.payload != null) {
-      return false;
-    }
-    return signatures != null ? signatures.equals(jwsJson.signatures) : jwsJson.signatures == null;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = payload != null ? Arrays.hashCode(payload) : 0;
-    result = 31 * result + (signatures != null ? signatures.hashCode() : 0);
-    return result;
-  }
-
-  @Override
-  public String toString() {
-    return "JWSJson{"
-      + "payload='" + Base64Utility.toBase64Url(payload) + '\''
-      + ", signatures=" + signatures
-      + '}';
   }
 }

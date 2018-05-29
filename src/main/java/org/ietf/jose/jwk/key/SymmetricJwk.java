@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +15,16 @@
  */
 package org.ietf.jose.jwk.key;
 
-import java.util.Arrays;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.jwk.JWK;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.jwk.JWK;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -34,6 +38,10 @@ import org.ietf.jose.jwk.JWK;
  * the application uses another means or convention to determine the algorithm
  * used.
  */
+@EqualsAndHashCode(callSuper = true)
+@ToString
+@Getter
+@Setter
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SymmetricJwk extends JWK {
 
@@ -46,44 +54,4 @@ public class SymmetricJwk extends JWK {
    */
   @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] k;
-
-  public byte[] getK() {
-    return k;
-  }
-
-  public void setK(byte[] k) {
-    this.k = k;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
-      return false;
-    }
-
-    SymmetricJwk that = (SymmetricJwk) o;
-
-    return Arrays.equals(k, that.k);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + Arrays.hashCode(k);
-    return result;
-  }
-
-  @Override
-  public String
-    toString() {
-    return "JwkSymmetricKey{"
-      + "k=" + Arrays.toString(k)
-      + '}';
-  }
 }

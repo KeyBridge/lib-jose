@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,10 @@
  */
 package org.ietf.jose.jwk.key;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -46,6 +50,10 @@ import java.security.spec.RSAPublicKeySpec;
  * present, with the exception of "oth", which MUST only be present when more
  * than two prime factors were used.
  */
+@EqualsAndHashCode(callSuper = true)
+@ToString
+@Getter
+@Setter
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RsaPrivateJwk extends RsaPublicJwk {
 
@@ -178,110 +186,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
     return jwkRsaKey;
   }
 
-  public BigInteger getPrivateExponent() {
-    return privateExponent;
-  }
-
-  public void setPrivateExponent(BigInteger privateExponent) {
-    this.privateExponent = privateExponent;
-  }
-
-  public BigInteger getP() {
-    return p;
-  }
-
-  public void setP(BigInteger p) {
-    this.p = p;
-  }
-
-  public BigInteger getQ() {
-    return q;
-  }
-
-  public void setQ(BigInteger q) {
-    this.q = q;
-  }
-
-  public BigInteger getDp() {
-    return dp;
-  }
-
-  public void setDp(BigInteger dp) {
-    this.dp = dp;
-  }
-
-  public BigInteger getDq() {
-    return dq;
-  }
-
-  public void setDq(BigInteger dq) {
-    this.dq = dq;
-  }
-
-  public BigInteger getQi() {
-    return qi;
-  }
-
-  public void setQi(BigInteger qi) {
-    this.qi = qi;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
-      return false;
-    }
-
-    RsaPrivateJwk rsaKey = (RsaPrivateJwk) o;
-
-    if (modulus != null ? !modulus.equals(rsaKey.modulus) : rsaKey.modulus != null) {
-      return false;
-    }
-    if (publicExponent != null ? !publicExponent.equals(rsaKey.publicExponent) : rsaKey.publicExponent != null) {
-      return false;
-    }
-    if (privateExponent != null ? !privateExponent.equals(rsaKey.privateExponent) : rsaKey.privateExponent != null) {
-      return false;
-    }
-    if (p != null ? !p.equals(rsaKey.p) : rsaKey.p != null) {
-      return false;
-    }
-    if (q != null ? !q.equals(rsaKey.q) : rsaKey.q != null) {
-      return false;
-    }
-    if (dp != null ? !dp.equals(rsaKey.dp) : rsaKey.dp != null) {
-      return false;
-    }
-    if (dq != null ? !dq.equals(rsaKey.dq) : rsaKey.dq != null) {
-      return false;
-    }
-    return qi != null ? qi.equals(rsaKey.qi) : rsaKey.qi == null;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (modulus != null ? modulus.hashCode() : 0);
-    result = 31 * result + (publicExponent != null ? publicExponent.hashCode() : 0);
-    result = 31 * result + (privateExponent != null ? privateExponent.hashCode() : 0);
-    result = 31 * result + (p != null ? p.hashCode() : 0);
-    result = 31 * result + (q != null ? q.hashCode() : 0);
-    result = 31 * result + (dp != null ? dp.hashCode() : 0);
-    result = 31 * result + (dq != null ? dq.hashCode() : 0);
-    result = 31 * result + (qi != null ? qi.hashCode() : 0);
-    return result;
-  }
-
-  public boolean hasPrivateKey() {
-    return privateExponent != null;
-  }
-
   public PrivateKey getPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
     KeyFactory kf = KeyFactory.getInstance("RSA");
     RSAPrivateKeySpec spec = new RSAPrivateKeySpec(getModulus(), getPrivateExponent());
@@ -292,6 +196,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
   public KeyPair getKeyPair() throws NoSuchAlgorithmException, InvalidKeySpecException {
     KeyFactory kf = KeyFactory.getInstance("RSA");
     return new KeyPair(kf.generatePublic(new RSAPublicKeySpec(getModulus(), getPublicExponent())),
-                       kf.generatePrivate(new RSAPrivateKeySpec(getModulus(), getPrivateExponent())));
+        kf.generatePrivate(new RSAPrivateKeySpec(getModulus(), getPrivateExponent())));
   }
 }

@@ -15,17 +15,8 @@
  */
 package org.ietf.jose.jwe;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.StringTokenizer;
-import javax.crypto.SecretKey;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
@@ -33,6 +24,17 @@ import org.ietf.jose.jwe.encryption.Encrypter;
 import org.ietf.jose.jwe.encryption.EncryptionResult;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
+
+import javax.crypto.SecretKey;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.util.Objects;
+import java.util.StringTokenizer;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.ietf.jose.util.Base64Utility.*;
@@ -51,6 +53,8 @@ import static org.ietf.jose.util.JsonMarshaller.fromJson;
  * than this syntax difference, JWE JSON Serialization objects using the
  * flattened syntax are processed identically to those using the general syntax.
  */
+@EqualsAndHashCode
+@ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JweJsonFlattened {
 
@@ -248,64 +252,7 @@ public class JweJsonFlattened {
     return fromBase64UrlToString(new String(bytes, US_ASCII));
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    JweJsonFlattened that = (JweJsonFlattened) o;
-
-    if (protectedHeader != null ? !protectedHeader.equals(that.protectedHeader) : that.protectedHeader != null) {
-      return false;
-    }
-    if (unprotected != null ? !unprotected.equals(that.unprotected) : that.unprotected != null) {
-      return false;
-    }
-    if (!Arrays.equals(encryptedKey, that.encryptedKey)) {
-      return false;
-    }
-    if (!Arrays.equals(initializationVector, that.initializationVector)) {
-      return false;
-    }
-    if (!Arrays.equals(ciphertext, that.ciphertext)) {
-      return false;
-    }
-    if (!Arrays.equals(authenticationTag, that.authenticationTag)) {
-      return false;
-    }
-    return Arrays.equals(additionalAuthenticationData, that.additionalAuthenticationData);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = protectedHeader != null ? protectedHeader.hashCode() : 0;
-    result = 31 * result + (unprotected != null ? unprotected.hashCode() : 0);
-    result = 31 * result + Arrays.hashCode(encryptedKey);
-    result = 31 * result + Arrays.hashCode(initializationVector);
-    result = 31 * result + Arrays.hashCode(ciphertext);
-    result = 31 * result + Arrays.hashCode(authenticationTag);
-    result = 31 * result + Arrays.hashCode(additionalAuthenticationData);
-    return result;
-  }
-
   public String toJson() throws IOException {
     return JsonMarshaller.toJson(this);
-  }
-
-  @Override
-  public String toString() {
-    return "JweJsonFlattened{"
-      + "protectedHeader=" + protectedHeader
-      + ", unprotected=" + unprotected
-      + ", encryptedKey=" + Arrays.toString(encryptedKey)
-      + ", initializationVector=" + Arrays.toString(initializationVector)
-      + ", ciphertext=" + Arrays.toString(ciphertext)
-      + ", authenticationTag=" + Arrays.toString(authenticationTag)
-      + ", additionalAuthenticationData=" + Arrays.toString(additionalAuthenticationData)
-      + '}';
   }
 }

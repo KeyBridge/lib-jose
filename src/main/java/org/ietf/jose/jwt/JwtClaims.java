@@ -15,6 +15,7 @@
  */
 package org.ietf.jose.jwt;
 
+import lombok.Data;
 import org.ietf.jose.adapter.XmlAdapterInstantLong;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -56,6 +57,7 @@ import java.time.temporal.ChronoField;
  * JWTs is for the representation to be compact.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@Data
 public class JwtClaims {
 
   /**
@@ -137,34 +139,6 @@ public class JwtClaims {
   @XmlElement(name = "jti")
   private String jwtId;
 
-  public String getIssuer() {
-    return issuer;
-  }
-
-  public void setIssuer(String issuer) {
-    this.issuer = issuer;
-  }
-
-  public String getSubject() {
-    return subject;
-  }
-
-  public void setSubject(String subject) {
-    this.subject = subject;
-  }
-
-  public String getAudience() {
-    return audience;
-  }
-
-  public void setAudience(String audience) {
-    this.audience = audience;
-  }
-
-  public Instant getExpirationTime() {
-    return expirationTime;
-  }
-
   /**
    * Strip the sub-second component of a java.time.Instant to
    * ensure conformance with the JWT NumericDate timestamp format
@@ -177,16 +151,8 @@ public class JwtClaims {
     return instant.with(ChronoField.MILLI_OF_SECOND, 0L);
   }
 
-  public Instant getNotBefore() {
-    return notBefore;
-  }
-
   public void setExpirationTime(Instant expirationTime) {
     this.expirationTime = removeSubseconds(expirationTime);
-  }
-
-  public Instant getIssuedAt() {
-    return issuedAt;
   }
 
   public void setNotBefore(Instant notBefore) {
@@ -195,57 +161,5 @@ public class JwtClaims {
 
   public void setIssuedAt(Instant issuedAt) {
     this.issuedAt = removeSubseconds(issuedAt);
-  }
-
-  public String getJwtId() {
-    return jwtId;
-  }
-
-  public void setJwtId(String jwtId) {
-    this.jwtId = jwtId;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    JwtClaims jwtClaim = (JwtClaims) o;
-
-    if (issuer != null ? !issuer.equals(jwtClaim.issuer) : jwtClaim.issuer != null) {
-      return false;
-    }
-    if (subject != null ? !subject.equals(jwtClaim.subject) : jwtClaim.subject != null) {
-      return false;
-    }
-    if (audience != null ? !audience.equals(jwtClaim.audience) : jwtClaim.audience != null) {
-      return false;
-    }
-    if (expirationTime != null ? !expirationTime.equals(jwtClaim.expirationTime) : jwtClaim.expirationTime != null) {
-      return false;
-    }
-    if (notBefore != null ? !notBefore.equals(jwtClaim.notBefore) : jwtClaim.notBefore != null) {
-      return false;
-    }
-    if (issuedAt != null ? !issuedAt.equals(jwtClaim.issuedAt) : jwtClaim.issuedAt != null) {
-      return false;
-    }
-    return jwtId != null ? jwtId.equals(jwtClaim.jwtId) : jwtClaim.jwtId == null;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = issuer != null ? issuer.hashCode() : 0;
-    result = 31 * result + (subject != null ? subject.hashCode() : 0);
-    result = 31 * result + (audience != null ? audience.hashCode() : 0);
-    result = 31 * result + (expirationTime != null ? expirationTime.hashCode() : 0);
-    result = 31 * result + (notBefore != null ? notBefore.hashCode() : 0);
-    result = 31 * result + (issuedAt != null ? issuedAt.hashCode() : 0);
-    result = 31 * result + (jwtId != null ? jwtId.hashCode() : 0);
-    return result;
   }
 }

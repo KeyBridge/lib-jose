@@ -15,6 +15,9 @@
  */
 package org.ietf.jose.jws;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.util.Base64Utility;
 import org.ietf.jose.util.JsonMarshaller;
@@ -25,7 +28,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
@@ -62,6 +64,8 @@ import static org.ietf.jose.util.Base64Utility.fromBase64UrlToString;
  * Serialization syntax.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class FlattendedJsonSignature extends AbstractJws {
 
   /**
@@ -71,6 +75,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    * are integrity protected.
    */
   @XmlElement(name = "protected")
+  @Getter
   private JwsHeader protectedHeader;
   /**
    * The "header" member MUST be present and contain the value JWS Unprotected
@@ -80,6 +85,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    * protected.
    */
   @XmlElement(name = "header")
+  @Getter
   private JwsHeader unprotectedHeader;
   /**
    * The "signature" member MUST be present and contain the value BASE64URL(JWS
@@ -109,7 +115,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    * Create instance from JSON string
    *
    * @param json JSON string
-   * @return a FlattendedJsonSignature instace
+   * @return a FlattendedJsonSignature instance
    * @throws IOException in case of failure to deserialise the JSON string
    */
   public static FlattendedJsonSignature fromJson(String json) throws IOException {
@@ -117,27 +123,9 @@ public class FlattendedJsonSignature extends AbstractJws {
   }
 
   /**
-   * Get the protected header
+   * Get the signature or HMAC bytes
    *
-   * @return protected header
-   */
-  public AbstractHeader getProtectedHeader() {
-    return protectedHeader;
-  }
-
-  /**
-   * Get the unprotected header
-   *
-   * @return unprotected header
-   */
-  public AbstractHeader getUnprotectedHeader() {
-    return unprotectedHeader;
-  }
-
-  /**
-   * Get the signature of HMAC bytes
-   *
-   * @return signature of HMAC bytes
+   * @return signature or HMAC bytes
    */
   public byte[] getSignatureBytes() {
     return signature;
@@ -222,37 +210,5 @@ public class FlattendedJsonSignature extends AbstractJws {
    */
   public String toJson() throws IOException {
     return JsonMarshaller.toJson(this);
-  }
-
-  @Override
-  public String toString() {
-    return "FlattendedJsonSignature{" +
-        "protectedHeader=" + protectedHeader +
-        ", unprotectedHeader=" + unprotectedHeader +
-        ", signature=" + Arrays.toString(signature) +
-        ", payload=" + Arrays.toString(payload) +
-        '}';
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    FlattendedJsonSignature that = (FlattendedJsonSignature) o;
-
-    if (protectedHeader != null ? !protectedHeader.equals(that.protectedHeader) : that.protectedHeader != null)
-      return false;
-    if (unprotectedHeader != null ? !unprotectedHeader.equals(that.unprotectedHeader) : that.unprotectedHeader != null)
-      return false;
-    return Arrays.equals(signature, that.signature);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = protectedHeader != null ? protectedHeader.hashCode() : 0;
-    result = 31 * result + (unprotectedHeader != null ? unprotectedHeader.hashCode() : 0);
-    result = 31 * result + Arrays.hashCode(signature);
-    return result;
   }
 }

@@ -15,6 +15,8 @@
  */
 package org.ietf.jose.jws;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JWK;
@@ -65,6 +67,8 @@ import static org.ietf.jose.util.Base64Utility.toBase64Url;
  * }</pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@EqualsAndHashCode
+@ToString
 public class Signature {
 
   /**
@@ -194,7 +198,7 @@ public class Signature {
   }
 
   /**
-   * Get the protected JOSE header
+   * Get the integrity-protected JOSE header
    *
    * @return the protected JOSE header
    */
@@ -203,9 +207,9 @@ public class Signature {
   }
 
   /**
-   * Get the unprotected JOSE header
+   * Get the integrity-unprotected JOSE header
    *
-   * @return the unprotected JOSE header
+   * @return the integrity-unprotected JOSE header
    */
   public JwsHeader getHeader() {
     return header;

@@ -16,16 +16,17 @@
 package org.ietf.jose.jws;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.net.URI;
-import java.util.List;
-import java.util.Objects;
+import lombok.Data;
+import org.ietf.jose.adapter.XmlAdapterX509Certificate;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterX509Certificate;
-import org.ietf.jose.jwa.JweKeyAlgorithmType;
-import org.ietf.jose.jwa.JwsAlgorithmType;
+import java.net.URI;
+import java.util.List;
 
 /**
  * An abstract JOSE object.
@@ -84,6 +85,7 @@ import org.ietf.jose.jwa.JwsAlgorithmType;
  * <a href="https://fasterxml.github.io/jackson-annotations/javadoc/2.6/com/fasterxml/jackson/annotation/JsonIgnoreProperties.html#ignoreUnknown()">ignoreUnknown</a>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 public abstract class AbstractHeader {
 
   /**
@@ -178,15 +180,7 @@ public abstract class AbstractHeader {
   @XmlElement(name = "x5t#S256")
   protected String x5tS256;
 
-  //<editor-fold defaultstate="collapsed" desc="Getter and Setter">
-  public String getAlg() {
-    return alg;
-  }
-
-  public void setAlg(String alg) {
-    this.alg = alg;
-  }
-
+  //<editor-fold defaultstate="collapsed" desc="Typed getters and setters for JWS and JWE algorithms">
   public JwsAlgorithmType getJwsAlgorithmType() {
     return JwsAlgorithmType.resolveAlgorithm(alg);
   }
@@ -202,87 +196,5 @@ public abstract class AbstractHeader {
   public void setJwsAlgorithmType(JweKeyAlgorithmType alg) {
     this.alg = alg.getJoseAlgorithmName();
   }
-
-  public String getKid() {
-    return kid;
-  }
-
-  public void setKid(String kid) {
-    this.kid = kid;
-  }
-
-  public URI getX5u() {
-    return x5u;
-  }
-
-  public void setX5u(URI x5u) {
-    this.x5u = x5u;
-  }
-
-  public List<X509CertificateHeader> getX5c() {
-    return x5c;
-  }
-
-  public void setX5c(List<X509CertificateHeader> x5c) {
-    this.x5c = x5c;
-  }
-
-  public String getX5t() {
-    return x5t;
-  }
-
-  public void setX5t(String x5t) {
-    this.x5t = x5t;
-  }
-
-  public String getX5tS256() {
-    return x5tS256;
-  }
-
-  public void setX5tS256(String x5tS256) {
-    this.x5tS256 = x5tS256;
-  }//</editor-fold>
-
-  @Override
-  public int hashCode() {
-    int hash = 7;
-    hash = 71 * hash + Objects.hashCode(this.alg);
-    hash = 71 * hash + Objects.hashCode(this.kid);
-    hash = 71 * hash + Objects.hashCode(this.x5u);
-    hash = 71 * hash + Objects.hashCode(this.x5c);
-    hash = 71 * hash + Objects.hashCode(this.x5t);
-    hash = 71 * hash + Objects.hashCode(this.x5tS256);
-    return hash;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    final AbstractHeader other = (AbstractHeader) obj;
-    if (!Objects.equals(this.alg, other.alg)) {
-      return false;
-    }
-    if (!Objects.equals(this.kid, other.kid)) {
-      return false;
-    }
-    if (!Objects.equals(this.x5t, other.x5t)) {
-      return false;
-    }
-    if (!Objects.equals(this.x5tS256, other.x5tS256)) {
-      return false;
-    }
-    if (!Objects.equals(this.x5u, other.x5u)) {
-      return false;
-    }
-    return Objects.equals(this.x5c, other.x5c);
-  }
-
+  //</editor-fold>
 }
