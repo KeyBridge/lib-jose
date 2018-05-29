@@ -17,13 +17,19 @@ package org.ietf.jose.jwt;
 
 import lombok.Data;
 import org.ietf.jose.adapter.XmlAdapterInstantLong;
+import org.ietf.jose.jws.JsonSerializable;
+import org.ietf.jose.util.JsonMarshaller;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * RFC 7519 JSON Web Token (JWT)
@@ -58,7 +64,7 @@ import java.time.temporal.ChronoField;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
-public class JwtClaims {
+public class JwtClaims extends JsonSerializable {
 
   /**
    * 4.1.1. "iss" (Issuer) Claim The "iss" (issuer) claim identifies the
@@ -161,5 +167,79 @@ public class JwtClaims {
 
   public void setIssuedAt(Instant issuedAt) {
     this.issuedAt = removeSubseconds(issuedAt);
+  }
+
+  @XmlTransient
+  private static final Set<String> RESERVED_CLAIM_NAMES = Arrays.stream(JwtClaims.class.getDeclaredFields())
+      .filter(field -> field.isAnnotationPresent(XmlElement.class))
+      .flatMap(field -> Arrays.stream(field.getAnnotationsByType(XmlElement.class)))
+      .map(XmlElement::name)
+      .collect(Collectors.toSet());
+
+  @XmlTransient
+  private static final XmlAdapterInstantLong DATE_ADAPTER = new XmlAdapterInstantLong();
+  private static final Class<?> UNMARSHALLING_CLASS = (new HashMap<String, Object>()).getClass();
+  @XmlTransient
+  private Map<String, Object> claims = new HashMap<>();
+
+  /**
+   * Create JWT Claims instance from JSON string
+   *
+   * @param json a valid JSON string representing JWT claims
+   * @return A JwtClaims object
+   * @throws IOException
+   */
+  @SuppressWarnings("unchecked")
+  public static JwtClaims fromJson(String json) throws IOException {
+    Map<String, Object> valueMap = (Map<String, Object>) JsonMarshaller.fromJson(json, UNMARSHALLING_CLASS);
+    JwtClaims claims = new JwtClaims();
+    claims.issuer = (String) valueMap.remove("iss");
+    claims.subject = (String) valueMap.remove("sub");
+    claims.audience = (String) valueMap.remove("aud");
+    claims.jwtId = (String) valueMap.remove("jti");
+    claims.expirationTime = convertToInstant(valueMap.remove("exp"));
+    claims.notBefore = convertToInstant(valueMap.remove("nbf"));
+    claims.issuedAt = convertToInstant(valueMap.remove("iat"));
+    claims.claims = valueMap;
+
+    return claims;
+  }
+
+  /**
+   * Internal utility method for converting a value to Instant
+   *
+   * @param value
+   * @return
+   */
+  private static Instant convertToInstant(Object value) {
+    if (value == null) return null;
+    if (value instanceof Integer) {
+      return DATE_ADAPTER.unmarshal((long) (int) value);
+    }
+    if (value instanceof Long) {
+      return DATE_ADAPTER.unmarshal((Long) value);
+    }
+    throw new IllegalArgumentException("Unsupported type for date field: " + value.getClass());
+  }
+
+  public void addClaim(String claimName, Object claimValue) {
+    if (RESERVED_CLAIM_NAMES.contains(claimName)) {
+      throw new IllegalArgumentException("Cannot use reserved claim name " + claimName);
+    }
+    claims.put(claimName, claimValue);
+  }
+
+  @Override
+  public String toJson() throws IOException {
+    Map<String, Object> jsonObject = new LinkedHashMap<>();
+    if (issuer != null) jsonObject.put("iss", issuer);
+    if (subject != null) jsonObject.put("sub", subject);
+    if (audience != null) jsonObject.put("aud", audience);
+    if (expirationTime != null) jsonObject.put("exp", DATE_ADAPTER.marshal(expirationTime));
+    if (notBefore != null) jsonObject.put("nbf", DATE_ADAPTER.marshal(notBefore));
+    if (issuedAt != null) jsonObject.put("iat", DATE_ADAPTER.marshal(issuedAt));
+    if (jwtId != null) jsonObject.put("jti", jwtId);
+    jsonObject.putAll(claims);
+    return JsonMarshaller.toJson(jsonObject);
   }
 }

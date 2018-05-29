@@ -25,8 +25,22 @@ public class JwtClaimTest {
     claim.setExpirationTime(now.plusHours(2).toInstant());
 
     String json = JsonMarshaller.toJson(claim);
+    String jsonDirect = claim.toJson();
     System.out.println(json);
+    assertEquals(json, jsonDirect);
 
     assertEquals(claim, JsonMarshaller.fromJson(json, JwtClaims.class));
+    assertEquals(claim, JwtClaims.fromJson(json));
+  }
+
+  @Test
+  public void testCustomClaims() throws IOException {
+    JwtClaims claims = new JwtClaims();
+    claims.addClaim("email", "foo@bar.com");
+
+    String json = claims.toJson();
+    System.out.println(json);
+    JwtClaims deserialized = JwtClaims.fromJson(json);
+    assertEquals(claims, deserialized);
   }
 }
