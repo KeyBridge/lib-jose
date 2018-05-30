@@ -1,9 +1,5 @@
 package org.ietf.jose.jws;
 
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.Signature;
-import java.security.spec.RSAPrivateKeySpec;
 import org.ietf.TestFileReader;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
@@ -11,20 +7,16 @@ import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
 import org.junit.Test;
 
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.spec.RSAPrivateKeySpec;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.ietf.jose.util.Base64Utility.toBase64Url;
 import static org.junit.Assert.assertEquals;
 
 public class JwsJsonExamplesTest {
-
-  private static byte[] convertToSignedBytes(int[] unsignedBytes) {
-    byte[] bytes = new byte[unsignedBytes.length];
-    for (int i = 0; i < unsignedBytes.length; i++) {
-      final int value = unsignedBytes[i];
-      bytes[i] = (byte) (value < 128 ? value : value - 256);
-    }
-    return bytes;
-  }
 
   @Test
   public void encodingTest() throws Exception {

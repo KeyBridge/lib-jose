@@ -15,21 +15,21 @@
  */
 package org.ietf.jose.jws;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.util.CryptographyUtility;
+import org.ietf.jose.util.JsonMarshaller;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JWK;
-import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.CryptographyUtility;
-import org.ietf.jose.util.JsonMarshaller;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.Key;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.ietf.jose.util.Base64Utility.toBase64Url;
@@ -67,7 +67,9 @@ import static org.ietf.jose.util.Base64Utility.toBase64Url;
  * }</pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JWS {
+@EqualsAndHashCode
+@ToString
+public class Signature {
 
   /**
    * The "protected" member MUST be present and contain the value
@@ -103,8 +105,8 @@ public class JWS {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public static JWS getInstance(byte[] payload, JWK key) throws IOException, GeneralSecurityException {
-    JWS signature = new JWS();
+  public static Signature getInstance(byte[] payload, JWK key) throws IOException, GeneralSecurityException {
+    Signature signature = new Signature();
     JwsHeader ph = new JwsHeader();
     ph.setAlg(key.getAlg());
     ph.setX5c(key.getX5c());
@@ -113,6 +115,7 @@ public class JWS {
     ph.setX5u(key.getX5u());
     ph.setKid(key.getKid());
     signature.protectedHeader = ph;
+    validateProtectedHeader(ph);
 
     String protectedHeaderJson = JsonMarshaller.toJson(ph);
     String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
@@ -132,8 +135,8 @@ public class JWS {
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  public static JWS getInstance(byte[] payload, Key key, JwsHeader protectedHeader) throws IOException,
-    GeneralSecurityException {
+  public static Signature getInstance(byte[] payload, Key key, JwsHeader protectedHeader) throws IOException,
+      GeneralSecurityException {
     return getInstance(payload, key, protectedHeader, null);
   }
 
@@ -150,8 +153,10 @@ public class JWS {
    * @throws IOException
    * @throws GeneralSecurityException
    */
-  public static JWS getInstance(byte[] payload, Key key, JwsHeader protectedHeader, JwsHeader unprotectedHeader) throws IOException, GeneralSecurityException {
-    JWS signature = new JWS();
+  public static Signature getInstance(byte[] payload, Key key, JwsHeader protectedHeader, JwsHeader
+      unprotectedHeader) throws IOException, GeneralSecurityException {
+    validateProtectedHeader(protectedHeader);
+    Signature signature = new Signature();
     signature.protectedHeader = protectedHeader;
     signature.header = unprotectedHeader;
     JwsAlgorithmType algorithm = protectedHeader.getJwsAlgorithmType();
@@ -159,8 +164,19 @@ public class JWS {
     String protectedHeaderJson = JsonMarshaller.toJson(signature.protectedHeader);
     String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
     signature.signature = CryptographyUtility.sign(fullPayload.getBytes(US_ASCII), key, algorithm
-                                                   .getJavaAlgorithmName());
+        .getJavaAlgorithmName());
     return signature;
+  }
+
+  /**
+   * Checks if the 'kid' field is set. Other checks can be added in future versions of the library.
+   *
+   * @param protectedHeader non-null protected header
+   */
+  private static void validateProtectedHeader(JwsHeader protectedHeader) {
+    if (protectedHeader.getKid() == null) {
+      throw new IllegalArgumentException("The protected header must have a key ID ('kid' field) populated");
+    }
   }
 
   /**
@@ -172,8 +188,9 @@ public class JWS {
    * @param signatureBytes    signature or HMAC
    * @return a JWS signature
    */
-  static JWS getInstance(JwsHeader protectedHeader, JwsHeader unprotectedHeader, byte[] signatureBytes) {
-    JWS signature = new JWS();
+  static Signature getInstance(JwsHeader protectedHeader, JwsHeader unprotectedHeader, byte[] signatureBytes) {
+    validateProtectedHeader(protectedHeader);
+    Signature signature = new Signature();
     signature.protectedHeader = protectedHeader;
     signature.header = unprotectedHeader;
     signature.signature = signatureBytes;
@@ -181,7 +198,7 @@ public class JWS {
   }
 
   /**
-   * Get the protected JOSE header
+   * Get the integrity-protected JOSE header
    *
    * @return the protected JOSE header
    */
@@ -190,67 +207,12 @@ public class JWS {
   }
 
   /**
-   * Get the unprotected JOSE header
+   * Get the integrity-unprotected JOSE header
    *
-   * @return the unprotected JOSE header
+   * @return the integrity-unprotected JOSE header
    */
   public JwsHeader getHeader() {
     return header;
-  }
-
-  /**
-   * Validate signature using a Key instance
-   *
-   * @param payload a String that was signed
-   * @param key     a Key instance
-   * @return true if signature is valid
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to validate the
-   *                                  signature
-   */
-  public boolean isValidSignature(String payload, Key key) throws IOException, GeneralSecurityException {
-    return isValidSignature(payload.getBytes(Base64Utility.DEFAULT_CHARSET), key);
-  }
-
-  /**
-   * Validate signature using a Key instance
-   *
-   * @param payload data that was signed
-   * @param key     a Key instance
-   * @return true if signature is valid
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to validate the
-   *                                  signature
-   */
-  public boolean isValidSignature(byte[] payload, Key key) throws IOException, GeneralSecurityException {
-    String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
-    String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
-    JwsAlgorithmType algorithm = protectedHeader.getJwsAlgorithmType();
-    return CryptographyUtility.validateSignature(signature, fullPayload.getBytes(US_ASCII), key, algorithm
-                                                 .getJavaAlgorithmName());
-  }
-
-  /**
-   * Validate signature using shared secret
-   *
-   * @param payload                data that was signed
-   * @param base64UrlEncodedSecret base64Url-encoded bytes of the shared secret
-   * @return true if signature is valid
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to validate the
-   *                                  signature
-   */
-  public boolean isValidSignature(byte[] payload, String base64UrlEncodedSecret)
-    throws IOException, GeneralSecurityException {
-    String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
-    String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
-    JwsAlgorithmType algorithm = protectedHeader.getJwsAlgorithmType();
-    SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(base64UrlEncodedSecret), algorithm.getJavaAlgorithmName());
-    return CryptographyUtility.validateSignature(signature, fullPayload.getBytes(US_ASCII), key, algorithm
-                                                 .getJavaAlgorithmName());
   }
 
   /**

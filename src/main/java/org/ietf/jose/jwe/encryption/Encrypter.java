@@ -59,4 +59,11 @@ public interface Encrypter {
    * @throws GeneralSecurityException encryption operation failed
    */
   byte[] decrypt(byte[] ciphertext, byte[] iv, byte[] aad, byte[] authTag, Key key) throws GeneralSecurityException;
+
+  /**
+   * Get the JCA algorithm name for the secret key used in this encryption scheme
+   *
+   * @return secret key JCA algorithm name
+   */
+  String getSecretKeyAlgorithm();
 }

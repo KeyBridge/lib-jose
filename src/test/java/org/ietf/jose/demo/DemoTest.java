@@ -1,18 +1,21 @@
 package org.ietf.jose.demo;
 
-import org.ietf.jose.JOSE;
+import ch.keybridge.lib.jose.JOSE;
 import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jws.FlattenedJsonSignature;
 import org.ietf.jose.jws.JwsBuilder;
-import org.ietf.jose.jws.FlattendedJsonSignature;
+import org.ietf.jose.jws.SignatureValidator;
 import org.ietf.jose.util.Base64Utility;
+import org.junit.Assert;
+import org.junit.Test;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import org.junit.Assert;
-import org.junit.Test;
+import java.util.UUID;
 
 /**
  * @author Andrius Druzinis-Vitkus
@@ -34,13 +37,14 @@ public class DemoTest {
     KeyPair senderKeyPair = generator.generateKeyPair();
     KeyPair recipientKeyPair = generator.generateKeyPair();
 
-    String json = JOSE.write(sampleText, senderKeyPair.getPrivate(), recipientKeyPair.getPublic(), "myKeyId");
+    String json = JOSE.SignAndEncrypt.write(sampleText, senderKeyPair.getPrivate(), recipientKeyPair.getPublic(),
+        "myKeyId");
     System.out.println("Signed and encrypted JSON:");
     System.out.println(json);
     System.out.println();
 
-    String decryptedRequest = JOSE.read(json, String.class, recipientKeyPair
-                                        .getPrivate(), senderKeyPair.getPublic());
+    String decryptedRequest = JOSE.SignAndEncrypt.read(json, String.class, recipientKeyPair
+        .getPrivate(), senderKeyPair.getPublic());
     Assert.assertEquals(sampleText, decryptedRequest);
 
     System.out.println("Decrypted object:");
@@ -63,12 +67,12 @@ public class DemoTest {
 
     String base64UrlEncodedSecret = Base64Utility.toBase64Url(key.getEncoded());
 
-    String json = JOSE.write(sampleText, base64UrlEncodedSecret, "myKeyId"); // java.security.InvalidKeyException: Illegal key size
+    String json = JOSE.SignAndEncrypt.write(sampleText, base64UrlEncodedSecret, "myKeyId");
     System.out.println("Signed and encrypted JSON:");
     System.out.println(json);
     System.out.println();
 
-    String decrypted = JOSE.read(json, String.class, base64UrlEncodedSecret);
+    String decrypted = JOSE.SignAndEncrypt.read(json, String.class, base64UrlEncodedSecret);
 
     Assert.assertEquals(sampleText, decrypted);
 
@@ -83,16 +87,18 @@ public class DemoTest {
 
     String sampleText = "sample text to sign";
 
-    KeyGenerator generator = KeyGenerator.getInstance("HmacSHA256");
+    JwsAlgorithmType algorithm = JwsAlgorithmType.HS256;
+
+    KeyGenerator generator = KeyGenerator.getInstance(algorithm.getJavaAlgorithmName());
     SecretKey key = generator.generateKey();
 
     String base64UrlEncodedSecret = Base64Utility.toBase64Url(key.getEncoded());
 
     String json = JwsBuilder.getInstance()
-      .withStringPayload(sampleText)
-      .sign(base64UrlEncodedSecret)
-      .buildJsonFlattened()
-      .toJson();
+        .withStringPayload(sampleText)
+        .sign(base64UrlEncodedSecret, algorithm, UUID.randomUUID().toString())
+        .buildJsonFlattened()
+        .toJson();
 
     System.out.println(json);
     System.out.println();
@@ -100,8 +106,8 @@ public class DemoTest {
     /**
      * Signature validation
      */
-    FlattendedJsonSignature jws = FlattendedJsonSignature.fromJson(json);
-    Assert.assertTrue(jws.getJwsSignature().isValidSignature(jws.getPayload(), base64UrlEncodedSecret));
+    FlattenedJsonSignature jws = FlattenedJsonSignature.fromJson(json);
+    Assert.assertTrue(SignatureValidator.isValid(jws, base64UrlEncodedSecret));
   }
 
   @Test
@@ -113,17 +119,17 @@ public class DemoTest {
     KeyPair senderKeyPair = generator.generateKeyPair();
 
     String json = JwsBuilder.getInstance()
-      .withStringPayload("sample text to sign")
-      .sign(senderKeyPair.getPrivate(), JwsAlgorithmType.RS256)
-      .buildJsonFlattened()
-      .toJson();
+        .withStringPayload("sample text to sign")
+        .sign(senderKeyPair.getPrivate(), JwsAlgorithmType.RS256, UUID.randomUUID().toString())
+        .buildJsonFlattened()
+        .toJson();
 
     System.out.println(json);
     json = JwsBuilder.getInstance()
-      .withStringPayload("sample text to sign")
-      .sign(senderKeyPair.getPrivate(), JwsAlgorithmType.RS512)
-      .buildJsonFlattened()
-      .toJson();
+        .withStringPayload("sample text to sign")
+        .sign(senderKeyPair.getPrivate(), JwsAlgorithmType.RS512, UUID.randomUUID().toString())
+        .buildJsonFlattened()
+        .toJson();
 
     System.out.println(json);
     System.out.println();
@@ -131,7 +137,7 @@ public class DemoTest {
     /**
      * Signature validation
      */
-    FlattendedJsonSignature jws = FlattendedJsonSignature.fromJson(json);
-    Assert.assertTrue(jws.getJwsSignature().isValidSignature(jws.getPayload(), senderKeyPair.getPublic()));
+    FlattenedJsonSignature jws = FlattenedJsonSignature.fromJson(json);
+    Assert.assertTrue(SignatureValidator.isValid(jws, senderKeyPair.getPublic()));
   }
 }

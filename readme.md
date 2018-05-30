@@ -55,8 +55,14 @@ JOSE.read(json, String.class, base64UrlEncodedSecret);
 
 # More examples
 
-See the [examples](doc/examples.md) for sample code.
+See the following examples for sample code:
 
+* [JWK examples](src/main/java/org/ietf/jose/jwk/examples.md)
+* [JWS examples](src/main/java/org/ietf/jose/jws/examples.md)
+* [JWE examples](src/main/java/org/ietf/jose/jwe/examples.md)
+* [JOSE utility class examples](doc/examples.md)
+
+All code used in these examples is available under `src/test/java/org/ietf/jose/jw*/examples.md` and `src/test/java/org/ietf/jose/demo`. 
 
 ## JWK - JSON Web Key
 
@@ -262,7 +268,7 @@ Copyright 2018 Key Bridge. Published under the Apache 2.0 license.
 # References
 
  * [jwt.io](https://jwt.io/) - a catalog of open source JWT implementations
- * [jose4j](https://bitbucket.org/b_c/jose4j/overview) another complete but poorly documented implementation in java
+ * [jose4j](https://bitbucket.org/b_c/jose4j/overview) another complete implementation in Java
 
 
 

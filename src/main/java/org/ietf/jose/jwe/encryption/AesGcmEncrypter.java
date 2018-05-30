@@ -16,13 +16,13 @@
 package org.ietf.jose.jwe.encryption;
 
 import org.ietf.jose.util.SecureRandomUtility;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.util.Arrays;
-import javax.crypto.BadPaddingException;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.util.Arrays;
 
 /**
  * A content encrypter that uses AES as the block cipher and Galois/Counter mode
@@ -220,10 +220,11 @@ public class AesGcmEncrypter implements Encrypter {
     Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
     cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(IV_LENGTH, iv));
     cipher.updateAAD(aad);
-    try {
-      return cipher.doFinal(concatenateArrays(ciphertext, authTag));
-    } catch (BadPaddingException e) {
-      return null;
-    }
+    return cipher.doFinal(concatenateArrays(ciphertext, authTag));
+  }
+
+  @Override
+  public String getSecretKeyAlgorithm() {
+    return SECRET_KEY_ALGORITHM;
   }
 }

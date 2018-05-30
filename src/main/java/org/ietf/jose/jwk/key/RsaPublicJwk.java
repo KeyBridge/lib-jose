@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,15 @@
  */
 package org.ietf.jose.jwk.key;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
+import org.ietf.jose.jwk.JWK;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -22,12 +31,6 @@ import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
-import org.ietf.jose.jwk.JWK;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -36,6 +39,8 @@ import org.ietf.jose.jwk.JWK;
  * <p>
  * The following members MUST be present for RSA public keys.
  */
+@EqualsAndHashCode(callSuper = true)
+@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RsaPublicJwk extends JWK {
 
@@ -76,67 +81,9 @@ public class RsaPublicJwk extends JWK {
     return jwkRsaKey;
   }
 
-  public BigInteger getModulus() {
-    return modulus;
-  }
-
-  public void setModulus(BigInteger modulus) {
-    this.modulus = modulus;
-  }
-
-  public BigInteger getPublicExponent() {
-    return publicExponent;
-  }
-
-  public void setPublicExponent(BigInteger publicExponent) {
-    this.publicExponent = publicExponent;
-  }
-
   public PublicKey getPublicKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
     KeyFactory kf = KeyFactory.getInstance("RSA");
     RSAPublicKeySpec spec = new RSAPublicKeySpec(getModulus(), getPublicExponent());
     return kf.generatePublic(spec);
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
-      return false;
-    }
-
-    RsaPublicJwk that = (RsaPublicJwk) o;
-
-    if (!modulus.equals(that.modulus)) {
-      return false;
-    }
-    return publicExponent.equals(that.publicExponent);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + modulus.hashCode();
-    result = 31 * result + publicExponent.hashCode();
-    return result;
-  }
-
-  @Override
-  public String toString() {
-    return "JwkRsaPublicKey{"
-      + "modulus=" + modulus
-      + ", publicExponent=" + publicExponent
-      + ", alg='" + alg + '\''
-      + ", kid='" + kid + '\''
-      + ", x5u=" + x5u
-      + ", x5c=" + x5c
-      + ", x5t='" + x5t + '\''
-      + ", x5tS256='" + x5tS256 + '\''
-      + '}';
   }
 }

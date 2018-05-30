@@ -15,16 +15,17 @@
  */
 package org.ietf.jose.jws;
 
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.util.Base64Utility;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JWK;
-import org.ietf.jose.util.Base64Utility;
 
 /**
  * A builder for JSON Web Signature objects.
@@ -42,7 +43,7 @@ public class JwsBuilder {
    * The "signature" member MUST be present and contain the value BASE64URL(JWS
    * Signature).
    */
-  private List<JWS> signatures = new ArrayList<>();
+  private List<Signature> signatures = new ArrayList<>();
 
   /**
    * The "protected" member MUST be present and contain the value
@@ -126,26 +127,29 @@ public class JwsBuilder {
    * @throws GeneralSecurityException in case of failure to sign
    */
   public JwsBuilder sign(JWK key) throws IOException, GeneralSecurityException {
-    this.signatures.add(JWS.getInstance(payload, key));
+    this.signatures.add(Signature.getInstance(payload, key));
     return this;
   }
 
   /**
    * Sign using a Key instance and specific algorithm
    *
-   * @param key       Key instance
+   * @param key       Key instance (either a PrivateKey or a SecretKey)
    * @param algorithm a signature algorithm suitable for the provided key
+   * @param keyId     a key ID which is put in the protected header's 'kid' field
    * @return this builder
    * @throws IOException              in case of failure to serialise the
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public JwsBuilder sign(Key key, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
+  public JwsBuilder sign(Key key, JwsAlgorithmType algorithm, String keyId) throws IOException,
+      GeneralSecurityException {
     if (protectedHeader == null) {
       this.protectedHeader = new JwsHeader();
     }
+    this.protectedHeader.setKid(keyId);
     this.protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
-    this.signatures.add(JWS.getInstance(payload, key, protectedHeader, header));
+    this.signatures.add(Signature.getInstance(payload, key, protectedHeader, header));
     return this;
   }
 
@@ -154,43 +158,16 @@ public class JwsBuilder {
    *
    * @param secret    a base64URL-encoded secret (e.g. a passphrase)
    * @param algorithm a signature algorithm suitable for the provided key
+   * @param keyId     a key ID which is put in the protected header's 'kid' field
    * @return this builder
    * @throws IOException              in case of failure to serialise the
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public JwsBuilder sign(String secret, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
+  public JwsBuilder sign(String secret, JwsAlgorithmType algorithm, String keyId) throws IOException,
+      GeneralSecurityException {
     SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(secret), algorithm.getJavaAlgorithmName());
-    return sign(key, algorithm);
-  }
-
-  /**
-   * Sign with a keyed hash (HMAC)
-   *
-   * @param secret a base64URL-encoded secret
-   * @return this builder
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to sign
-   */
-  public JwsBuilder sign(String secret) throws IOException, GeneralSecurityException {
-    byte[] keyBytes = Base64Utility.fromBase64Url(secret);
-    JwsAlgorithmType algorithm;
-    switch (keyBytes.length) {
-      case 32:
-        algorithm = JwsAlgorithmType.HS256;
-        break;
-      case 48:
-        algorithm = JwsAlgorithmType.HS384;
-        break;
-      case 64:
-        algorithm = JwsAlgorithmType.HS512;
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported key length: " + keyBytes.length);
-    }
-    SecretKey key = new SecretKeySpec(keyBytes, algorithm.getJavaAlgorithmName());
-    return sign(key, algorithm);
+    return sign(key, algorithm, keyId);
   }
 
   /**
@@ -199,7 +176,7 @@ public class JwsBuilder {
    *
    * @return a GeneralJsonSignature instance
    */
-  public GeneralJsonSignature buildJson() {
+  public GeneralJsonSignature buildJsonGeneral() {
     return new GeneralJsonSignature(payload, signatures);
   }
 
@@ -209,7 +186,7 @@ public class JwsBuilder {
    *
    * @return a FlattendedJsonSignature instance
    */
-  public FlattendedJsonSignature buildJsonFlattened() {
+  public FlattenedJsonSignature buildJsonFlattened() {
     return new GeneralJsonSignature(payload, signatures).toFlattened();
   }
 

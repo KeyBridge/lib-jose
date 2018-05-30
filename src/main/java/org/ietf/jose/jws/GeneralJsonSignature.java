@@ -15,14 +15,15 @@
  */
 package org.ietf.jose.jws;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.ietf.jose.util.JsonMarshaller;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonMarshaller;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * RFC 7515 JSON Web Signature (GeneralJsonSignature)
@@ -62,6 +63,8 @@ import org.ietf.jose.util.JsonMarshaller;
  * }</pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@EqualsAndHashCode(callSuper = true)
+@ToString
 public class GeneralJsonSignature extends AbstractJws {
 
   /**
@@ -69,7 +72,7 @@ public class GeneralJsonSignature extends AbstractJws {
    * represents a signature or MAC over the GeneralJsonSignature Payload and the
    * GeneralJsonSignature Protected Header.
    */
-  private List<JWS> signatures;
+  private List<Signature> signatures;
 
   /**
    * Default constructor. Used by JSON (de)serialisers.
@@ -77,7 +80,7 @@ public class GeneralJsonSignature extends AbstractJws {
   private GeneralJsonSignature() {
   }
 
-  public GeneralJsonSignature(byte[] payload, List<JWS> signatures) {
+  public GeneralJsonSignature(byte[] payload, List<Signature> signatures) {
     this.payload = payload;
     this.signatures = signatures;
   }
@@ -86,8 +89,8 @@ public class GeneralJsonSignature extends AbstractJws {
    * Create instance from JSON string
    *
    * @param json JSON string
-   * @return a FlattendedJsonSignature instace
-   * @throws IOException in case of failure to deserialise the JSON string
+   * @return a FlattenedJsonSignature instance
+   * @throws IOException in case of failure to deserialize the JSON string
    */
   public static GeneralJsonSignature fromJson(String json) throws IOException {
     return JsonMarshaller.fromJson(json, GeneralJsonSignature.class);
@@ -98,7 +101,7 @@ public class GeneralJsonSignature extends AbstractJws {
    *
    * @return signature list
    */
-  public List<JWS> getSignatures() {
+  public List<Signature> getSignatures() {
     return new ArrayList<>(signatures);
   }
 
@@ -107,57 +110,15 @@ public class GeneralJsonSignature extends AbstractJws {
    *
    * @return a FlattendedJsonSignature instance
    */
-  public FlattendedJsonSignature toFlattened() {
+  public FlattenedJsonSignature toFlattened() {
     if (signatures.isEmpty()) {
       throw new IllegalArgumentException("Must sign data!");
     }
     if (signatures.size() > 1) {
       throw new IllegalArgumentException("JWS Flattened format support only one signature.");
     }
-    JWS signature = signatures.get(0);
-    return new FlattendedJsonSignature(
+    Signature signature = signatures.get(0);
+    return new FlattenedJsonSignature(
       signature.getProtectedHeader(), signature.getHeader(), payload, signature.getSignatureBytes());
-  }
-
-  /**
-   * Serialise to JSON.
-   *
-   * @return JSON string
-   * @throws IOException in case of failure to serialise the object to JSON
-   */
-  public String toJson() throws IOException {
-    return JsonMarshaller.toJson(this);
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    GeneralJsonSignature jwsJson = (GeneralJsonSignature) o;
-
-    if (payload != null ? !Arrays.equals(payload, jwsJson.payload) : jwsJson.payload != null) {
-      return false;
-    }
-    return signatures != null ? signatures.equals(jwsJson.signatures) : jwsJson.signatures == null;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = payload != null ? Arrays.hashCode(payload) : 0;
-    result = 31 * result + (signatures != null ? signatures.hashCode() : 0);
-    return result;
-  }
-
-  @Override
-  public String toString() {
-    return "JWSJson{"
-      + "payload='" + Base64Utility.toBase64Url(payload) + '\''
-      + ", signatures=" + signatures
-      + '}';
   }
 }

@@ -17,13 +17,17 @@ package org.ietf.jose.jwk;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.jwk.key.SymmetricJwk;
 import org.ietf.jose.jws.AbstractHeader;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import java.util.List;
 
 /**
  * RFC-7517 JSON Web Key (JWK)
@@ -62,11 +66,13 @@ import org.ietf.jose.jws.AbstractHeader;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kty")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = EllipticCurveJwk.class, name = "EC")
-//  , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
-  , @JsonSubTypes.Type(value = RsaPublicJwk.class, name = "RSA")
-  , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
+    @JsonSubTypes.Type(value = EllipticCurveJwk.class, name = "EC")
+    , @JsonSubTypes.Type(value = RsaPublicJwk.class, name = "RSA")
+    , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
+    , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
 )
+@EqualsAndHashCode(callSuper = true)
+@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class JWK extends AbstractHeader {
 
@@ -245,55 +251,4 @@ public abstract class JWK extends AbstractHeader {
    * <p>
    * Developer note: inherited from AbstractHeader
    */
-  public JWK() {
-  }
-
-  /**
-   * 4.2. "use" (Public Key Use) Parameter
-   * <p>
-   * The "use" (public key use) parameter identifies the intended use of the
-   * public key. The "use" parameter is employed to indicate whether a public
-   * key is used for encrypting data or verifying the signature on data.
-   *
-   * @return the "use" (Public Key Use) Parameter
-   */
-  public PublicKeyUseType getUse() {
-    return use;
-  }
-
-  public void setUse(PublicKeyUseType use) {
-    this.use = use;
-  }
-
-  public List<KeyOperationType> getKey_ops() {
-    return key_ops;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
-      return false;
-    }
-
-    JWK jwk = (JWK) o;
-
-    if (use != null ? !use.equals(jwk.use) : jwk.use != null) {
-      return false;
-    }
-    return key_ops != null ? key_ops.equals(jwk.key_ops) : jwk.key_ops == null;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (use != null ? use.hashCode() : 0);
-    result = 31 * result + (key_ops != null ? key_ops.hashCode() : 0);
-    return result;
-  }
 }

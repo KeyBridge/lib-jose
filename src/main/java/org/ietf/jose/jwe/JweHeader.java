@@ -15,12 +15,15 @@
  */
 package org.ietf.jose.jwe;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.ietf.jose.adapter.XmlAdapterEContentEncryptionAlgorithm;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
+import org.ietf.jose.jws.AbstractHeader;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.jws.AbstractHeader;
-import org.ietf.jose.adapter.XmlAdapterEContentEncryptionAlgorithm;
-import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 
 /**
  * RFC 7516 JSON Web Encryption (JWE)
@@ -61,6 +64,8 @@ import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
  *
  * @author Key Bridge
  */
+@EqualsAndHashCode(callSuper = true)
+@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JweHeader extends AbstractHeader {
 
@@ -105,40 +110,4 @@ public class JweHeader extends AbstractHeader {
    * processed by implementations.
    */
   private String zip;
-
-  //<editor-fold defaultstate="collapsed" desc="Getter and Setter">
-  public JweEncryptionAlgorithmType getEnc() {
-    return enc;
-  }
-
-  public void setEnc(JweEncryptionAlgorithmType enc) {
-    this.enc = enc;
-  }
-
-  public String getZip() {
-    return zip;
-  }
-
-  public void setZip(String zip) {
-    this.zip = zip;
-  }//</editor-fold>
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    JweHeader that = (JweHeader) o;
-
-    return enc == that.enc;
-  }
-
-  @Override
-  public int hashCode() {
-    return enc != null ? enc.hashCode() : 0;
-  }
 }

@@ -15,15 +15,23 @@
  */
 package org.ietf.jose.jws;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.util.Base64Utility;
+import org.ietf.jose.util.JsonMarshaller;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonMarshaller;
+import java.io.IOException;
+import java.util.Objects;
+import java.util.StringTokenizer;
+
+import static org.ietf.jose.util.Base64Utility.fromBase64Url;
+import static org.ietf.jose.util.Base64Utility.fromBase64UrlToString;
 
 /**
  * RFC 7515 JSON Web Signature (JWS)
@@ -55,7 +63,9 @@ import org.ietf.jose.util.JsonMarshaller;
  * Serialization syntax.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class FlattendedJsonSignature extends AbstractJws {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class FlattenedJsonSignature extends AbstractJws {
 
   /**
    * The "protected" member MUST be present and contain the value
@@ -64,6 +74,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    * are integrity protected.
    */
   @XmlElement(name = "protected")
+  @Getter
   private JwsHeader protectedHeader;
   /**
    * The "header" member MUST be present and contain the value JWS Unprotected
@@ -73,6 +84,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    * protected.
    */
   @XmlElement(name = "header")
+  @Getter
   private JwsHeader unprotectedHeader;
   /**
    * The "signature" member MUST be present and contain the value BASE64URL(JWS
@@ -85,13 +97,13 @@ public class FlattendedJsonSignature extends AbstractJws {
   /**
    * Default constructor; required for JSON/XML serializers
    */
-  public FlattendedJsonSignature() {
+  public FlattenedJsonSignature() {
   }
 
-  public FlattendedJsonSignature(JwsHeader protectedHeader,
-                                 JwsHeader unprotectedHeader,
-                                 byte[] payload,
-                                 byte[] signature) {
+  public FlattenedJsonSignature(JwsHeader protectedHeader,
+                                JwsHeader unprotectedHeader,
+                                byte[] payload,
+                                byte[] signature) {
     this.protectedHeader = protectedHeader;
     this.unprotectedHeader = unprotectedHeader;
     this.payload = payload;
@@ -102,38 +114,57 @@ public class FlattendedJsonSignature extends AbstractJws {
    * Create instance from JSON string
    *
    * @param json JSON string
-   * @return a FlattendedJsonSignature instace
+   * @return a FlattendedJsonSignature instance
    * @throws IOException in case of failure to deserialise the JSON string
    */
-  public static FlattendedJsonSignature fromJson(String json) throws IOException {
-    return JsonMarshaller.fromJson(json, FlattendedJsonSignature.class);
+  public static FlattenedJsonSignature fromJson(String json) throws IOException {
+    return JsonMarshaller.fromJson(json, FlattenedJsonSignature.class);
   }
 
   /**
-   * Get the protected header
+   * Get the signature or HMAC bytes
    *
-   * @return protected header
-   */
-  public AbstractHeader getProtectedHeader() {
-    return protectedHeader;
-  }
-
-  /**
-   * Get the unprotected header
-   *
-   * @return unprotected header
-   */
-  public AbstractHeader getUnprotectedHeader() {
-    return unprotectedHeader;
-  }
-
-  /**
-   * Get the signature of HMAC bytes
-   *
-   * @return signature of HMAC bytes
+   * @return signature or HMAC bytes
    */
   public byte[] getSignatureBytes() {
     return signature;
+  }
+
+  /**
+   * 3.1.  JWS Compact Serialization Overview
+   * <p>
+   * In the JWS Compact Serialization, no JWS Unprotected Header is used.
+   * In this case, the JOSE Header and the JWS Protected Header are the
+   * same.
+   * <p>
+   * In the JWS Compact Serialization, a JWS is represented as the
+   * concatenation:
+   * <pre>
+   *       BASE64URL(UTF8(JWS Protected Header)) || ’.’ ||
+   *       BASE64URL(JWS Payload) || ’.’ ||
+   *       BASE64URL(JWS Signature)
+   *       </pre>
+   * See RFC 7515 Section 7.1 for more information about the JWS Compact
+   * Serialization.
+   *
+   * @param text a valid compact JWS string
+   * @return non-null JWE instance
+   * @throws IOException
+   * @throws IllegalArgumentException if the provided input is not a valid
+   *                                  compact JWS string
+   */
+  public static FlattenedJsonSignature fromCompactForm(String text) throws IOException {
+    StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
+    if (tokenizer.countTokens() != 3) {
+      throw new IllegalArgumentException("JWS compact form must have 3 elements separated by dots. Supplied string " +
+          "has " + tokenizer.countTokens() + ".");
+    }
+    FlattenedJsonSignature jws = new FlattenedJsonSignature();
+    String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
+    jws.protectedHeader = JsonMarshaller.fromJson(protectedHeaderJson, JwsHeader.class);
+    jws.payload = fromBase64Url(tokenizer.nextToken());
+    jws.signature = fromBase64Url(tokenizer.nextToken());
+    return jws;
   }
 
   /**
@@ -152,40 +183,7 @@ public class FlattendedJsonSignature extends AbstractJws {
    */
   public String getCompactForm() throws IOException {
     return Base64Utility.toBase64Url(JsonMarshaller.toJson(protectedHeader))
-      + '.' + Base64Utility.toBase64Url(payload)
-      + '.' + Base64Utility.toBase64Url(signature);
-  }
-
-  /**
-   * Get the signature as a JWS instance
-   *
-   * @return a JWS instance
-   */
-  public JWS getJwsSignature() {
-    return JWS.getInstance(protectedHeader, unprotectedHeader, signature);
-  }
-
-  /**
-   * Validate signature
-   *
-   * @param base64UrlEncodedSecret base64Url-encoded bytes of the shared secret
-   * @return true if the digital signature or HMAC is valid
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to validate the
-   *                                  signature
-   */
-  public boolean isSignatureValid(String base64UrlEncodedSecret) throws IOException, GeneralSecurityException {
-    return getJwsSignature().isValidSignature(payload, base64UrlEncodedSecret);
-  }
-
-  /**
-   * Serialise to JSON.
-   *
-   * @return JSON string
-   * @throws IOException in case of failure to serialise the object to JSON
-   */
-  public String toJson() throws IOException {
-    return JsonMarshaller.toJson(this);
+        + '.' + Base64Utility.toBase64Url(payload)
+        + '.' + Base64Utility.toBase64Url(signature);
   }
 }

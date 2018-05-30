@@ -112,12 +112,7 @@ public enum JwsAlgorithmType {
   /**
    * No digital signature or MAC performed (Optional)
    */
-  NONE("none", null),
-  /**
-   * A special value for cases when the signature algorithm is not supported or
-   * implemented.
-   */
-  UNKNOWN(null, null);
+  NONE("none", null);
 
   /**
    * The name of the algorithm as per the JWS/JOSE specification
@@ -139,14 +134,14 @@ public enum JwsAlgorithmType {
 
   public static JwsAlgorithmType resolveAlgorithm(String alg) {
     if (alg == null || alg.isEmpty()) {
-      return UNKNOWN;
+      throw new IllegalArgumentException("Unsupported algorithm: " + alg);
     }
     for (JwsAlgorithmType algorithm : JwsAlgorithmType.values()) {
       if (alg.equals(algorithm.joseAlgorithmName)) {
         return algorithm;
       }
     }
-    return UNKNOWN;
+    throw new IllegalArgumentException("Unsupported algorithm: " + alg);
   }
 
   public String getJavaAlgorithmName() {

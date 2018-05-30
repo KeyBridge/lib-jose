@@ -15,9 +15,12 @@
  */
 package org.ietf.jose.jws;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.util.Base64Utility;
+
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * RFC 7515 JSON Web Signature (JWS)
@@ -36,7 +39,9 @@ import org.ietf.jose.util.Base64Utility;
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 02/01/2018
  */
-public abstract class AbstractJws {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public abstract class AbstractJws extends JsonSerializable {
 
   /**
    * The "payload" member MUST be present and contain the value BASE64URL(JWS
@@ -44,15 +49,6 @@ public abstract class AbstractJws {
    */
   @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   protected byte[] payload;
-
-  /**
-   * Get payload
-   *
-   * @return payload bytes
-   */
-  public byte[] getPayload() {
-    return payload;
-  }
 
   public String getStringPayload() {
     return new String(payload, Base64Utility.DEFAULT_CHARSET);
