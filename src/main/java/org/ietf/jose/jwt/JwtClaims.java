@@ -18,6 +18,7 @@ package org.ietf.jose.jwt;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.ietf.jose.adapter.XmlAdapterInstantLong;
 import org.ietf.jose.jws.JsonSerializable;
 import org.ietf.jose.util.JsonMarshaller;
@@ -66,6 +67,7 @@ import java.util.stream.Collectors;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 public class JwtClaims extends JsonSerializable {
 
@@ -160,16 +162,19 @@ public class JwtClaims extends JsonSerializable {
     return instant.with(ChronoField.MILLI_OF_SECOND, 0L);
   }
 
-  public void setExpirationTime(Instant expirationTime) {
+  public JwtClaims setExpirationTime(Instant expirationTime) {
     this.expirationTime = removeSubseconds(expirationTime);
+    return this;
   }
 
-  public void setNotBefore(Instant notBefore) {
+  public JwtClaims setNotBefore(Instant notBefore) {
     this.notBefore = removeSubseconds(notBefore);
+    return this;
   }
 
-  public void setIssuedAt(Instant issuedAt) {
+  public JwtClaims setIssuedAt(Instant issuedAt) {
     this.issuedAt = removeSubseconds(issuedAt);
+    return this;
   }
 
   @XmlTransient
@@ -233,11 +238,12 @@ public class JwtClaims extends JsonSerializable {
    * @param claimName  claim name
    * @param claimValue claim value
    */
-  public void addClaim(String claimName, Object claimValue) {
+  public JwtClaims addClaim(String claimName, Object claimValue) {
     if (RESERVED_CLAIM_NAMES.contains(claimName)) {
       throw new IllegalArgumentException("Cannot use reserved claim name " + claimName);
     }
     claims.put(claimName, claimValue);
+    return this;
   }
 
   @Override

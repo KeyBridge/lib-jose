@@ -89,8 +89,8 @@ public class GeneralJsonSignature extends AbstractJws {
    * Create instance from JSON string
    *
    * @param json JSON string
-   * @return a FlattendedJsonSignature instace
-   * @throws IOException in case of failure to deserialise the JSON string
+   * @return a FlattenedJsonSignature instance
+   * @throws IOException in case of failure to deserialize the JSON string
    */
   public static GeneralJsonSignature fromJson(String json) throws IOException {
     return JsonMarshaller.fromJson(json, GeneralJsonSignature.class);

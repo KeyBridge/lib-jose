@@ -67,8 +67,7 @@ public class DemoTest {
 
     String base64UrlEncodedSecret = Base64Utility.toBase64Url(key.getEncoded());
 
-    String json = JOSE.SignAndEncrypt.write(sampleText, base64UrlEncodedSecret, "myKeyId"); // java.security
-    // .InvalidKeyException: Illegal key size
+    String json = JOSE.SignAndEncrypt.write(sampleText, base64UrlEncodedSecret, "myKeyId");
     System.out.println("Signed and encrypted JSON:");
     System.out.println(json);
     System.out.println();
@@ -88,14 +87,16 @@ public class DemoTest {
 
     String sampleText = "sample text to sign";
 
-    KeyGenerator generator = KeyGenerator.getInstance("HmacSHA256");
+    JwsAlgorithmType algorithm = JwsAlgorithmType.HS256;
+
+    KeyGenerator generator = KeyGenerator.getInstance(algorithm.getJavaAlgorithmName());
     SecretKey key = generator.generateKey();
 
     String base64UrlEncodedSecret = Base64Utility.toBase64Url(key.getEncoded());
 
     String json = JwsBuilder.getInstance()
         .withStringPayload(sampleText)
-        .sign(base64UrlEncodedSecret, UUID.randomUUID().toString())
+        .sign(base64UrlEncodedSecret, algorithm, UUID.randomUUID().toString())
         .buildJsonFlattened()
         .toJson();
 

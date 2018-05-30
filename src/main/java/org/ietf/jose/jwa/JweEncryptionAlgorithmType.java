@@ -15,10 +15,11 @@
  */
 package org.ietf.jose.jwa;
 
-import javax.xml.bind.annotation.XmlEnumValue;
-import org.ietf.jose.jwe.encryption.DefaultEncrypter;
 import org.ietf.jose.jwe.encryption.AesGcmEncrypter;
+import org.ietf.jose.jwe.encryption.DefaultEncrypter;
 import org.ietf.jose.jwe.encryption.Encrypter;
+
+import javax.xml.bind.annotation.XmlEnumValue;
 
 import static org.ietf.jose.jwe.encryption.DefaultEncrypter.Configuration.*;
 
@@ -124,18 +125,15 @@ public enum JweEncryptionAlgorithmType {
   /**
    * AES GCM using 192-bit key.
    *
-   * @see A128GCM
    * @deprecated AES in Galois/Counter Mode is not a JDK default transformation
    */
   A192GCM("A192GCM", new AesGcmEncrypter(192)),
   /**
    * AES GCM using 256-bit key
    *
-   * @see A128GCM
    * @deprecated AES in Galois/Counter Mode is not a JDK default transformation
    */
-  A256GCM("A256GCM", new AesGcmEncrypter(256)),
-  UNKNOWN(null, null);
+  A256GCM("A256GCM", new AesGcmEncrypter(256));
 
   /**
    * The name of the algorithm as per the JWE/JOSE specification
@@ -153,14 +151,14 @@ public enum JweEncryptionAlgorithmType {
 
   public static JweEncryptionAlgorithmType resolve(String joseAngorithm) {
     if (joseAngorithm == null || joseAngorithm.isEmpty()) {
-      return UNKNOWN;
+      throw new IllegalArgumentException("Unsupported algorithm: " + joseAngorithm);
     }
     for (JweEncryptionAlgorithmType algorithm : JweEncryptionAlgorithmType.values()) {
       if (joseAngorithm.equals(algorithm.joseAlgorithmName)) {
         return algorithm;
       }
     }
-    return UNKNOWN;
+    throw new IllegalArgumentException("Unsupported algorithm: " + joseAngorithm);
   }
 
   public String getJoseAlgorithmName() {

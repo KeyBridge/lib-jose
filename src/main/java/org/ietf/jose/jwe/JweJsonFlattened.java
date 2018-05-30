@@ -16,17 +16,16 @@
 package org.ietf.jose.jwe;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
-import org.ietf.jose.jwe.encryption.Encrypter;
 import org.ietf.jose.jwe.encryption.EncryptionResult;
 import org.ietf.jose.jws.JsonSerializable;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
 
-import javax.crypto.SecretKey;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -39,7 +38,6 @@ import java.util.StringTokenizer;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.ietf.jose.util.Base64Utility.*;
-import static org.ietf.jose.util.JsonMarshaller.fromJson;
 
 /**
  * 7.2.2. Flattened JWE JSON Serialization Syntax
@@ -56,6 +54,7 @@ import static org.ietf.jose.util.JsonMarshaller.fromJson;
  */
 @EqualsAndHashCode(callSuper = false)
 @ToString
+@Getter
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JweJsonFlattened extends JsonSerializable {
 
@@ -101,43 +100,6 @@ public class JweJsonFlattened extends JsonSerializable {
   private byte[] additionalAuthenticationData;
 
   public JweJsonFlattened() {
-  }
-
-  /**
-   * Converts a JWE compact serialization string into a JWE instance
-   * <p>
-   * In the JWE Compact Serialization, no JWE Shared Unprotected Header or JWE
-   * Per-Recipient Unprotected Header are used. In this case, the JOSE Header
-   * and the JWE Protected Header are the same. In the JWE Compact
-   * Serialization, a JWE is represented as the concatenation:
-   * <pre>
-   * BASE64URL(UTF8(JWE Protected Header)) || ’.’ ||
-   * BASE64URL(JWE Encrypted Key) || ’.’ ||
-   * BASE64URL(JWE Initialization Vector) || ’.’ ||
-   * BASE64URL(JWE Ciphertext) || ’.’ ||
-   * BASE64URL(JWE Authentication Tag)
-   * </pre> See RFC 7516 Section 7.1 for more information about the JWE Compact
-   * Serialization.
-   *
-   * @param text a valid compact JWE string
-   * @return non-null JWE instance
-   * @throws IllegalArgumentException if the provided input is not a valid
-   *                                  compact JWE string
-   */
-  public static JweJsonFlattened fromCompactForm(String text) throws IOException {
-    StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
-    if (tokenizer.countTokens() != 5) {
-      throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string has " + tokenizer.countTokens() + ".");
-    }
-    JweJsonFlattened jwe = new JweJsonFlattened();
-    String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
-    jwe.protectedHeader = fromJson(protectedHeaderJson, JweHeader.class);
-    jwe.encryptedKey = fromBase64Url(tokenizer.nextToken());
-    jwe.initializationVector = fromBase64Url(tokenizer.nextToken());
-    jwe.ciphertext = fromBase64Url(tokenizer.nextToken());
-    jwe.authenticationTag = fromBase64Url(tokenizer.nextToken());
-    jwe.additionalAuthenticationData = toBase64Url(protectedHeaderJson).getBytes(US_ASCII);
-    return jwe;
   }
 
   /**
@@ -191,21 +153,52 @@ public class JweJsonFlattened extends JsonSerializable {
   }
 
   /**
-   * Get the integrity-protected header
+   * Create instance from JSON string
    *
-   * @return integrity-protected header
+   * @param json JSON string
+   * @return a JweJsonFlattened instance
+   * @throws IOException in case of failure to deserialise the JSON string
    */
-  public JweHeader getProtectedHeader() {
-    return protectedHeader;
+  public static JweJsonFlattened fromJson(String json) throws IOException {
+    return JsonMarshaller.fromJson(json, JweJsonFlattened.class);
   }
 
   /**
-   * Get the non-integrity-protected header
+   * Converts a JWE compact serialization string into a JWE instance
+   * <p>
+   * In the JWE Compact Serialization, no JWE Shared Unprotected Header or JWE
+   * Per-Recipient Unprotected Header are used. In this case, the JOSE Header
+   * and the JWE Protected Header are the same. In the JWE Compact
+   * Serialization, a JWE is represented as the concatenation:
+   * <pre>
+   * BASE64URL(UTF8(JWE Protected Header)) || ’.’ ||
+   * BASE64URL(JWE Encrypted Key) || ’.’ ||
+   * BASE64URL(JWE Initialization Vector) || ’.’ ||
+   * BASE64URL(JWE Ciphertext) || ’.’ ||
+   * BASE64URL(JWE Authentication Tag)
+   * </pre> See RFC 7516 Section 7.1 for more information about the JWE Compact
+   * Serialization.
    *
-   * @return non-integrity-protected header
+   * @param text a valid compact JWE string
+   * @return non-null JWE instance
+   * @throws IllegalArgumentException if the provided input is not a valid
+   *                                  compact JWE string
    */
-  public JweHeader getUnprotected() {
-    return unprotected;
+  public static JweJsonFlattened fromCompactForm(String text) throws IOException {
+    StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
+    if (tokenizer.countTokens() != 5) {
+      throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string " +
+          "has " + tokenizer.countTokens() + ".");
+    }
+    JweJsonFlattened jwe = new JweJsonFlattened();
+    String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
+    jwe.protectedHeader = JsonMarshaller.fromJson(protectedHeaderJson, JweHeader.class);
+    jwe.encryptedKey = fromBase64Url(tokenizer.nextToken());
+    jwe.initializationVector = fromBase64Url(tokenizer.nextToken());
+    jwe.ciphertext = fromBase64Url(tokenizer.nextToken());
+    jwe.authenticationTag = fromBase64Url(tokenizer.nextToken());
+    jwe.additionalAuthenticationData = toBase64Url(protectedHeaderJson).getBytes(US_ASCII);
+    return jwe;
   }
 
   /**
@@ -233,23 +226,5 @@ public class JweJsonFlattened extends JsonSerializable {
       + toBase64Url(initializationVector) + '.'
       + toBase64Url(ciphertext) + '.'
       + toBase64Url(authenticationTag);
-  }
-
-  public byte[] decryptPayload(Key key) throws GeneralSecurityException {
-    final JweKeyAlgorithmType keyManagementAlgorithm = protectedHeader.getJweKeyAlgorithmType();
-    final SecretKey aesKey = (SecretKey) CryptographyUtility.unwrapKey(encryptedKey, key, keyManagementAlgorithm
-                                                                       .getJavaAlgorithm(), "AES"); //todo
-    /**
-     * Developer note: Additional files may need to be downloaded and copied
-     * into the Java installation security directory
-     * https://stackoverflow.com/questions/6481627/java-security-illegal-key-size-or-default-parameters
-     */
-    Encrypter encrypter = protectedHeader.getEnc().getEncrypter();
-    return encrypter.decrypt(ciphertext, initializationVector, additionalAuthenticationData, authenticationTag, aesKey);
-  }
-
-  public String decryptAsString(Key key) throws GeneralSecurityException {
-    byte[] bytes = decryptPayload(key);
-    return fromBase64UrlToString(new String(bytes, US_ASCII));
   }
 }

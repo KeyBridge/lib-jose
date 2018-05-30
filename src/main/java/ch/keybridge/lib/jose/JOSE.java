@@ -17,6 +17,7 @@ package ch.keybridge.lib.jose;
 
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JweBuilder;
+import org.ietf.jose.jwe.JweDecryptor;
 import org.ietf.jose.jwe.JweHeader;
 import org.ietf.jose.jwe.JweJsonFlattened;
 import org.ietf.jose.jws.FlattenedJsonSignature;
@@ -97,34 +98,10 @@ public class JOSE {
       return JsonMarshaller.fromJson(json, JweJsonFlattened.class);
     }
 
-    public static byte[] decryptBinary(JweJsonFlattened jwe, Key key) throws GeneralSecurityException {
-      return jwe.decryptPayload(key);
+    public static JweDecryptor decrypt(JweJsonFlattened jwe) {
+      return JweDecryptor.createFor(jwe);
     }
 
-    /**
-     * Decrypt the payload as string
-     *
-     * @param jwe valid JweJsonFlattened instance
-     * @param key key used to encrypt the payload
-     * @return decrypted plaintext
-     * @throws GeneralSecurityException
-     */
-    public static String decryptString(JweJsonFlattened jwe, Key key) throws GeneralSecurityException {
-      return jwe.decryptAsString(key);
-    }
-
-    /**
-     * Verify if the object has not been tampered with. Check the additional authenticated data
-     * and attempts to decrypt.
-     *
-     * @param jwe JWE instance
-     * @param key key used to encrypt the payload
-     * @return true if the additional authenticated data validated and payload decrypted successfully
-     * @throws GeneralSecurityException
-     */
-    public static boolean verify(JweJsonFlattened jwe, Key key) throws GeneralSecurityException {
-      return jwe.decryptPayload(key) == null;
-    }
   }
 
   /**
@@ -216,10 +193,12 @@ public class JOSE {
      */
     public static <T> T read(String json, Class<T> type, PrivateKey receiverKey, PublicKey senderKey) {
       try {
-        JweJsonFlattened jwe = JsonMarshaller.fromJson(json, JweJsonFlattened.class);
-        String payload = jwe.decryptAsString(receiverKey);
+        JweJsonFlattened jwe = JweJsonFlattened.fromJson(json);
+        String payload = JweDecryptor.createFor(jwe)
+            .decrypt(receiverKey)
+            .getAsString();
 
-        FlattenedJsonSignature jws = JsonMarshaller.fromJson(payload, FlattenedJsonSignature.class);
+        FlattenedJsonSignature jws = FlattenedJsonSignature.fromJson(payload);
 
         /**
          * The payload is rejected if the digital signature cannot be validated.
@@ -251,13 +230,15 @@ public class JOSE {
      */
     public static <T> T read(String json, Class<T> type, String base64UrlEncodedSecret) {
       try {
-        JweJsonFlattened jwe = JsonMarshaller.fromJson(json, JweJsonFlattened.class);
-        String payload = jwe.decryptAsString(JweBuilder.createSecretKey(base64UrlEncodedSecret));
+        JweJsonFlattened jwe = JweJsonFlattened.fromJson(json);
+        String payload = JweDecryptor.createFor(jwe)
+            .decrypt(base64UrlEncodedSecret)
+            .getAsString();
 
         /**
          * The payload is rejected if the digital signature cannot be validated.
          */
-        FlattenedJsonSignature jws = JsonMarshaller.fromJson(payload, FlattenedJsonSignature.class);
+        FlattenedJsonSignature jws = FlattenedJsonSignature.fromJson(payload);
 
         boolean signatureValid = SignatureValidator.isValid(jws, base64UrlEncodedSecret);
         if (!signatureValid) {

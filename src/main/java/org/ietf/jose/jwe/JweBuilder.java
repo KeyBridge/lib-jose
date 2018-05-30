@@ -15,14 +15,14 @@
  */
 package org.ietf.jose.jwe;
 
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
+import org.ietf.jose.util.KeyUtility;
+
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
-import org.ietf.jose.jwa.JweKeyAlgorithmType;
-import org.ietf.jose.util.Base64Utility;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.ietf.jose.util.Base64Utility.toBase64Url;
@@ -71,17 +71,6 @@ public class JweBuilder {
    */
   public static JweBuilder getInstance() {
     return new JweBuilder();
-  }
-
-  /**
-   * Create an AES secret key instance from a Base64URL encoded string
-   *
-   * @param base64UrlEncodedSecret base64URL-encoded bytes of the secret
-   * @return a SecretKey instance
-   */
-  public static SecretKey createSecretKey(String base64UrlEncodedSecret) {
-    byte[] secretBytes = Base64Utility.fromBase64Url(base64UrlEncodedSecret);
-    return new SecretKeySpec(secretBytes, "AES");
   }
 
   /**
@@ -213,7 +202,7 @@ public class JweBuilder {
    * @throws GeneralSecurityException in case of failure to encrypt
    */
   public JweJsonFlattened buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException, GeneralSecurityException {
-    SecretKey key = createSecretKey(base64UrlEncodedSecret);
+    SecretKey key = KeyUtility.convertBase64UrlSecretToKey("AES", base64UrlEncodedSecret);
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);
   }
