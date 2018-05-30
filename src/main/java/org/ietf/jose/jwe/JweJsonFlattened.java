@@ -54,7 +54,7 @@ import static org.ietf.jose.util.JsonMarshaller.fromJson;
  * than this syntax difference, JWE JSON Serialization objects using the
  * flattened syntax are processed identically to those using the general syntax.
  */
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @ToString
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JweJsonFlattened extends JsonSerializable {

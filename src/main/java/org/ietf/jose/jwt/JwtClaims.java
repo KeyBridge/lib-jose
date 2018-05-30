@@ -16,6 +16,7 @@
 package org.ietf.jose.jwt;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.ietf.jose.adapter.XmlAdapterInstantLong;
 import org.ietf.jose.jws.JsonSerializable;
@@ -65,6 +66,7 @@ import java.util.stream.Collectors;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class JwtClaims extends JsonSerializable {
 
   /**
