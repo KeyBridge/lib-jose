@@ -35,7 +35,7 @@ public class SignatureValidator {
    */
   public static boolean isValid(FlattenedJsonSignature jws, String base64UrlEncodedSecret) throws IOException,
       GeneralSecurityException {
-    Key key = convertSecretToKey(jws.getProtectedHeader().getJwsAlgorithmType(), base64UrlEncodedSecret);
+    SecretKey key = convertBase64UrlSecretToKey(jws.getProtectedHeader().getJwsAlgorithmType(), base64UrlEncodedSecret);
     return isValid(jws.getProtectedHeader(), jws.getPayload(), key, jws.getSignatureBytes());
   }
 
@@ -52,6 +52,23 @@ public class SignatureValidator {
   public static boolean isValid(FlattenedJsonSignature jws, PublicKey key) throws IOException,
       GeneralSecurityException {
     return isValid(jws.getProtectedHeader(), jws.getPayload(), key, jws.getSignatureBytes());
+
+  }
+
+  /**
+   * Validate the digital signature of a FlattendedJsonSignature with the provided key
+   *
+   * @param jws    FlattendedJsonSignature instance
+   * @param secret bytes of the shared secret used to create the HMAC
+   * @return true if the HMAC has been validated successfully
+   * @throws IOException              in case of failure to serialize the JWS protected header to JSON
+   * @throws GeneralSecurityException in case signature algorithms are not available
+   *                                  or another security-related issue
+   */
+  public static boolean isValid(FlattenedJsonSignature jws, byte[] secret) throws IOException,
+      GeneralSecurityException {
+    SecretKey key = convertSecretToKey(jws.getProtectedHeader().getJwsAlgorithmType(), secret);
+    return isValid(jws.getProtectedHeader(), jws.getPayload(), key, jws.getSignatureBytes());
   }
 
   /**
@@ -61,8 +78,19 @@ public class SignatureValidator {
    * @param base64UrlEncodedSecret base64UrlEncodedSecret
    * @return a SecretKey instance
    */
-  private static SecretKey convertSecretToKey(JwsAlgorithmType algorithm, String base64UrlEncodedSecret) {
+  private static SecretKey convertBase64UrlSecretToKey(JwsAlgorithmType algorithm, String base64UrlEncodedSecret) {
     byte[] secret = Base64Utility.fromBase64Url(base64UrlEncodedSecret);
+    return new SecretKeySpec(secret, algorithm.getJavaAlgorithmName());
+  }
+
+  /**
+   * Convert a base64URL-encoded secret into a Key
+   *
+   * @param algorithm secret key algorithm
+   * @param secret    bytes of the secret used to create the HMAC
+   * @return a SecretKey instance
+   */
+  private static SecretKey convertSecretToKey(JwsAlgorithmType algorithm, byte[] secret) {
     return new SecretKeySpec(secret, algorithm.getJavaAlgorithmName());
   }
 
@@ -117,7 +145,25 @@ public class SignatureValidator {
   public static boolean isValid(Signature signature, byte[] payload, String base64UrlEncodedSecret)
       throws IOException, GeneralSecurityException {
     JwsAlgorithmType algorithm = signature.getProtectedHeader().getJwsAlgorithmType();
-    Key key = convertSecretToKey(algorithm, base64UrlEncodedSecret);
+    Key key = convertBase64UrlSecretToKey(algorithm, base64UrlEncodedSecret);
+    return isValid(signature.getProtectedHeader(), payload, key, signature.getSignatureBytes());
+  }
+
+  /**
+   * Validate signature using shared secret
+   *
+   * @param payload data that was signed
+   * @param secret  bytes of the shared secret used to create the HMAC
+   * @return true if signature is valid
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
+   * @throws GeneralSecurityException in case of failure to validate the
+   *                                  signature
+   */
+  public static boolean isValid(Signature signature, byte[] payload, byte[] secret)
+      throws IOException, GeneralSecurityException {
+    JwsAlgorithmType algorithm = signature.getProtectedHeader().getJwsAlgorithmType();
+    SecretKey key = convertSecretToKey(algorithm, secret);
     return isValid(signature.getProtectedHeader(), payload, key, signature.getSignatureBytes());
   }
 }
