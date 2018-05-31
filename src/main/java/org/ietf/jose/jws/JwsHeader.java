@@ -17,6 +17,7 @@ package org.ietf.jose.jws;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.ietf.jose.jwk.JWK;
 
 import java.net.URI;
@@ -44,6 +45,7 @@ import java.util.List;
  * @since 0.0.1 created 02/01/2018
  */
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Data
 public class JwsHeader extends AbstractHeader {
 

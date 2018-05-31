@@ -181,16 +181,6 @@ public class JwsBuilder {
   }
 
   /**
-   * Build a FlattendedJsonSignature instance: A GeneralJsonSignature object
-   * with a single signature.
-   *
-   * @return a FlattendedJsonSignature instance
-   */
-  public FlattenedJsonSignature buildJsonFlattened() {
-    return new GeneralJsonSignature(payload, signatures).toFlattened();
-  }
-
-  /**
    * Build a GeneralJsonSignature compact string: a string which contains the
    * payload and a single signature.
    *
@@ -198,6 +188,6 @@ public class JwsBuilder {
    * @throws java.io.IOException on error
    */
   public String buildCompact() throws IOException {
-    return buildJsonFlattened().getCompactForm();
+    return buildJsonGeneral().getCompactForm();
   }
 }

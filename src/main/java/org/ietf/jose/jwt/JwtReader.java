@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.ietf.jose.jwe.JweJsonFlattened;
-import org.ietf.jose.jws.FlattenedJsonSignature;
+import org.ietf.jose.jws.GeneralJsonSignature;
 
 import java.io.IOException;
 
@@ -27,11 +27,14 @@ public class JwtReader {
   /**
    * If signed, the jwsFlattenedObject field holds the value
    */
-  private FlattenedJsonSignature jwsFlattenedObject;
+  private GeneralJsonSignature jwsFlattenedObject;
   /**
    * If encrypted, the jweFlattenedObject field holds the value
    */
   private JweJsonFlattened jweFlattenedObject;
+
+  private JwtReader() {
+  }
 
   /**
    * Parse a JWT in a compact form string
@@ -42,10 +45,10 @@ public class JwtReader {
    * @throws IllegalArgumentException if the JWT (compact form) is not valid
    */
   public static JwtReader readCompactForm(String compactForm) throws IOException {
-    final int dots = coundDots(compactForm);
+    final int dots = countDots(compactForm);
     JwtReader jwt = new JwtReader();
     if (dots == 2) {
-      jwt.jwsFlattenedObject = FlattenedJsonSignature.fromCompactForm(compactForm);
+      jwt.jwsFlattenedObject = GeneralJsonSignature.fromCompactForm(compactForm);
       jwt.type = Type.Signed;
     } else if (dots == 4) {
       jwt.jweFlattenedObject = JweJsonFlattened.fromCompactForm(compactForm);
@@ -59,10 +62,10 @@ public class JwtReader {
   /**
    * Count how many dots there are in the token string
    *
-   * @param string
-   * @return
+   * @param string non-null string
+   * @return number of '.' symbol occurrences in the string
    */
-  private static int coundDots(String string) {
+  private static int countDots(String string) {
     int dots = 0;
     for (int i = 0; i < string.length(); i++) {
       if (string.charAt(i) == '.') dots++;

@@ -39,10 +39,10 @@ public class JwsJsonSignatureTest {
           .buildJsonGeneral();
       assertEquals(1, jws.getSignatures().size());
       Signature signature = jws.getSignatures().get(0);
-      assertTrue(SignatureValidator.isValid(signature, payload, publicKey));
+      assertTrue(SignatureValidator.isValid(signature, publicKey));
       wrongPublicKeys.forEach(key -> {
         try {
-          assertFalse(SignatureValidator.isValid(signature, payload, key));
+          assertFalse(SignatureValidator.isValid(signature, key));
         } catch (Exception e) {
           e.printStackTrace();
           fail(e.getMessage());
@@ -64,11 +64,11 @@ public class JwsJsonSignatureTest {
           .buildJsonGeneral();
       assertEquals(1, jws.getSignatures().size());
       Signature signature = jws.getSignatures().get(0);
-      assertTrue(SignatureValidator.isValid(signature, jws.getPayload(), secret));
+      assertTrue(SignatureValidator.isValid(signature, secret));
 
       for (int i = 0; i < 100; i++) {
         String base64UrlEncodedWrongKey = toBase64Url(getAlteredBytes(fromBase64Url(secret)));
-        assertFalse(SignatureValidator.isValid(signature, jws.getPayload(), base64UrlEncodedWrongKey));
+        assertFalse(SignatureValidator.isValid(signature, base64UrlEncodedWrongKey));
       }
 
     } catch (Exception e) {
@@ -149,11 +149,11 @@ public class JwsJsonSignatureTest {
     final String payload = "payload";
     final String secret = Base64Utility.toBase64Url(KeyGenerator.getInstance("HmacSHA256").generateKey().getEncoded());
 
-    FlattenedJsonSignature jws = JwsBuilder.getInstance()
+    GeneralJsonSignature jws = JwsBuilder.getInstance()
       .withStringPayload(payload)
         .sign(secret, JwsAlgorithmType.HS256, UUID.randomUUID().toString())
-      .buildJsonFlattened();
+        .buildJsonGeneral();
 
-    assertTrue(SignatureValidator.isValid(jws, secret));
+    assertTrue(SignatureValidator.isValid(jws.getSignatures().get(0), secret));
   }
 }
