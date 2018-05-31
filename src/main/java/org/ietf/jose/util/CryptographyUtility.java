@@ -15,18 +15,19 @@
  */
 package org.ietf.jose.util;
 
-import java.security.*;
-import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
-import javax.crypto.Cipher;
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JWK;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.SymmetricJwk;
+
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.*;
+import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
 
 /**
  * A utility class for common cryptographic operations
@@ -226,8 +227,7 @@ public class CryptographyUtility {
    * @return bytes of the signature or HMAC
    * @throws GeneralSecurityException in case of failure
    */
-  public static byte[] sign(byte[] payloadBytes, JWK jwk) throws GeneralSecurityException {
-    final JwsAlgorithmType algorithm = jwk.getJwsAlgorithmType();
+  public static byte[] sign(byte[] payloadBytes, JWK jwk, JwsAlgorithmType algorithm) throws GeneralSecurityException {
     if (jwk instanceof SymmetricJwk) {
       SymmetricJwk symmetricKey = (SymmetricJwk) jwk;
       return sign(payloadBytes, new SecretKeySpec(symmetricKey.getK(), algorithm.getJavaAlgorithmName()), algorithm

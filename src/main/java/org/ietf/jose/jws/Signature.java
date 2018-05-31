@@ -18,6 +18,7 @@ package org.ietf.jose.jws;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JWK;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
@@ -115,10 +116,11 @@ public class Signature {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public static Signature getInstance(byte[] payload, JWK key) throws IOException, GeneralSecurityException {
+  public static Signature getInstance(byte[] payload, JWK key, JwsAlgorithmType algorithm) throws IOException,
+      GeneralSecurityException {
     Signature signature = new Signature();
     JwsHeader ph = new JwsHeader();
-    ph.setAlg(key.getAlg());
+    ph.setAlg(algorithm.getJoseAlgorithmName());
     ph.setX5c(key.getX5c());
     ph.setX5t(key.getX5t());
     ph.setX5tS256(key.getX5tS256());
@@ -128,7 +130,7 @@ public class Signature {
     validateProtectedHeader(ph);
 
     signature.jwsSigningInput = createJwsSigningInput(ph, payload);
-    signature.signature = CryptographyUtility.sign(signature.jwsSigningInput, key);
+    signature.signature = CryptographyUtility.sign(signature.jwsSigningInput, key, algorithm);
     return signature;
   }
 

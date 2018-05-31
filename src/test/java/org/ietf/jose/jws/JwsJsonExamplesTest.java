@@ -45,7 +45,7 @@ public class JwsJsonExamplesTest {
     /**
      * Check whether the EncryptionUtility returns the same result
      */
-    byte[] signatureUtility = CryptographyUtility.sign(fullPayload.getBytes(UTF_8), key);
+    byte[] signatureUtility = CryptographyUtility.sign(fullPayload.getBytes(UTF_8), key, JwsAlgorithmType.RS256);
     assertEquals(expectedSignature, toBase64Url(signatureUtility));
   }
 

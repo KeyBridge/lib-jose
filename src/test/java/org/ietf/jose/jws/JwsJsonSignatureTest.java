@@ -85,17 +85,14 @@ public class JwsJsonSignatureTest {
     JWK jwkOne = RsaPrivateJwk.getInstance(keyPair, UUID.randomUUID().toString());
     JWK jwkTwo = RsaPrivateJwk.getInstance(keyPair, UUID.randomUUID().toString());
 
-    jwkOne.setJwsAlgorithmType(RS256);
-    jwkTwo.setJwsAlgorithmType(RS512);
-
-    Signature signature = Signature.getInstance("sign this".getBytes(), jwkOne);
-    Signature signature2 = Signature.getInstance("sign this".getBytes(), jwkTwo);
+    Signature signature = Signature.getInstance("sign this".getBytes(), jwkOne, RS256);
+    Signature signature2 = Signature.getInstance("sign this".getBytes(), jwkTwo, RS512);
 
     System.out.println(toBase64Url(signature.getSignatureBytes()));
     System.out.println(toBase64Url(signature2.getSignatureBytes()));
 
     String longString = createRandomString(10000);
-    Signature signature3 = Signature.getInstance(longString.getBytes(), jwkTwo);
+    Signature signature3 = Signature.getInstance(longString.getBytes(), jwkTwo, RS512);
     System.out.println(toBase64Url(signature3.getSignatureBytes()));
   }
 

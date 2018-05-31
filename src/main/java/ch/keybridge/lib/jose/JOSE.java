@@ -163,12 +163,8 @@ public class JOSE {
      * @param signature a valid Signature instance
      * @param key       a Key instance
      * @return true if signature is valid
-     * @throws IOException              in case of failure to serialise the
-     *                                  protected header to JSON
-     * @throws GeneralSecurityException in case of failure to validate the
-     *                                  signature
      */
-    public static boolean verify(Signature signature, SecretKey key) throws IOException {
+    public static boolean verify(Signature signature, SecretKey key) {
       return SignatureValidator.isValid(signature, key);
     }
   }
@@ -252,7 +248,7 @@ public class JOSE {
           throw new IllegalArgumentException("A JWS must have at least one signature");
         }
         if (signatures.size() > 1) {
-          LOG.log(Level.WARNING, "JWS {1} signatures instead of the expected 1. Validating only the first signature" +
+          LOG.log(Level.WARNING, "JWS {0} signatures instead of the expected 1. Validating only the first signature" +
               ".", new Object[]{signatures.size()});
         }
         boolean signatureValid = SignatureValidator.isValid(signatures.get(0), base64UrlEncodedSecret);

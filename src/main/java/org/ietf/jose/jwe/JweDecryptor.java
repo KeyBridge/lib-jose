@@ -7,12 +7,10 @@ import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.KeyUtility;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.PrivateKey;
-
-import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.ietf.jose.util.Base64Utility.fromBase64UrlToString;
 
 /**
  * A JWE decryption utility. Accepts a JweJsonFlattened instance, decrypts the ciphertext using a valid key
@@ -135,7 +133,7 @@ public class JweDecryptor {
      * @return plaintext string
      */
     public String getAsString() {
-      return fromBase64UrlToString(new String(plaintext, US_ASCII));
+      return new String(plaintext, StandardCharsets.UTF_8);
     }
   }
 }

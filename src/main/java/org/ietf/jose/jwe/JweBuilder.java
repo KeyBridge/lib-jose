@@ -25,7 +25,6 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.ietf.jose.util.Base64Utility.toBase64Url;
 
 /**
  * RFC 7516
@@ -112,7 +111,7 @@ public class JweBuilder {
    * @return this builder
    */
   public JweBuilder withStringPayload(String payload) {
-    this.payload = toBase64Url(payload).getBytes(US_ASCII);
+    this.payload = payload.getBytes(US_ASCII);
     return this;
   }
 

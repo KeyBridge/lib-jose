@@ -4,7 +4,7 @@ import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JweBuilder;
 import org.ietf.jose.jwe.JweDecryptor;
 import org.ietf.jose.jwe.JweJsonFlattened;
-import org.ietf.jose.jws.FlattenedJsonSignature;
+import org.ietf.jose.jws.GeneralJsonSignature;
 import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.SignatureValidator;
 import org.ietf.jose.util.Base64Utility;
@@ -99,7 +99,7 @@ public class Examples {
     /**
      * In this instance we have a JWS.
      */
-    FlattenedJsonSignature decodedFromCompactForm = jwtDecoded.getJwsFlattenedObject();
+    GeneralJsonSignature decodedFromCompactForm = jwtDecoded.getJwsFlattenedObject();
     /**
      * Get the payload as string:
      */
@@ -114,12 +114,12 @@ public class Examples {
     System.out.println("claims.getAudience() = " + claims.getAudience());
     System.out.println("claims.getSubject() = " + claims.getSubject());
 
-    assertEquals(jwsBuilder.buildJsonFlattened(), decodedFromCompactForm);
+    assertEquals(jwsBuilder.buildJsonGeneral(), decodedFromCompactForm);
 
     /**
      * Validate the JWT by using the SignatureValidator class
      */
-    boolean isValid = SignatureValidator.isValid(decodedFromCompactForm, keyPair.getPublic());
+    boolean isValid = SignatureValidator.isValid(decodedFromCompactForm.getSignatures().get(0), keyPair.getPublic());
     assertTrue(isValid);
     System.out.println();
   }

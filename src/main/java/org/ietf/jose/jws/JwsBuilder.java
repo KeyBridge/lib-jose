@@ -126,8 +126,8 @@ public class JwsBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public JwsBuilder sign(JWK key) throws IOException, GeneralSecurityException {
-    this.signatures.add(Signature.getInstance(payload, key));
+  public JwsBuilder sign(JWK key, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
+    this.signatures.add(Signature.getInstance(payload, key, algorithm));
     return this;
   }
 
