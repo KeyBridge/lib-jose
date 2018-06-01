@@ -1,6 +1,8 @@
 package org.ietf.jose.jws;
 
 import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
+import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.util.JsonMarshaller;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,6 +11,7 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
 
 /**
@@ -26,12 +29,25 @@ public class Examples {
   }
 
   @Test
+  public void printKeysAsJwk() throws IOException {
+    RsaPrivateJwk jwkPrivateKey = RsaPrivateJwk.getInstance(keyPair, keyId);
+    System.out.println("Private key:");
+    System.out.println(JsonMarshaller.toJson(jwkPrivateKey));
+    System.out.println();
+
+    RsaPublicJwk jwkPublicKey = RsaPublicJwk.getInstance((RSAPublicKey) keyPair.getPublic());
+    System.out.println("Public key:");
+    System.out.println(JsonMarshaller.toJson(jwkPublicKey));
+    System.out.println();
+  }
+
+  @Test
   public void createConsumeAndValidateExample() throws Exception {
 
     /**
      * Create a JSON Web Signature with a string as payload
      */
-    JwsBuilder jwsBuilder = JwsBuilder.getInstance()
+    JwsBuilder.Signable jwsBuilder = JwsBuilder.getInstance()
         .withStringPayload("hi")
         // sign it with our private key and specify a random UUID as the key ID
         .sign(keyPair.getPrivate(), JwsAlgorithmType.RS256, keyId);
@@ -65,23 +81,4 @@ public class Examples {
 //    System.out.println("JWS is valid: " + isValid);
   }
 
-  @Test
-  public void name() throws IOException {
-    String json = "{\"payload\":\"aGk\",\"protected\":{\"alg\":\"RS256\"," +
-        "\"kid\":\"82bcb607-15ff-4e54-aea8-1843c596de4f\"}," +
-        "\"signature\":\"EV9OHcLaK5_ZMqGa5Jhvd2orcBbp9dU7D4Z6Qhj5QugE4XJ6UaRiOPfGqSDRgfU" +
-        "-e2dknFQzmRZyydXuzWHhsN_UnWjNiTSniWGOmbviH17fCh-s19hkAiGiCH7WsPI_ZZe3eDj_9tPbogRvM8XfwcSt_Nur32" +
-        "-sC8emtU0wIsVQyk8v_pQq-PRjoz4tbgM9BsWYFXXwbiH9ki61M0v5CPyA_i1fwXO_PCtz9k9X" +
-        "-LJYaDRJRxgOzX_G3P2dVcGVPPEiJAoOZyTZ0eqEw8jQikf0Sks6nv_459YgqCoPfK6aD0w7cQzud" +
-        "-cA6JmZTw4lpYSuwSYEAk11frnOGO00fg\"}";
-    String json2 = "{\"payload\":\"aGk\",\"protected\":{\"kid\":\"82bcb607-15ff-4e54-aea8-1843c596de4f\"," +
-        "\"alg\":\"RS256\"}," +
-        "\"signature\":\"EV9OHcLaK5_ZMqGa5Jhvd2orcBbp9dU7D4Z6Qhj5QugE4XJ6UaRiOPfGqSDRgfU" +
-        "-e2dknFQzmRZyydXuzWHhsN_UnWjNiTSniWGOmbviH17fCh-s19hkAiGiCH7WsPI_ZZe3eDj_9tPbogRvM8XfwcSt_Nur32" +
-        "-sC8emtU0wIsVQyk8v_pQq-PRjoz4tbgM9BsWYFXXwbiH9ki61M0v5CPyA_i1fwXO_PCtz9k9X" +
-        "-LJYaDRJRxgOzX_G3P2dVcGVPPEiJAoOZyTZ0eqEw8jQikf0Sks6nv_459YgqCoPfK6aD0w7cQzud" +
-        "-cA6JmZTw4lpYSuwSYEAk11frnOGO00fg\"}";
-    GeneralJsonSignature.fromJson(json);
-    GeneralJsonSignature.fromJson(json2);
-  }
 }

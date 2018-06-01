@@ -1,12 +1,16 @@
 package org.ietf.jose.jwe;
 
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
+import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.util.JsonMarshaller;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -23,6 +27,19 @@ public class Examples {
   @Before
   public void generateKeyPair() throws NoSuchAlgorithmException {
     keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+  }
+
+  @Test
+  public void printKeysAsJwk() throws IOException {
+    RsaPrivateJwk jwkPrivateKey = RsaPrivateJwk.getInstance(keyPair, keyId);
+    System.out.println("Private key:");
+    System.out.println(JsonMarshaller.toJson(jwkPrivateKey));
+    System.out.println();
+
+    RsaPublicJwk jwkPublicKey = RsaPublicJwk.getInstance((RSAPublicKey) keyPair.getPublic());
+    System.out.println("Public key:");
+    System.out.println(JsonMarshaller.toJson(jwkPublicKey));
+    System.out.println();
   }
 
   @Test
