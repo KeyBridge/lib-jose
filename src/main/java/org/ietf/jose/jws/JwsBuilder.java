@@ -16,7 +16,7 @@
 package org.ietf.jose.jws;
 
 import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.jwk.JsonWebKey;
 import org.ietf.jose.util.Base64Utility;
 
 import javax.crypto.SecretKey;
@@ -136,7 +136,7 @@ public class JwsBuilder {
      *                                  protected header to JSON
      * @throws GeneralSecurityException in case of failure to sign
      */
-    public Signable sign(JWK key, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
+    public Signable sign(JsonWebKey key, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
       this.signatures.add(Signature.getInstance(payload, key, algorithm));
       return this;
     }
@@ -186,8 +186,8 @@ public class JwsBuilder {
      *
      * @return a GeneralJsonSignature instance
      */
-    public GeneralJsonSignature buildJsonGeneral() {
-      return new GeneralJsonSignature(payload, signatures);
+    public JsonWebSignature buildJsonWebSignature() {
+      return new JsonWebSignature(payload, signatures);
     }
 
     /**
@@ -198,7 +198,7 @@ public class JwsBuilder {
      * @throws java.io.IOException on error
      */
     public String buildCompact() throws IOException {
-      return buildJsonGeneral().getCompactForm();
+      return buildJsonWebSignature().getCompactForm();
     }
   }
 }

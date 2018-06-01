@@ -4,22 +4,20 @@ import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.ietf.TestFileReader;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweDecryptor;
-import org.ietf.jose.jwe.JweJsonFlattened;
 import org.ietf.jose.jwe.encryption.Encrypter;
-import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.jwk.JsonWebKey;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
-import org.ietf.jose.jws.GeneralJsonSignature;
+import org.ietf.jose.jws.JsonWebSignature;
 import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.SignatureValidator;
 import org.ietf.jose.util.JsonMarshaller;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
-import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.jws.AlgorithmIdentifiers;
-import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.junit.Test;
@@ -66,7 +64,7 @@ public class InteropTest {
 
     // A JWT is a JWS and/or a JWE with JSON claims as the payload.
     // In this example it is a JWS so we create a JsonWebSignature object.
-    JsonWebSignature jws = new JsonWebSignature();
+    org.jose4j.jws.JsonWebSignature jws = new org.jose4j.jws.JsonWebSignature();
 
     // The payload of the JWS is JSON content of the JWT Claims
     jws.setPayload(claims.toJson());
@@ -110,7 +108,7 @@ public class InteropTest {
 
     JwtReader reader = JwtReader.readCompactForm(jwt);
     assertEquals(JwtReader.Type.Signed, reader.getType());
-    GeneralJsonSignature jwsDecoded = reader.getJwsFlattenedObject();
+    JsonWebSignature jwsDecoded = reader.getJsonWebSignature();
     System.out.println(jwsDecoded);
 
     assertTrue(SignatureValidator.isValid(jwsDecoded.getSignatures().get(0), kp.getPublic()));
@@ -153,7 +151,7 @@ public class InteropTest {
 //    KeyPair kp = KeyPairGenerator.getInstance("RSA").generateKeyPair();
 
     // Create a new Json Web Encryption object
-    JsonWebEncryption senderJwe = new JsonWebEncryption();
+    org.jose4j.jwe.JsonWebEncryption senderJwe = new org.jose4j.jwe.JsonWebEncryption();
 
     // The plaintext of the JWE is the message that we want to encrypt.
     senderJwe.setPlaintext("hi");
@@ -177,7 +175,7 @@ public class InteropTest {
 
     String jose4jecryptedCompact = senderJwe.getCompactSerialization();
 
-    JweJsonFlattened joseJwe = JweJsonFlattened.fromCompactForm(jose4jecryptedCompact);
+    JsonWebEncryption joseJwe = JsonWebEncryption.fromCompactForm(jose4jecryptedCompact);
     JweDecryptor.DecryptionResult result = JweDecryptor.createFor(joseJwe)
         .decrypt(key);
     assertEquals("hi", result.getAsString());
@@ -187,7 +185,7 @@ public class InteropTest {
   public void signedJwtHmacTest() throws Exception {
     String jwt =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsYXN0bmFtZSI6IlJhamthcm5pa2FyIiwiZmlyc3RuYW1lIjoiTmlyYWphbiJ9.9ioIwAcjATPumTWU_Ml6W0ngCx6T4IX8MUgVr3FPD-Q";
-    GeneralJsonSignature jws = GeneralJsonSignature.fromCompactForm(jwt);
+    JsonWebSignature jws = JsonWebSignature.fromCompactForm(jwt);
     JwtClaims claims = JwtClaims.fromJson(jws.getStringPayload());
     System.out.println(claims);
     System.out.println(jws.getStringPayload());
@@ -198,10 +196,10 @@ public class InteropTest {
   @Test
   public void jwtSignedWithRsaJwk() throws Exception {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-public-key.json");
-    JWK key = JsonMarshaller.fromJson(json, JWK.class);
+    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
     RsaPublicJwk rsaPublicJwk = (RsaPublicJwk) key;
     json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    key = JsonMarshaller.fromJson(json, JWK.class);
+    key = JsonMarshaller.fromJson(json, JsonWebKey.class);
     RsaPrivateJwk rsaPrivateJwk = (RsaPrivateJwk) key;
 
     JwtClaims claims = new JwtClaims()
@@ -220,7 +218,7 @@ public class InteropTest {
         .sign(rsaPrivateJwk, JwsAlgorithmType.RS256)
         .buildCompact();
 
-    GeneralJsonSignature jwsDecoded = GeneralJsonSignature.fromCompactForm(signedJwtCompact);
+    JsonWebSignature jwsDecoded = JsonWebSignature.fromCompactForm(signedJwtCompact);
     assertEquals(1, jwsDecoded.getSignatures().size());
 
     assertTrue(SignatureValidator.isValid(jwsDecoded.getSignatures().get(0), rsaPublicJwk.getPublicKey()));
@@ -229,7 +227,7 @@ public class InteropTest {
     // Verify signature using jose4j
 
     // Create a new JsonWebSignature object
-    JsonWebSignature jws = new JsonWebSignature();
+    org.jose4j.jws.JsonWebSignature jws = new org.jose4j.jws.JsonWebSignature();
 
     // Set the algorithm constraints based on what is agreed upon or expected from the sender
     jws.setAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST,
@@ -268,7 +266,7 @@ public class InteropTest {
   @Test
   public void convertKeyToPem() throws Exception {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    JWK key = JsonMarshaller.fromJson(json, JWK.class);
+    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
     RsaPrivateJwk rsaPrivateJwk = (RsaPrivateJwk) key;
 
     StringWriter sw = new StringWriter();

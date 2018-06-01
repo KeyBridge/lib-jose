@@ -1,7 +1,7 @@
 package org.ietf.jose.jws;
 
 import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.jwk.JsonWebKey;
 import org.ietf.jose.util.CryptographyUtility;
 
 import javax.crypto.SecretKey;
@@ -50,7 +50,7 @@ public class SignatureValidator {
    * @param key       a JSON Web Key instance
    * @return true if signature is valid
    */
-  public static boolean isValid(Signature signature, JWK key) {
+  public static boolean isValid(Signature signature, JsonWebKey key) {
     try {
       return CryptographyUtility.validateSignature(signature.getSignatureBytes(), signature.getSigningInput(),
           key, signature.getProtectedHeader().getJwsAlgorithmType().getJavaAlgorithmName());

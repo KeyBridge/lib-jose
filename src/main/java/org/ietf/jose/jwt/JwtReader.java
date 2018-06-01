@@ -3,8 +3,8 @@ package org.ietf.jose.jwt;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.ietf.jose.jwe.JweJsonFlattened;
-import org.ietf.jose.jws.GeneralJsonSignature;
+import org.ietf.jose.jwe.JsonWebEncryption;
+import org.ietf.jose.jws.JsonWebSignature;
 
 import java.io.IOException;
 
@@ -25,14 +25,19 @@ public class JwtReader {
    */
   private Type type;
   /**
-   * If signed, the jwsFlattenedObject field holds the value
+   * If signed, the jsonWebSignature field holds the value
    */
-  private GeneralJsonSignature jwsFlattenedObject;
+  private JsonWebSignature jsonWebSignature;
   /**
-   * If encrypted, the jweFlattenedObject field holds the value
+   * If encrypted, the jsonWebEncryption field holds the value
    */
-  private JweJsonFlattened jweFlattenedObject;
+  private JsonWebEncryption jsonWebEncryption;
 
+  /**
+   * Private constructor because the class should be accessed via static readCompactForm method
+   *
+   * @see JwtReader#readCompactForm(String)
+   */
   private JwtReader() {
   }
 
@@ -48,10 +53,10 @@ public class JwtReader {
     final int dots = countDots(compactForm);
     JwtReader jwt = new JwtReader();
     if (dots == 2) {
-      jwt.jwsFlattenedObject = GeneralJsonSignature.fromCompactForm(compactForm);
+      jwt.jsonWebSignature = JsonWebSignature.fromCompactForm(compactForm);
       jwt.type = Type.Signed;
     } else if (dots == 4) {
-      jwt.jweFlattenedObject = JweJsonFlattened.fromCompactForm(compactForm);
+      jwt.jsonWebEncryption = JsonWebEncryption.fromCompactForm(compactForm);
       jwt.type = Type.Encrypted;
     } else {
       throw new IllegalArgumentException("Unable to parse JWT as JWS or JWE");

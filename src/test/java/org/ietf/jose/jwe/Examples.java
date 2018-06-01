@@ -48,7 +48,7 @@ public class Examples {
     /**
      * Create a JSON Web Encryption object with a string as payload
      */
-    JweJsonFlattened jwe = JweBuilder.getInstance()
+    JsonWebEncryption jwe = JweBuilder.getInstance()
         .withStringPayload("hi")
         // sign it with our private key and specify a random UUID as the key ID
         .buildJweJsonFlattened(keyPair.getPublic());
@@ -63,9 +63,9 @@ public class Examples {
      * Consume the JWE
      */
     // From compact form
-    JweJsonFlattened fromCompact = JweJsonFlattened.fromCompactForm(jweCompact);
+    JsonWebEncryption fromCompact = JsonWebEncryption.fromCompactForm(jweCompact);
     // From JSON Flattened form
-    JweJsonFlattened fromJson = JweJsonFlattened.fromJson(jwe.toJson());
+    JsonWebEncryption fromJson = JsonWebEncryption.fromJson(jwe.toJson());
 
     assertEquals(jwe, fromCompact);
     assertEquals(jwe, fromJson);

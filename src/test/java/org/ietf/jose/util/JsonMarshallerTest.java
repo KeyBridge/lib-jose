@@ -1,7 +1,7 @@
 package org.ietf.jose.util;
 
+import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
-import org.ietf.jose.jwe.JweJsonFlattened;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -24,14 +24,14 @@ public class JsonMarshallerTest {
       KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
       generator.initialize(2048);
       KeyPair keyPair = generator.generateKeyPair();
-      JweJsonFlattened original = JweBuilder.getInstance()
+      JsonWebEncryption original = JweBuilder.getInstance()
           .withBinaryPayload("somePayload".getBytes(StandardCharsets.UTF_8))
           .buildJweJsonFlattened(keyPair.getPublic());
 
-      JweJsonFlattened unmarshalled = fromJson(toJson(original), JweJsonFlattened.class);
+      JsonWebEncryption unmarshalled = fromJson(toJson(original), JsonWebEncryption.class);
       String jsonPretty = toJsonPrettyFormatted(original);
       System.out.println(jsonPretty);
-      JweJsonFlattened unmarshalledFromPrettyJson = fromJson(jsonPretty, JweJsonFlattened.class);
+      JsonWebEncryption unmarshalledFromPrettyJson = fromJson(jsonPretty, JsonWebEncryption.class);
       assertEquals(original, unmarshalled);
       assertEquals(original, unmarshalledFromPrettyJson);
     } catch (Exception e) {

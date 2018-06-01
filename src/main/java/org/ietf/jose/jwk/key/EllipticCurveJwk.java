@@ -18,7 +18,7 @@ package org.ietf.jose.jwk.key;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
-import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.jwk.JsonWebKey;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -52,7 +52,7 @@ import java.math.BigInteger;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class EllipticCurveJwk extends JWK {
+public class EllipticCurveJwk extends JsonWebKey {
 
   /**
    * 6.2.1.1. "crv" (Curve) Parameter

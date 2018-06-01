@@ -20,9 +20,9 @@ import java.security.PrivateKey;
  * @since 0.0.1 created 30/05/2018
  */
 public class JweDecryptor {
-  private JweJsonFlattened jwe;
+  private JsonWebEncryption jwe;
 
-  private JweDecryptor(JweJsonFlattened jwe) {
+  private JweDecryptor(JsonWebEncryption jwe) {
     this.jwe = jwe;
   }
 
@@ -32,7 +32,7 @@ public class JweDecryptor {
    * @param jwe
    * @return
    */
-  public static JweDecryptor createFor(JweJsonFlattened jwe) {
+  public static JweDecryptor createFor(JsonWebEncryption jwe) {
     return new JweDecryptor(jwe);
   }
 

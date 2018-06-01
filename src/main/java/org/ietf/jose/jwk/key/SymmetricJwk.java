@@ -18,7 +18,7 @@ package org.ietf.jose.jwk.key;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.jwk.JsonWebKey;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -39,7 +39,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SymmetricJwk extends JWK {
+public class SymmetricJwk extends JsonWebKey {
 
   /**
    * 6.4.1. "k" (Key Value) Parameter

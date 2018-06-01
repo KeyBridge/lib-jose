@@ -51,10 +51,11 @@ public class Examples {
         .withStringPayload("hi")
         // sign it with our private key and specify a random UUID as the key ID
         .sign(keyPair.getPrivate(), JwsAlgorithmType.RS256, keyId);
-    String jwsJsonGeneral = jwsBuilder.buildJsonGeneral().toJson();
+    String jwsJsonGeneral = jwsBuilder.buildJsonWebSignature().toJson();
     String jwsCompact = jwsBuilder.buildCompact();
 
-    System.out.println("JWS JSON general:\n" + JsonMarshaller.toJsonPrettyFormatted(jwsBuilder.buildJsonGeneral()));
+    System.out.println("JWS JSON general:\n" + JsonMarshaller.toJsonPrettyFormatted(jwsBuilder.buildJsonWebSignature
+        ()));
     System.out.println();
 //    System.out.println("JWS compact form:\n" + jwsCompact);
 //    System.out.println();
@@ -68,10 +69,10 @@ public class Examples {
     // From compact form
 //    GeneralJsonSignature decodedFromCompactForm = GeneralJsonSignature.fromCompactForm(jwsCompact);
     // From JSON General form
-    GeneralJsonSignature decodedFromJsonGeneral = GeneralJsonSignature.fromJson(jwsJsonGeneral);
+    JsonWebSignature decodedFromJsonGeneral = JsonWebSignature.fromJson(jwsJsonGeneral);
 
-//    assertEquals(jwsBuilder.buildJsonGeneral(), decodedFromCompactForm);
-//    assertEquals(jwsBuilder.buildJsonGeneral(), decodedFromJsonGeneral);
+//    assertEquals(jwsBuilder.buildJsonWebSignature(), decodedFromCompactForm);
+//    assertEquals(jwsBuilder.buildJsonWebSignature(), decodedFromJsonGeneral);
 
     /**
      * Validate the JWT

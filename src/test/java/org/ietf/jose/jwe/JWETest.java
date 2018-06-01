@@ -57,13 +57,13 @@ public class JWETest {
     generator.initialize(2048);
     KeyPair pair = generator.generateKeyPair();
 
-    JweJsonFlattened jwe = JweBuilder.getInstance()
+    JsonWebEncryption jwe = JweBuilder.getInstance()
       .withBinaryPayload(payload)
       .buildJweJsonFlattened(pair.getPublic());
 
     String compactForm = jwe.toCompactForm();
 
-    JweJsonFlattened fromCompact = JweJsonFlattened.fromCompactForm(compactForm);
+    JsonWebEncryption fromCompact = JsonWebEncryption.fromCompactForm(compactForm);
 
     assertEquals(jwe, fromCompact);
 
@@ -83,7 +83,7 @@ public class JWETest {
     generator.initialize(1024);
     KeyPair pair = generator.generateKeyPair();
 
-    JweJsonFlattened jwe = JweBuilder.getInstance()
+    JsonWebEncryption jwe = JweBuilder.getInstance()
       .withBinaryPayload(payload)
       .buildJweJsonFlattened(pair.getPublic());
 
@@ -103,7 +103,7 @@ public class JWETest {
     generator.initialize(1024);
     KeyPair pair = generator.generateKeyPair();
 
-    JweJsonFlattened jwe = JweBuilder.getInstance()
+    JsonWebEncryption jwe = JweBuilder.getInstance()
         .withStringPayload(stringPayload)
       .buildJweJsonFlattened(pair.getPublic());
 

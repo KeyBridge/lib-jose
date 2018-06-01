@@ -1,10 +1,10 @@
 package org.ietf.jose.jwt;
 
 import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
 import org.ietf.jose.jwe.JweDecryptor;
-import org.ietf.jose.jwe.JweJsonFlattened;
-import org.ietf.jose.jws.GeneralJsonSignature;
+import org.ietf.jose.jws.JsonWebSignature;
 import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.SignatureValidator;
 import org.ietf.jose.util.Base64Utility;
@@ -99,7 +99,7 @@ public class Examples {
     /**
      * In this instance we have a JWS.
      */
-    GeneralJsonSignature decodedFromCompactForm = jwtDecoded.getJwsFlattenedObject();
+    JsonWebSignature decodedFromCompactForm = jwtDecoded.getJsonWebSignature();
     /**
      * Get the payload as string:
      */
@@ -114,7 +114,7 @@ public class Examples {
     System.out.println("claims.getAudience() = " + claims.getAudience());
     System.out.println("claims.getSubject() = " + claims.getSubject());
 
-    assertEquals(jwsBuilder.buildJsonGeneral(), decodedFromCompactForm);
+    assertEquals(jwsBuilder.buildJsonWebSignature(), decodedFromCompactForm);
 
     /**
      * Validate the JWT by using the SignatureValidator class
@@ -162,7 +162,7 @@ public class Examples {
     /**
      * Create a JSON Web Signature with the serialized JWT Claims as payload.
      */
-    JweJsonFlattened jwe = JweBuilder.getInstance()
+    JsonWebEncryption jwe = JweBuilder.getInstance()
         .withStringPayload(joseClaimsJson)
         .buildJweJsonFlattened(Base64Utility.toBase64Url(secret));
     String jwt = jwe.toCompactForm();
@@ -178,7 +178,7 @@ public class Examples {
      * In this instance we have a JWE.
      */
     assertEquals(JwtReader.Type.Encrypted, jwtDecoded.getType());
-    JweJsonFlattened jweDecoded = jwtDecoded.getJweFlattenedObject();
+    JsonWebEncryption jweDecoded = jwtDecoded.getJsonWebEncryption();
 
     String plaintext = JweDecryptor.createFor(jweDecoded)
         .decrypt(secret)

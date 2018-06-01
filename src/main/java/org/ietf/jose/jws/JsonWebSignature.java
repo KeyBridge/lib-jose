@@ -100,7 +100,7 @@ import static org.ietf.jose.util.Base64Utility.fromBase64UrlToString;
 @XmlAccessorType(XmlAccessType.FIELD)
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class GeneralJsonSignature extends JsonSerializable {
+public class JsonWebSignature extends JsonSerializable {
   /**
    * The "payload" member MUST be present and contain the value BASE64URL(JWS
    * Payload).
@@ -154,10 +154,10 @@ public class GeneralJsonSignature extends JsonSerializable {
   /**
    * Default constructor. Used by JSON (de)serialisers.
    */
-  private GeneralJsonSignature() {
+  private JsonWebSignature() {
   }
 
-  public GeneralJsonSignature(byte[] payload, List<Signature> signatures) {
+  public JsonWebSignature(byte[] payload, List<Signature> signatures) {
     this.payload = payload;
     if (signatures.isEmpty()) {
       throw new IllegalArgumentException("A JWS object must have at least one signature");
@@ -179,8 +179,8 @@ public class GeneralJsonSignature extends JsonSerializable {
    * @return a FlattenedJsonSignature instance
    * @throws IOException in case of failure to deserialize the JSON string
    */
-  public static GeneralJsonSignature fromJson(String json) throws IOException {
-    GeneralJsonSignature jws = JsonMarshaller.fromJson(json, GeneralJsonSignature.class);
+  public static JsonWebSignature fromJson(String json) throws IOException {
+    JsonWebSignature jws = JsonMarshaller.fromJson(json, JsonWebSignature.class);
 
     /**
      * Read the JSON again but with retained protected header order.
@@ -230,13 +230,13 @@ public class GeneralJsonSignature extends JsonSerializable {
    * @throws IllegalArgumentException if the provided input is not a valid
    *                                  compact JWS string
    */
-  public static GeneralJsonSignature fromCompactForm(String text) throws IOException {
+  public static JsonWebSignature fromCompactForm(String text) throws IOException {
     StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
     if (tokenizer.countTokens() != 3) {
       throw new IllegalArgumentException("JWS compact form must have 3 elements separated by dots. Supplied string " +
           "has " + tokenizer.countTokens() + ".");
     }
-    GeneralJsonSignature jws = new GeneralJsonSignature();
+    JsonWebSignature jws = new JsonWebSignature();
     String protectedHeaderBase64Url = tokenizer.nextToken();
     String payloadBase64Url = tokenizer.nextToken();
     String signatureBase64Url = tokenizer.nextToken();

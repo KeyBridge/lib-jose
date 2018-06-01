@@ -16,7 +16,7 @@
 package org.ietf.jose.util;
 
 import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.jwk.JsonWebKey;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
@@ -228,7 +228,8 @@ public class CryptographyUtility {
    * @return bytes of the signature or HMAC
    * @throws GeneralSecurityException in case of failure
    */
-  public static byte[] sign(byte[] payloadBytes, JWK jwk, JwsAlgorithmType algorithm) throws GeneralSecurityException {
+  public static byte[] sign(byte[] payloadBytes, JsonWebKey jwk, JwsAlgorithmType algorithm) throws
+      GeneralSecurityException {
     if (jwk instanceof SymmetricJwk) {
       SymmetricJwk symmetricKey = (SymmetricJwk) jwk;
       String jcaAlgorithm = algorithm.getJavaAlgorithmName();
@@ -272,7 +273,7 @@ public class CryptographyUtility {
    * @return
    * @throws GeneralSecurityException in case of failure
    */
-  public static boolean validateSignature(byte[] signature, byte[] payload, JWK jwk, String algorithm) throws
+  public static boolean validateSignature(byte[] signature, byte[] payload, JsonWebKey jwk, String algorithm) throws
       GeneralSecurityException {
     if (jwk instanceof SymmetricJwk) {
       SymmetricJwk symmetricKey = (SymmetricJwk) jwk;
