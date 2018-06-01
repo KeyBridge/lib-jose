@@ -17,8 +17,10 @@ package org.ietf.jose.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+
 import java.io.IOException;
 
 /**
@@ -28,6 +30,7 @@ import java.io.IOException;
 public class JsonMarshaller {
 
   private final static ObjectMapper mapper = new ObjectMapper();
+  private final static ObjectWriter prettyWriter;
 
   static {
     /**
@@ -49,6 +52,7 @@ public class JsonMarshaller {
      * entity classes in this library.
      */
     mapper.registerModule(new JaxbAnnotationModule());
+    prettyWriter = mapper.writerWithDefaultPrettyPrinter();
   }
 
   /**
@@ -60,6 +64,17 @@ public class JsonMarshaller {
    */
   public static String toJson(Object value) throws IOException {
     return mapper.writeValueAsString(value);
+  }
+
+  /**
+   * Serialize object to pretty-formatted JSON.
+   *
+   * @param value object to serialize
+   * @return A JSON string representing the object
+   * @throws IOException Error encountered while serializing
+   */
+  public static String toJsonPrettyFormatted(Object value) throws IOException {
+    return prettyWriter.writeValueAsString(value);
   }
 
   /**

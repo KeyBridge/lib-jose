@@ -1,17 +1,5 @@
 package org.ietf.jose.jwe;
 
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.util.Arrays;
-import javax.crypto.Cipher;
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import org.ietf.TestFileReader;
 import org.ietf.TestUtil;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
@@ -23,6 +11,19 @@ import org.ietf.jose.jwe.encryption.EncryptionResult;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.SymmetricJwk;
 import org.junit.Test;
+
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -56,22 +57,19 @@ public class JWETest {
     generator.initialize(2048);
     KeyPair pair = generator.generateKeyPair();
 
-//    System.out.println(pair.getPrivate().getAlgorithm());
-//    System.out.println(pair.getPrivate().getFormat());
-//    System.out.println(pair.getPublic().getAlgorithm());
-//    System.out.println(pair.getPublic().getFormat());
-    JweJsonFlattened jwe = JweBuilder.getInstance()
+    JsonWebEncryption jwe = JweBuilder.getInstance()
       .withBinaryPayload(payload)
       .buildJweJsonFlattened(pair.getPublic());
 
     String compactForm = jwe.toCompactForm();
 
-//    System.out.println(compactForm);
-    JweJsonFlattened fromCompact = JweJsonFlattened.fromCompactForm(compactForm);
+    JsonWebEncryption fromCompact = JsonWebEncryption.fromCompactForm(compactForm);
 
     assertEquals(jwe, fromCompact);
 
-    byte[] decrypted = jwe.decryptPayload(pair.getPrivate());
+    byte[] decrypted = JweDecryptor.createFor(jwe)
+        .decrypt(pair.getPrivate())
+        .getAsBytes();
 
     assertArrayEquals(payload, decrypted);
   }
@@ -85,31 +83,45 @@ public class JWETest {
     generator.initialize(1024);
     KeyPair pair = generator.generateKeyPair();
 
-    JweJsonFlattened jwe = JweBuilder.getInstance()
+    JsonWebEncryption jwe = JweBuilder.getInstance()
       .withBinaryPayload(payload)
       .buildJweJsonFlattened(pair.getPublic());
 
-    byte[] decrypted = jwe.decryptPayload(pair.getPrivate());
+    byte[] decrypted = JweDecryptor.createFor(jwe)
+        .decrypt(pair.getPrivate())
+        .getAsBytes();
 
     assertArrayEquals(payload, decrypted);
   }
 
   @Test
   public void encryptDecryptStringTest() throws Exception {
-    String payloadString = "some text to test with";
-    byte[] payload = toBase64Url(payloadString).getBytes(US_ASCII);
+    String stringPayload = "some text to test with";
+    byte[] binaryPayload = stringPayload.getBytes(StandardCharsets.UTF_8);
 
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
     generator.initialize(1024);
     KeyPair pair = generator.generateKeyPair();
 
-    JweJsonFlattened jwe = JweBuilder.getInstance()
-      .withBinaryPayload(payload)
+    JsonWebEncryption jwe = JweBuilder.getInstance()
+        .withStringPayload(stringPayload)
       .buildJweJsonFlattened(pair.getPublic());
 
-    String decrypted = jwe.decryptAsString(pair.getPrivate());
+    String decrypted = JweDecryptor.createFor(jwe)
+        .decrypt(pair.getPrivate())
+        .getAsString();
 
-    assertEquals(payloadString, decrypted);
+    assertEquals(stringPayload, decrypted);
+
+    jwe = JweBuilder.getInstance()
+        .withStringPayload(stringPayload)
+        .buildJweJsonFlattened(pair.getPublic());
+
+    byte[] decryptedBytes = JweDecryptor.createFor(jwe)
+        .decrypt(pair.getPrivate())
+        .getAsBytes();
+
+    assertArrayEquals(binaryPayload, decryptedBytes);
   }
 
   @Test
@@ -654,55 +666,75 @@ public class JWETest {
     assertArrayEquals(authTag, calculatedAuthTag);
 
     Encrypter encrypter = new DefaultEncrypter(DefaultEncrypter.Configuration.AES_128_CBC_HMAC_SHA_256);
-    EncryptionResult encryptionResult = encrypter.encrypt(plaintextBytes, initVector, aad, new SecretKeySpec(cekBytes, "AES"));
+    EncryptionResult encryptionResult = encrypter.encrypt(plaintextBytes, initVector, aad,
+        new SecretKeySpec(cekBytes, encrypter.getSecretKeyAlgorithm()));
 
     assertArrayEquals(aad, encryptionResult.getAad());
     assertArrayEquals(initVector, encryptionResult.getIv());
     assertArrayEquals(ciphertext, encryptionResult.getCiphertext());
     assertArrayEquals(authTag, encryptionResult.getAuthTag());
 
-    byte[] decrypted = encrypter.decrypt(ciphertext, initVector, aad, authTag, new SecretKeySpec(cekBytes, "AES"));
+    byte[] decrypted = encrypter.decrypt(ciphertext, initVector, aad, authTag,
+        new SecretKeySpec(cekBytes, encrypter.getSecretKeyAlgorithm()));
 
     assertArrayEquals(plaintextBytes, decrypted);
   }
 
+  /**
+   * Generate random plaintext and AAD, encrypt them, then try to decrypt with either an incorrect AAD
+   * or an incorrect key and confirm that the operation fails. Failure is indicated either by
+   * a null result or a GeneralSecurityException thrown. That is, when expecting failure, both results indicate
+   * success.
+   */
   @Test
   public void testAllAlgorithms() {
     byte[] plaintext = TestUtil.createRandomString(100).getBytes();
     byte[] aad = TestUtil.createRandomString(20).getBytes();
 
     for (JweEncryptionAlgorithmType eEncryptionAlgo : JweEncryptionAlgorithmType.values()) {
-      if (eEncryptionAlgo == JweEncryptionAlgorithmType.UNKNOWN) {
-        continue;
-      }
-//      System.out.println(eEncryptionAlgo);
       final Encrypter encrypter = eEncryptionAlgo.getEncrypter();
+      Key key = null;
+      EncryptionResult result = null;
+      byte[] decrypted = new byte[0];
+      /**
+       * Encryption is expected to succeed. A GeneralSecurityException at this step would indicate
+       * a bug or problems with JCA algorithm availability.
+       */
       try {
-        Key key = encrypter.generateKey();
-        EncryptionResult result = eEncryptionAlgo.getEncrypter().encrypt(plaintext, null, aad, key);  // java.security.InvalidKeyException: Illegal key size
-        byte[] decrypted = encrypter.decrypt(result.getCiphertext(), result.getIv(), aad, result.getAuthTag(), key);
-        assertArrayEquals(plaintext, decrypted);
+        key = encrypter.generateKey();
+        result = eEncryptionAlgo.getEncrypter().encrypt(plaintext, null, aad, key);
+        decrypted = encrypter.decrypt(result.getCiphertext(), result.getIv(), aad, result.getAuthTag(), key);
+      } catch (GeneralSecurityException e) {
+        fail();
+      }
+      assertArrayEquals(plaintext, decrypted);
 
-        for (int i = 0; i < 1000; i++) {
-          /**
-           * Check if changing the AAD makes decryption unsuccessful, i.e.
-           * result is null.
-           */
-          decrypted = encrypter.decrypt(result.getCiphertext(), result.getIv(), TestUtil.getAlteredBytes(aad),
-                                        result.getAuthTag(), key);
+      for (int i = 0; i < 1000; i++) {
+        /**
+         * Check if changing the AAD makes decryption unsuccessful, i.e.
+         * result is null.
+         */
+        try {
+          byte[] alteredAad = TestUtil.getAlteredBytes(aad);
+          assertTrue(!Arrays.equals(aad, alteredAad));
+          decrypted = encrypter.decrypt(result.getCiphertext(), result.getIv(), alteredAad,
+              result.getAuthTag(), key);
           assertTrue(decrypted == null || !Arrays.equals(plaintext, decrypted));
-          /**
-           * Check if changing the key makes decryption unsuccessful, i.e.
-           * result is null. Developer note: occasionally the decrypted value is
-           * not null but, as expected, not equal to the original plaintext
-           */
-          Key fakeKey = new SecretKeySpec(TestUtil.getAlteredBytes(key.getEncoded()), "AES");
+        } catch (GeneralSecurityException e) {
+          // expected
+        }
+        /**
+         * Check if changing the key makes decryption unsuccessful, i.e.
+         * result is null. Developer note: occasionally the decrypted value is
+         * not null but, as expected, not equal to the original plaintext
+         */
+        Key fakeKey = new SecretKeySpec(TestUtil.getAlteredBytes(key.getEncoded()), "AES");
+        try {
           decrypted = encrypter.decrypt(result.getCiphertext(), result.getIv(), aad, result.getAuthTag(), fakeKey);
           assertTrue(decrypted == null || !Arrays.equals(plaintext, decrypted));
+        } catch (GeneralSecurityException e) {
+          // expected
         }
-      } catch (GeneralSecurityException e) {
-        e.printStackTrace();
-        fail();
       }
     }
 

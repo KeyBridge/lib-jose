@@ -15,16 +15,16 @@
  */
 package org.ietf.jose.jwe.encryption;
 
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.util.Arrays;
-import javax.crypto.BadPaddingException;
+import org.ietf.jose.util.SecureRandomUtility;
+
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import org.ietf.jose.util.SecureRandomUtility;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.util.Arrays;
 
 /**
  * A (default) content encrypter implementation that uses AES as the block
@@ -116,11 +116,7 @@ public class DefaultEncrypter implements Encrypter {
 
     Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
     cipher.init(Cipher.DECRYPT_MODE, generateEncryptionKey(key), new IvParameterSpec(iv));
-    try {
-      return cipher.doFinal(ciphertext);
-    } catch (BadPaddingException e) {
-      return null;
-    }
+    return cipher.doFinal(ciphertext);
   }
 
   private byte[] calculateAuthenticationTag(byte[] ciphertext, byte[] aad, byte[] iv, Key key) throws
@@ -216,5 +212,10 @@ public class DefaultEncrypter implements Encrypter {
       JCE_MAC_ALG = jce_mac_alg;
       T_LEN = t_LEN;
     }
+  }
+
+  @Override
+  public String getSecretKeyAlgorithm() {
+    return SECRET_KEY_ALGORITHM;
   }
 }

@@ -15,17 +15,16 @@
  */
 package org.ietf.jose.jwe;
 
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
+import org.ietf.jose.util.KeyUtility;
+
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
-import org.ietf.jose.jwa.JweKeyAlgorithmType;
-import org.ietf.jose.util.Base64Utility;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.ietf.jose.util.Base64Utility.toBase64Url;
 
 /**
  * RFC 7516
@@ -74,17 +73,6 @@ public class JweBuilder {
   }
 
   /**
-   * Create an AES secret key instance from a Base64URL encoded string
-   *
-   * @param base64UrlEncodedSecret base64URL-encoded bytes of the secret
-   * @return a SecretKey instance
-   */
-  public static SecretKey createSecretKey(String base64UrlEncodedSecret) {
-    byte[] secretBytes = Base64Utility.fromBase64Url(base64UrlEncodedSecret);
-    return new SecretKeySpec(secretBytes, "AES");
-  }
-
-  /**
    * Resolve the Key Management algorithm from the SecretKey length (16, 24, or
    * 32). This only applies for symmetric encryption (wrapping) of encryption
    * keys.
@@ -123,7 +111,7 @@ public class JweBuilder {
    * @return this builder
    */
   public JweBuilder withStringPayload(String payload) {
-    this.payload = toBase64Url(payload).getBytes(US_ASCII);
+    this.payload = payload.getBytes(US_ASCII);
     return this;
   }
 
@@ -180,11 +168,11 @@ public class JweBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
-  public JweJsonFlattened buildJweJsonFlattened(PublicKey key) throws IOException, GeneralSecurityException {
+  public JsonWebEncryption buildJweJsonFlattened(PublicKey key) throws IOException, GeneralSecurityException {
     if (keyMgmtAlgo == null) {
       keyMgmtAlgo = KEY_MGMT_ALGO_ASYM;
     }
-    return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
+    return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
                                         protectedHeader, unprotectedHeader);
   }
 
@@ -197,9 +185,9 @@ public class JweBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
-  public JweJsonFlattened buildJweJsonFlattened(SecretKey key) throws IOException, GeneralSecurityException {
+  public JsonWebEncryption buildJweJsonFlattened(SecretKey key) throws IOException, GeneralSecurityException {
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
-    return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
+    return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
                                         protectedHeader, unprotectedHeader);
   }
 
@@ -212,9 +200,10 @@ public class JweBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
-  public JweJsonFlattened buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException, GeneralSecurityException {
-    SecretKey key = createSecretKey(base64UrlEncodedSecret);
+  public JsonWebEncryption buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException,
+      GeneralSecurityException {
+    SecretKey key = KeyUtility.convertBase64UrlSecretToKey("AES", base64UrlEncodedSecret);
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
-    return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);
+    return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);
   }
 }

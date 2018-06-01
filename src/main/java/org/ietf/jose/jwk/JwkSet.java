@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +15,12 @@
  */
 package org.ietf.jose.jwk;
 
-import java.util.List;
+import lombok.Data;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import java.util.List;
 
 /**
  * RFC 7517 JSON Web Key (JWK)
@@ -43,6 +45,7 @@ import javax.xml.bind.annotation.XmlElement;
  * values that are not understood by them, that are missing required members, or
  * for which values are out of the supported ranges.
  */
+@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JwkSet {
 
@@ -55,31 +58,5 @@ public class JwkSet {
    * assign a meaning to the order for their purposes, if desired.
    */
   @XmlElement(required = true)
-  List<? extends JWK> keys;
-
-  @Override
-  public String toString() {
-    return "JWKSet{"
-      + "keys=" + keys
-      + '}';
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    JwkSet jwkSet = (JwkSet) o;
-
-    return keys != null ? keys.equals(jwkSet.keys) : jwkSet.keys == null;
-  }
-
-  @Override
-  public int hashCode() {
-    return keys != null ? keys.hashCode() : 0;
-  }
+  private List<? extends JsonWebKey> keys;
 }

@@ -1,4 +1,4 @@
-
+<pre>
 Internet Engineering Task Force (IETF)                          M. Jones
 Request for Comments: 7515                                     Microsoft
 Category: Standards Track                                     J. Bradley
@@ -94,3 +94,4 @@ ISSN: 2070-1721                                            Ping Identity
    "signatures" array (the "protected", "header", and "signature"
    members) in the top-level JSON object (at the same level as the
    "payload" member).
+</pre>

@@ -15,9 +15,13 @@
  */
 package org.ietf.jose.jws;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.ietf.jose.jwk.JsonWebKey;
+
 import java.net.URI;
 import java.util.List;
-import org.ietf.jose.jwk.JWK;
 
 /**
  * RFC 7515 JSON Web Signature (JWS)
@@ -40,6 +44,9 @@ import org.ietf.jose.jwk.JWK;
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 02/01/2018
  */
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Data
 public class JwsHeader extends AbstractHeader {
 
   /**
@@ -63,7 +70,7 @@ public class JwsHeader extends AbstractHeader {
    * represented as a JSON Web Key [JWK]. Use of this Header Parameter is
    * OPTIONAL.
    */
-  protected JWK jwk;
+  protected JsonWebKey jwk;
   /**
    * 4.1.9. "typ" (Type) Header Parameter
    * <p>
@@ -153,95 +160,4 @@ public class JwsHeader extends AbstractHeader {
    * </pre>
    */
   protected List<String> crit;
-
-  public URI getJku() {
-    return jku;
-  }
-
-  public void setJku(URI jku) {
-    this.jku = jku;
-  }
-
-  public JWK getJwk() {
-    return jwk;
-  }
-
-  public void setJwk(JWK jwk) {
-    this.jwk = jwk;
-  }
-
-  public List<String> getCrit() {
-    return crit;
-  }
-
-  public void setCrit(List<String> crit) {
-    this.crit = crit;
-  }
-
-  public String getCty() {
-    return cty;
-  }
-
-  public void setCty(String cty) {
-    this.cty = cty;
-  }
-
-  public String getTyp() {
-    return typ;
-  }
-
-  public void setTyp(String typ) {
-    this.typ = typ;
-  }
-
-  @Override
-  public String toString() {
-    return "JoseCryptoHeader{"
-      + "jku=" + jku
-      + ", jwk=" + jwk
-      + ", typ='" + typ + '\''
-      + ", cty='" + cty + '\''
-      + ", crit=" + crit
-      + '}';
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
-      return false;
-    }
-
-    JwsHeader header = (JwsHeader) o;
-
-    if (jku != null ? !jku.equals(header.jku) : header.jku != null) {
-      return false;
-    }
-    if (jwk != null ? !jwk.equals(header.jwk) : header.jwk != null) {
-      return false;
-    }
-    if (typ != null ? !typ.equals(header.typ) : header.typ != null) {
-      return false;
-    }
-    if (cty != null ? !cty.equals(header.cty) : header.cty != null) {
-      return false;
-    }
-    return crit != null ? crit.equals(header.crit) : header.crit == null;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (jku != null ? jku.hashCode() : 0);
-    result = 31 * result + (jwk != null ? jwk.hashCode() : 0);
-    result = 31 * result + (typ != null ? typ.hashCode() : 0);
-    result = 31 * result + (cty != null ? cty.hashCode() : 0);
-    result = 31 * result + (crit != null ? crit.hashCode() : 0);
-    return result;
-  }
 }

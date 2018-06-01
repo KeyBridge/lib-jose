@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,7 +18,7 @@ public class JwtClaimTest {
 
   @Test
   public void equals() throws IOException {
-    JwtClaim claim = new JwtClaim();
+    JwtClaims claim = new JwtClaims();
     claim.setAudience("someAudience");
     ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
     claim.setIssuedAt(now.toInstant());
@@ -25,8 +26,23 @@ public class JwtClaimTest {
     claim.setExpirationTime(now.plusHours(2).toInstant());
 
     String json = JsonMarshaller.toJson(claim);
+    String jsonDirect = claim.toJson();
     System.out.println(json);
+    assertEquals(json, jsonDirect);
 
-    assertEquals(claim, JsonMarshaller.fromJson(json, JwtClaim.class));
+    assertEquals(claim, JsonMarshaller.fromJson(json, JwtClaims.class));
+    assertEquals(claim, JwtClaims.fromJson(json));
+  }
+
+  @Test
+  public void testCustomClaims() throws IOException {
+    JwtClaims claims = new JwtClaims();
+    claims.addClaim("email", "foo@bar.com");
+    claims.addClaim("friends", Arrays.asList("John", "Jack", "Jeremy"));
+
+    String json = claims.toJson();
+    System.out.println(json);
+    JwtClaims deserialized = JwtClaims.fromJson(json);
+    assertEquals(claims, deserialized);
   }
 }
