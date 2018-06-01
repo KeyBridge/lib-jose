@@ -47,14 +47,14 @@ PublicKey recipientPublicKey = ...
 // the signature key ID to be written as the 'kid' (key ID) field of the JWS protected header. Can be null.
 String keyId = ... 
 
-// SignAndEncrypt.write produces a a valid JSON string if the operation is successful; null in case of failure
+// SignAndEncrypt.write produces a a valid JSON string; null on error
 String json = JOSE.SignAndEncrypt.write(sampleText, 
                                         senderPrivateKey, 
                                         recipientPublicKey, 
                                         keyId);
 ```
 
-The signed and encrypted JSON output looks like:
+The signed and encrypted JSON output looks like (formatted for readability):
 
 ```javascript
 {"protected":"eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0",
