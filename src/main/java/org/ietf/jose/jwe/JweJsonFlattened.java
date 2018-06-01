@@ -19,6 +19,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.adapter.XmlAdapterJweHeader;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwe.encryption.EncryptionResult;
@@ -62,6 +63,7 @@ public class JweJsonFlattened extends JsonSerializable {
    * Integrity-protected header contents
    */
   @XmlElement(name = "protected", required = true)
+  @XmlJavaTypeAdapter(type = JweHeader.class, value = XmlAdapterJweHeader.class)
   private JweHeader protectedHeader;
   /**
    * Non-integrity-protected header contents

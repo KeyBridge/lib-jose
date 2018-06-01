@@ -18,6 +18,7 @@ package org.ietf.jose.jws;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.adapter.XmlAdapterJwsHeader;
 import org.ietf.jose.util.Base64Utility;
 import org.ietf.jose.util.JsonMarshaller;
 
@@ -113,6 +114,7 @@ public class GeneralJsonSignature extends JsonSerializable {
    * are integrity protected.
    */
   @XmlElement(name = "protected")
+  @XmlJavaTypeAdapter(type = JwsHeader.class, value = XmlAdapterJwsHeader.class)
   private JwsHeader protectedHeader;
   /**
    * The "header" member MUST be present and contain the value JWS Unprotected
@@ -200,10 +202,8 @@ public class GeneralJsonSignature extends JsonSerializable {
     return jws;
   }
 
-  private static byte[] createSignatureInput(JwsFrame frame) throws IOException {
-    String protectedHeaderJson = JsonMarshaller.toJson(frame.protectedHeader);
-    String protectedHeaderJsonBase64Url = Base64Utility.toBase64Url(protectedHeaderJson);
-    String signingInputString = protectedHeaderJsonBase64Url + '.' + frame.payload;
+  private static byte[] createSignatureInput(JwsFrame frame) {
+    String signingInputString = frame.protectedHeaderJsonBase64Url + '.' + frame.payload;
     return signingInputString.getBytes(StandardCharsets.US_ASCII);
   }
 
@@ -314,7 +314,8 @@ public class GeneralJsonSignature extends JsonSerializable {
   private static final class JwsFrame {
     String payload;
     @XmlElement(name = "protected")
-    Map<String, String> protectedHeader;
+    String protectedHeaderJsonBase64Url;
+    Map<String, String> header;
     String signature;
     List<JwsFrame> signatures;
   }

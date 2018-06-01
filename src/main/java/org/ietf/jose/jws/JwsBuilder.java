@@ -35,32 +35,6 @@ import java.util.List;
  */
 public class JwsBuilder {
 
-  /**
-   * The JWS payload.
-   */
-  private byte[] payload;
-  /**
-   * The "signature" member MUST be present and contain the value BASE64URL(JWS
-   * Signature).
-   */
-  private List<Signature> signatures = new ArrayList<>();
-
-  /**
-   * The "protected" member MUST be present and contain the value
-   * BASE64URL(UTF8(JWS Protected Header)) when the JWS Protected Header value
-   * is non-empty; otherwise, it MUST be absent. These Header Parameter values
-   * are integrity protected.
-   */
-  private JwsHeader protectedHeader;
-  /**
-   * The "header" member MUST be present and contain the value JWS Unprotected
-   * Header when the JWS Unprotected Header value is non- empty; otherwise, it
-   * MUST be absent. This value is represented as an unencoded JSON object,
-   * rather than as a string. These Header Parameter values are not integrity
-   * protected.
-   */
-  private JwsHeader header;
-
   private JwsBuilder() {
   }
 
@@ -79,9 +53,8 @@ public class JwsBuilder {
    * @param payload data to sign
    * @return this builder
    */
-  public JwsBuilder withBinaryPayload(byte[] payload) {
-    this.payload = payload;
-    return this;
+  public Signable withBinaryPayload(byte[] payload) {
+    return Signable.getInstance(payload);
   }
 
   /**
@@ -90,104 +63,142 @@ public class JwsBuilder {
    * @param payload string to sign
    * @return this builder
    */
-  public JwsBuilder withStringPayload(String payload) {
-    this.payload = payload.getBytes(Base64Utility.DEFAULT_CHARSET);
-    return this;
+  public Signable withStringPayload(String payload) {
+    byte[] payloadBytes = payload.getBytes(Base64Utility.DEFAULT_CHARSET);
+    return Signable.getInstance(payloadBytes);
   }
 
-  /**
-   * Add a protected header
-   *
-   * @param header a JwsHeader instance
-   * @return this builder
-   */
-  public JwsBuilder withProtectedHeader(JwsHeader header) {
-    this.protectedHeader = header;
-    return this;
-  }
+  public static class Signable {
 
-  /**
-   * Add an unprotected header
-   *
-   * @param header a JwsHeader instance
-   * @return this builder
-   */
-  public JwsBuilder withHeader(JwsHeader header) {
-    this.header = header;
-    return this;
-  }
+    /**
+     * The JWS payload.
+     */
+    private byte[] payload;
+    /**
+     * The "signature" member MUST be present and contain the value BASE64URL(JWS
+     * Signature).
+     */
+    private List<Signature> signatures = new ArrayList<>();
 
-  /**
-   * Sign using a JWK
-   *
-   * @param key a JWK instance
-   * @return this builder
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to sign
-   */
-  public JwsBuilder sign(JWK key, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
-    this.signatures.add(Signature.getInstance(payload, key, algorithm));
-    return this;
-  }
+    /**
+     * The "protected" member MUST be present and contain the value
+     * BASE64URL(UTF8(JWS Protected Header)) when the JWS Protected Header value
+     * is non-empty; otherwise, it MUST be absent. These Header Parameter values
+     * are integrity protected.
+     */
+    private JwsHeader protectedHeader;
+    /**
+     * The "header" member MUST be present and contain the value JWS Unprotected
+     * Header when the JWS Unprotected Header value is non- empty; otherwise, it
+     * MUST be absent. This value is represented as an unencoded JSON object,
+     * rather than as a string. These Header Parameter values are not integrity
+     * protected.
+     */
+    private JwsHeader header;
 
-  /**
-   * Sign using a Key instance and specific algorithm
-   *
-   * @param key       Key instance (either a PrivateKey or a SecretKey)
-   * @param algorithm a signature algorithm suitable for the provided key
-   * @param keyId     a key ID which is put in the protected header's 'kid' field
-   * @return this builder
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to sign
-   */
-  public JwsBuilder sign(Key key, JwsAlgorithmType algorithm, String keyId) throws IOException,
-      GeneralSecurityException {
-    if (protectedHeader == null) {
-      this.protectedHeader = new JwsHeader();
+    private Signable() {
     }
-    this.protectedHeader.setKid(keyId);
-    this.protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
-    this.signatures.add(Signature.getInstance(payload, key, protectedHeader, header));
-    return this;
-  }
 
-  /**
-   * Sign with a keyed hash (HMAC)
-   *
-   * @param secret    a base64URL-encoded secret (e.g. a passphrase)
-   * @param algorithm a signature algorithm suitable for the provided key
-   * @param keyId     a key ID which is put in the protected header's 'kid' field
-   * @return this builder
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to sign
-   */
-  public JwsBuilder sign(String secret, JwsAlgorithmType algorithm, String keyId) throws IOException,
-      GeneralSecurityException {
-    SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(secret), algorithm.getJavaAlgorithmName());
-    return sign(key, algorithm, keyId);
-  }
+    public static Signable getInstance(byte[] payload) {
+      Signable builder = new Signable();
+      builder.payload = payload;
+      return builder;
+    }
 
-  /**
-   * Build a GeneralJsonSignature instance: A GeneralJsonSignature object with
-   * one or more signatures
-   *
-   * @return a GeneralJsonSignature instance
-   */
-  public GeneralJsonSignature buildJsonGeneral() {
-    return new GeneralJsonSignature(payload, signatures);
-  }
+    /**
+     * Add a protected header
+     *
+     * @param header a JwsHeader instance
+     * @return this builder
+     */
+    public Signable withProtectedHeader(JwsHeader header) {
+      this.protectedHeader = header;
+      return this;
+    }
 
-  /**
-   * Build a GeneralJsonSignature compact string: a string which contains the
-   * payload and a single signature.
-   *
-   * @return a GeneralJsonSignature compact string
-   * @throws java.io.IOException on error
-   */
-  public String buildCompact() throws IOException {
-    return buildJsonGeneral().getCompactForm();
+    /**
+     * Add an unprotected header
+     *
+     * @param header a JwsHeader instance
+     * @return this builder
+     */
+    public Signable withHeader(JwsHeader header) {
+      this.header = header;
+      return this;
+    }
+
+    /**
+     * Sign using a JWK
+     *
+     * @param key a JWK instance
+     * @return this builder
+     * @throws IOException              in case of failure to serialise the
+     *                                  protected header to JSON
+     * @throws GeneralSecurityException in case of failure to sign
+     */
+    public Signable sign(JWK key, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
+      this.signatures.add(Signature.getInstance(payload, key, algorithm));
+      return this;
+    }
+
+    /**
+     * Sign using a Key instance and specific algorithm
+     *
+     * @param key       Key instance (either a PrivateKey or a SecretKey)
+     * @param algorithm a signature algorithm suitable for the provided key
+     * @param keyId     a key ID which is put in the protected header's 'kid' field
+     * @return this builder
+     * @throws IOException              in case of failure to serialise the
+     *                                  protected header to JSON
+     * @throws GeneralSecurityException in case of failure to sign
+     */
+    public Signable sign(Key key, JwsAlgorithmType algorithm, String keyId) throws IOException,
+        GeneralSecurityException {
+      if (protectedHeader == null) {
+        this.protectedHeader = new JwsHeader();
+      }
+      this.protectedHeader.setKid(keyId);
+      this.protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
+      this.signatures.add(Signature.getInstance(payload, key, protectedHeader, header));
+      return this;
+    }
+
+    /**
+     * Sign with a keyed hash (HMAC)
+     *
+     * @param secret    a base64URL-encoded secret (e.g. a passphrase)
+     * @param algorithm a signature algorithm suitable for the provided key
+     * @param keyId     a key ID which is put in the protected header's 'kid' field
+     * @return this builder
+     * @throws IOException              in case of failure to serialise the
+     *                                  protected header to JSON
+     * @throws GeneralSecurityException in case of failure to sign
+     */
+    public Signable sign(String secret, JwsAlgorithmType algorithm, String keyId) throws IOException,
+        GeneralSecurityException {
+      SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(secret), algorithm.getJavaAlgorithmName());
+      return sign(key, algorithm, keyId);
+    }
+
+    /**
+     * Build a GeneralJsonSignature instance: A GeneralJsonSignature object with
+     * one or more signatures
+     *
+     * @return a GeneralJsonSignature instance
+     */
+    public GeneralJsonSignature buildJsonGeneral() {
+      return new GeneralJsonSignature(payload, signatures);
+    }
+
+    /**
+     * Build a GeneralJsonSignature compact string: a string which contains the
+     * payload and a single signature.
+     *
+     * @return a GeneralJsonSignature compact string
+     * @throws java.io.IOException on error
+     */
+    public String buildCompact() throws IOException {
+      return buildJsonGeneral().getCompactForm();
+    }
   }
 }

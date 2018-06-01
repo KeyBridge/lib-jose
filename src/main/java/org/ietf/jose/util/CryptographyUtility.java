@@ -19,6 +19,7 @@ import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JWK;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
+import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.jwk.key.SymmetricJwk;
 
 import javax.crypto.Cipher;
@@ -230,15 +231,15 @@ public class CryptographyUtility {
   public static byte[] sign(byte[] payloadBytes, JWK jwk, JwsAlgorithmType algorithm) throws GeneralSecurityException {
     if (jwk instanceof SymmetricJwk) {
       SymmetricJwk symmetricKey = (SymmetricJwk) jwk;
-      return sign(payloadBytes, new SecretKeySpec(symmetricKey.getK(), algorithm.getJavaAlgorithmName()), algorithm
-                  .getJavaAlgorithmName());
+      String jcaAlgorithm = algorithm.getJavaAlgorithmName();
+      return sign(payloadBytes, new SecretKeySpec(symmetricKey.getK(), jcaAlgorithm), jcaAlgorithm);
     } else if (jwk instanceof RsaPrivateJwk) {
       RsaPrivateJwk rsaKey = (RsaPrivateJwk) jwk;
       return sign(payloadBytes, rsaKey.getPrivateKey(), algorithm.getJavaAlgorithmName());
     } else if (jwk instanceof EllipticCurveJwk) {
       throw new UnsupportedOperationException("Elliptic curve keys are not supported");
     }
-    return null;
+    throw new UnsupportedOperationException("Unsupported key type " + jwk.getClass().getCanonicalName());
   }
 
   /**
@@ -257,6 +258,29 @@ public class CryptographyUtility {
       return validate(signature, payload, (SecretKey) key, algorithm);
     } else if (key instanceof PublicKey) {
       return validate(signature, payload, (PublicKey) key, algorithm);
+    }
+    return false;
+  }
+
+  /**
+   * Validate digital signature of a keyed message authentication code (HMAC) using a JSON Web Key
+   *
+   * @param signature signature bytes
+   * @param payload   data used to create the signature
+   * @param jwk       a valid JWK
+   * @param algorithm JCA algorithm
+   * @return
+   * @throws GeneralSecurityException in case of failure
+   */
+  public static boolean validateSignature(byte[] signature, byte[] payload, JWK jwk, String algorithm) throws
+      GeneralSecurityException {
+    if (jwk instanceof SymmetricJwk) {
+      SymmetricJwk symmetricKey = (SymmetricJwk) jwk;
+      SecretKey key = new SecretKeySpec(symmetricKey.getK(), algorithm);
+      return validate(signature, payload, key, algorithm);
+    } else if (jwk instanceof RsaPublicJwk) {
+      RsaPublicJwk key = (RsaPublicJwk) jwk;
+      return validate(signature, payload, key.getPublicKey(), algorithm);
     }
     return false;
   }

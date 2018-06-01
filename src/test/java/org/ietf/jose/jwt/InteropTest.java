@@ -25,9 +25,7 @@ import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.junit.Test;
 
 import javax.crypto.SecretKey;
-import java.io.IOException;
 import java.io.StringWriter;
-import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.time.Instant;
@@ -139,9 +137,9 @@ public class InteropTest {
 
     String joseClaimsJson = joseClaims.toJson();
     System.out.println("lib-jose Claims:" + joseClaimsJson);
-    JwsBuilder builder = JwsBuilder.getInstance()
-        .withStringPayload(claims.toJson())
-        .sign(kp.getPrivate(), JwsAlgorithmType.RS256, "k1");
+//    JwsBuilder builder = JwsBuilder.getInstance()
+//        .withStringPayload(claims.toJson())
+//        .sign(kp.getPrivate(), JwsAlgorithmType.RS256, "k1");
 
     org.jose4j.jwt.JwtClaims jwtClaims2 = jwtConsumer.processToClaims(jwt);
     System.out.println("JWT validation succeeded! " + jwtClaims2);
@@ -198,7 +196,7 @@ public class InteropTest {
   }
 
   @Test
-  public void jwtSignedWithRsaJwk() throws IOException, GeneralSecurityException {
+  public void jwtSignedWithRsaJwk() throws Exception {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-public-key.json");
     JWK key = JsonMarshaller.fromJson(json, JWK.class);
     RsaPublicJwk rsaPublicJwk = (RsaPublicJwk) key;
@@ -208,25 +206,63 @@ public class InteropTest {
 
     JwtClaims claims = new JwtClaims()
         .setAudience("Quality assurance")
+        .setIssuer("tester")
         .setIssuedAt(Instant.now())
         .setExpirationTime(Instant.now().plus(5, ChronoUnit.MINUTES))
         .setJwtId(UUID.randomUUID().toString())
-        .setSubject("Tester")
+        .setSubject("Test")
         .addClaim("email", "foo@bar.com");
 
     String claimJson = claims.toJson();
 
-    JwsBuilder jwsBuilder = JwsBuilder.getInstance()
+    String signedJwtCompact = JwsBuilder.getInstance()
         .withStringPayload(claimJson)
-        .sign(rsaPrivateJwk, JwsAlgorithmType.RS256);
+        .sign(rsaPrivateJwk, JwsAlgorithmType.RS256)
+        .buildCompact();
 
-    String signedJwt = jwsBuilder.buildCompact();
-
-    GeneralJsonSignature jwsDecoded = GeneralJsonSignature.fromCompactForm(signedJwt);
+    GeneralJsonSignature jwsDecoded = GeneralJsonSignature.fromCompactForm(signedJwtCompact);
     assertEquals(1, jwsDecoded.getSignatures().size());
 
     assertTrue(SignatureValidator.isValid(jwsDecoded.getSignatures().get(0), rsaPublicJwk.getPublicKey()));
 
+
+    // Verify signature using jose4j
+
+    // Create a new JsonWebSignature object
+    JsonWebSignature jws = new JsonWebSignature();
+
+    // Set the algorithm constraints based on what is agreed upon or expected from the sender
+    jws.setAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST,
+        AlgorithmIdentifiers.RSA_USING_SHA256));
+
+    // Set the compact serialization on the JWS
+    jws.setCompactSerialization(signedJwtCompact);
+
+    jws.setKey(rsaPublicJwk.getPublicKey());
+    jws.verifySignature();
+
+    assertEquals(claimJson, jws.getPayload());
+
+    // Use JwtConsumerBuilder to construct an appropriate JwtConsumer, which will
+    // be used to validate and process the JWT.
+    // The specific validation requirements for a JWT are context dependent, however,
+    // it typically advisable to require a (reasonable) expiration time, a trusted issuer, and
+    // and audience that identifies your system as the intended recipient.
+    // If the JWT is encrypted too, you need only provide a decryption key or
+    // decryption key resolver to the builder.
+    JwtConsumer jwtConsumer = new JwtConsumerBuilder()
+        .setRequireExpirationTime() // the JWT must have an expiration time
+        .setRequireSubject() // the JWT must have a subject claim
+        .setExpectedIssuer("tester") // whom the JWT needs to have been issued by
+        .setExpectedAudience("Quality assurance") // to whom the JWT is intended for
+        .setVerificationKey(rsaPublicJwk.getPublicKey()) // verify the signature with the public key
+        .setJwsAlgorithmConstraints( // only allow the expected signature algorithm(s) in the given context
+            new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST, // which is only RS256 here
+                AlgorithmIdentifiers.RSA_USING_SHA256))
+        .build();
+
+    org.jose4j.jwt.JwtClaims jwtClaimsDecodedByJose4j = jwtConsumer.processToClaims(signedJwtCompact);
+    assertEquals(claims.getJwtId(), jwtClaimsDecodedByJose4j.getJwtId());
   }
 
   @Test

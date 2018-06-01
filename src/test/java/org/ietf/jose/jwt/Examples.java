@@ -78,7 +78,7 @@ public class Examples {
     /**
      * Create a JSON Web Signature with the serialized JWT Claims as payload.
      */
-    JwsBuilder jwsBuilder = JwsBuilder.getInstance()
+    JwsBuilder.Signable jwsBuilder = JwsBuilder.getInstance()
         .withStringPayload(joseClaimsJson)
         // sign it with our private key
         .sign(keyPair.getPrivate(), JwsAlgorithmType.RS256, keyId);
