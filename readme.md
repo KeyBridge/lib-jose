@@ -37,19 +37,26 @@ See the [Java Cryptography Architecture (JCA) Documentation](https://docs.oracle
 
 ```java
 String sampleText = "sample text to sign and encrypt";
-String signedAndEcryptedText = JOSE.write(sampleText, senderPrivateKey, recipientPublicKey, "myKeyId");
+
+privateKey = ... // sender's PrivateKey (for digital signing)
+recipientPublicKey = ... // recipient's PublicKey (for encryption)
+
+String json = JOSE.SignAndEncrypt.write(sampleText, senderPrivateKey, recipientPublicKey, "myKeyId");
 ```
 
-**Encryption and signing**
+**Signed and encrypted output in JSON form**
 
-```json
-{"protected":{"alg":"RSA1_5","kid":"myKeyId","enc":"A128CBC-HS256"},"encrypted_key":"jgz9i1TlyMINzo33qbdyjiNfYFx_hGWZXl9jwfHPwnsNze9usppOtuIgNFde8z0BHuJTDZz7TN7Ogi0ZmTnUV2NGlMxX9MbU1ZcqaIhx9ODJbQ7r61ow10pAZpHJOdPWNlGf06fsUhRsteZH-fbR978FM67_7T_K1aaIcZhW1zKkyXNSiUFMjPi66MtGjqH1gb72CCerq_GyI-BrD_A1XCj2DF78-b6h475LerWxEJGXaZs_48EJwB4zvMp3fK0xygg4BPFjJO0xSUVqqmz70w0W4sOKc5V7_JmvTMXoSuuuKHwuGq9r77p0eKUnr5U0DzMUKqTlxRsMtoNcT0OLtQ","iv":"Nn9CsSi0-tacUZEQ-vDC0w","ciphertext":"GYYpUaQwnV1jNDmwOTpQ6k3P5iCMMSju2x462YMiQsmboKnDMfxn-948Rs17SKwI4NGH8kB0zXVEDiiBSPEZnfcntt42txlFcFLwA7zzv1dj5tMUhQZoa3WvffMhugsOwmammM9FwKEq9Gi6U06JXSV8e9DmyvFRfGnNSnVgMO97P7_63tMpqiAjJJsqVfxdTgUj8rP0UV8V-QkQaDon01wCnwDP436GniCXYdfmH0MM9ExNwrtQL3VFZCAxDz6ZkaHi4S93KGNYtCtSYFQ_Gpk9c_82Mxerb5aATaVx9dGSAQcK5OIzwYEDB-QH2jXjxd68Z9LV86UNRWkx-MmRSLC2qjywR0qsLcZh4lZedk1bRJK3rPkP1NsvV3F30b-Y2vWfoSKufTTMjOD2Z20GdkakZ1H1r1YjO9sXfqEses0VhP_rfNdfgk-9zqxgyu2z5HY88m4rDn5zZXP4wlSGwvymOTFm8FSSUP_k96Jk_61Xhcyo5kGuAccoMwzGPBYmnHNyAUQRDUdxNtAx5o-fXNR58YdMEPEoog7zBj9usJJmh74pYtYt9OBbWLEWW9SOM-z6zICWgW3mM9I8erDaRU1x3UNYRLuTwUZU6brrh9E_yPReajLXxEaWid46qjF926mOGv7OvTKnB43PshY8N7hYPQZCSj-Pvelb61uINuH8AsN6fQV-_s_Gs8qjVM1Cy7_F0pdSVLo14ehZlpZKe7xbOw51-TJLnPAExWGQqq2L-I_s_YRQoY_HpoL4HepMO90dlrr0reKw6N0scQAQGq23P-1EwJvH375l3bEW1gemJkf2a8Z_FOiuvmCw69kq","tag":"s66_5GYp9UecmT2G76y7jA","aad":"ZXlKaGJHY2lPaUpTVTBFeFh6VWlMQ0pyYVdRaU9pSnRlVXRsZVVsa0lpd2laVzVqSWpvaVFURXlPRU5DUXkxSVV6STFOaUo5"}
+```javascript
+{"protected":"eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0","encrypted_key":"Vb9FW86Z5J3Kbcg-05I8qy1ADmeqD2MBDK0_7RosUaEtWLEvBeqgGxfQxLI5acjlrZbtsulUVxcOsiMg37MHqjIHhglCyDV8bdV2X9BlcyLyxe2xHqqPxZAn5KlY9vDptdx7djvZvfWPxnK3qaMTY5YKOflkHqzu5CLrQjHuvxvkDsjxDjPcl6_evrCqYaeJ45h_qzTDVaOoqSl3Z6Fv0az39h0jocSBwF4aIw_WpN2RXF787NPZe9gPzhsWudwYED_-bNhCbPssjF87j9ErPe8n0jGywXGc4oPAIZ7Ju0op1fQ_MedHNmZ7jOJgEbr-MWR5SlgqnqIZj6l_NR7MOA","iv":"-mFR5g_xCQKwTBPwCkQgbQ","ciphertext":"2N8nxhH9WPdrdjb1Ma7B2K3XXLnj6PIqDawR347HeFQS7XY-UVVl6qgvQy0zlwF2mblEgJiHkMxNPjnLC8URQpY9GsHcGEiCk9SmrKNqyX24f4dnStJFUTfQgpF7GsxEyOu4NGSYr4tmr7vpycW_WDgFIbZz5ZLc1PTcjazdwY8xiKNH4Jd_tJvBoLi4vYOVH1OzF6hWFSRkTSjbYRRF87XnsJwGBKH-56g1_MuI5FxXM9wYjsMeJNJ5hudsB7SMsdYYspDLVnuJ_wTHgf-tv3pi5yJCzp95Ai4L7G7CjLyWJFmEhxwuksLSk379TjeNO7RoEJWMBk_PuQ0XSoyF5OGfEMmZ7LMp2oXd1T6ccm6jf1rcqAZQuVg3koQWCGuK3hrwrTx5fhVixnuLEUlc-fGCKJZAvyHjxIDunFAsTeE6vDNecieLsedM6cTaXZ-xrJioYJXLlNAsrLq3VGuZxwSSVwzibsZ-LMwfJhJHvEiiHBjLXiKODW49e4Lol7eMRqBS1oi-BOrTW3EWP-BzkbTG_sDQJUmtf6lIfTGyZP-xb_YFbKPBtNUMNCh91tRUGK7n4s35x_aeFt-y4EtROH00z39BE6KsFTcB5_HP7cOQxsYJQV8zk52YKicth4EL","tag":"0jVcl-qMfMvW5SywFIbqRg","aad":"ZXlKaGJHY2lPaUpTVTBFeFh6VWlMQ0psYm1NaU9pSkJNVEk0UTBKRExVaFRNalUySW4w"}
 ```
 
 **Decryption**
 
 ```java
-JOSE.read(json, String.class, base64UrlEncodedSecret);
+recipientPrivateKey = ... // recipient's PrivateKey (for decryption)
+senderPublicKey = ... // sender's PublicKey (for signature validation)
+
+String plaintext = JOSE.SignAndEncrypt.read(json, String.class, recipientPrivateKey, senderPublicKey);
 ```
 
 ## More examples
@@ -79,7 +86,3 @@ Copyright 2018 Key Bridge. Published under the Apache 2.0 license.
 
  * [jwt.io](https://jwt.io/) - a catalog of open source JWT implementations
  * [jose4j](https://bitbucket.org/b_c/jose4j/overview) another complete implementation in Java
-
-
-
-
