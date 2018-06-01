@@ -17,6 +17,9 @@ package org.ietf.jose.jwk;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
@@ -24,10 +27,6 @@ import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.jwk.key.SymmetricJwk;
 import org.ietf.jose.jws.AbstractHeader;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import java.util.List;
 
 /**
  * RFC-7517 JSON Web Key (JWK)
@@ -66,17 +65,10 @@ import java.util.List;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kty")
 @JsonSubTypes({
-<<<<<<< HEAD:src/main/java/org/ietf/jose/jwk/JWK.java
   @JsonSubTypes.Type(value = EllipticCurveJwk.class, name = "EC")
   , @JsonSubTypes.Type(value = RsaPublicJwk.class, name = "RSA")
   , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
   , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
-=======
-    @JsonSubTypes.Type(value = EllipticCurveJwk.class, name = "EC")
-    , @JsonSubTypes.Type(value = RsaPublicJwk.class, name = "RSA")
-    , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
-    , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
->>>>>>> 804b747accee030270c0ec3f47253914e3a38c69:src/main/java/org/ietf/jose/jwk/JsonWebKey.java
 )
 @EqualsAndHashCode(callSuper = true)
 @Data
