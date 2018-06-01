@@ -74,7 +74,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class JWK extends AbstractHeader {
+public abstract class JsonWebKey extends AbstractHeader {
 
   /**
    * 4.2. "use" (Public Key Use) Parameter

@@ -1,12 +1,16 @@
 package org.ietf.jose.jwe;
 
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
+import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.util.JsonMarshaller;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -26,12 +30,25 @@ public class Examples {
   }
 
   @Test
+  public void printKeysAsJwk() throws IOException {
+    RsaPrivateJwk jwkPrivateKey = RsaPrivateJwk.getInstance(keyPair, keyId);
+    System.out.println("Private key:");
+    System.out.println(JsonMarshaller.toJson(jwkPrivateKey));
+    System.out.println();
+
+    RsaPublicJwk jwkPublicKey = RsaPublicJwk.getInstance((RSAPublicKey) keyPair.getPublic());
+    System.out.println("Public key:");
+    System.out.println(JsonMarshaller.toJson(jwkPublicKey));
+    System.out.println();
+  }
+
+  @Test
   public void createConsumeAndValidateExample() throws Exception {
 
     /**
      * Create a JSON Web Encryption object with a string as payload
      */
-    JweJsonFlattened jwe = JweBuilder.getInstance()
+    JsonWebEncryption jwe = JweBuilder.getInstance()
         .withStringPayload("hi")
         // sign it with our private key and specify a random UUID as the key ID
         .buildJweJsonFlattened(keyPair.getPublic());
@@ -46,9 +63,9 @@ public class Examples {
      * Consume the JWE
      */
     // From compact form
-    JweJsonFlattened fromCompact = JweJsonFlattened.fromCompactForm(jweCompact);
+    JsonWebEncryption fromCompact = JsonWebEncryption.fromCompactForm(jweCompact);
     // From JSON Flattened form
-    JweJsonFlattened fromJson = JweJsonFlattened.fromJson(jwe.toJson());
+    JsonWebEncryption fromJson = JsonWebEncryption.fromJson(jwe.toJson());
 
     assertEquals(jwe, fromCompact);
     assertEquals(jwe, fromJson);

@@ -19,13 +19,14 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.jwk.JsonWebKey;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -96,6 +97,16 @@ public class Signature {
   private byte[] signature;
 
   /**
+   * JWS Signing Input
+   * <pre>
+   *        ASCII(BASE64URL(UTF8(JWS Protected Header)) || ’.’ ||
+   *        BASE64URL(JWS Payload))
+   * </pre>
+   */
+  @XmlTransient
+  byte[] jwsSigningInput;
+
+  /**
    * Create signature for the provided payload and JSON Web Key
    *
    * @param payload data to sign
@@ -105,10 +116,11 @@ public class Signature {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public static Signature getInstance(byte[] payload, JWK key) throws IOException, GeneralSecurityException {
+  public static Signature getInstance(byte[] payload, JsonWebKey key, JwsAlgorithmType algorithm) throws IOException,
+      GeneralSecurityException {
     Signature signature = new Signature();
     JwsHeader ph = new JwsHeader();
-    ph.setAlg(key.getAlg());
+    ph.setAlg(algorithm.getJoseAlgorithmName());
     ph.setX5c(key.getX5c());
     ph.setX5t(key.getX5t());
     ph.setX5tS256(key.getX5tS256());
@@ -117,10 +129,23 @@ public class Signature {
     signature.protectedHeader = ph;
     validateProtectedHeader(ph);
 
-    String protectedHeaderJson = JsonMarshaller.toJson(ph);
-    String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
-    signature.signature = CryptographyUtility.sign(fullPayload.getBytes(US_ASCII), key);
+    signature.jwsSigningInput = createJwsSigningInput(ph, payload);
+    signature.signature = CryptographyUtility.sign(signature.jwsSigningInput, key, algorithm);
     return signature;
+  }
+
+
+  /**
+   * JWS Signing Input
+   * <pre>
+   *        ASCII(BASE64URL(UTF8(JWS Protected Header)) || ’.’ ||
+   *        BASE64URL(JWS Payload))
+   * </pre>
+   */
+  private static byte[] createJwsSigningInput(JwsHeader protectedHeader, byte[] jwsPayload) throws IOException {
+    String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
+    String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(jwsPayload);
+    return fullPayload.getBytes(US_ASCII);
   }
 
   /**
@@ -131,9 +156,9 @@ public class Signature {
    *                        javax.crypto.SecretKey or java.security.PrivateKey
    * @param protectedHeader a JwsHeader that will be integrity-protected by the
    *                        signature
-   * @return JWS instance
-   * @throws IOException
-   * @throws GeneralSecurityException
+   * @return Signature instance
+   * @throws IOException in case of failure to serialize the protected header to JSON
+   * @throws GeneralSecurityException in case of failure to digitally sign or compute HMAC
    */
   public static Signature getInstance(byte[] payload, Key key, JwsHeader protectedHeader) throws IOException,
       GeneralSecurityException {
@@ -149,9 +174,9 @@ public class Signature {
    * @param protectedHeader   a JwsHeader that will be integrity-protected
    * @param unprotectedHeader a JwsHeader that will not be integrity-protected
    *                          by the signature
-   * @return JWS instance
-   * @throws IOException
-   * @throws GeneralSecurityException
+   * @return Signature instance
+   * @throws IOException in case of failure to serialize the protected header to JSON
+   * @throws GeneralSecurityException in case of failure to digitally sign or compute HMAC
    */
   public static Signature getInstance(byte[] payload, Key key, JwsHeader protectedHeader, JwsHeader
       unprotectedHeader) throws IOException, GeneralSecurityException {
@@ -159,12 +184,30 @@ public class Signature {
     Signature signature = new Signature();
     signature.protectedHeader = protectedHeader;
     signature.header = unprotectedHeader;
-    JwsAlgorithmType algorithm = protectedHeader.getJwsAlgorithmType();
+    signature.jwsSigningInput = createJwsSigningInput(protectedHeader, payload);
 
-    String protectedHeaderJson = JsonMarshaller.toJson(signature.protectedHeader);
-    String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(payload);
-    signature.signature = CryptographyUtility.sign(fullPayload.getBytes(US_ASCII), key, algorithm
-        .getJavaAlgorithmName());
+    signature.signature = CryptographyUtility.sign(signature.jwsSigningInput, key,
+        protectedHeader.getJwsAlgorithmType().getJavaAlgorithmName());
+    return signature;
+  }
+
+  /**
+   * Create signature for the provided payload, key, and headers
+   *
+   * @param signingInput      bytes used as input data when signing
+   * @param signatureBytes    bytes of the digital signature or HMAC
+   * @param protectedHeader   a JwsHeader that will be integrity-protected
+   * @param unprotectedHeader a JwsHeader that will not be integrity-protected
+   *                          by the signature
+   * @return Signature instance
+   */
+  static Signature getInstance(byte[] signingInput, byte[] signatureBytes, JwsHeader protectedHeader, JwsHeader
+      unprotectedHeader) {
+    Signature signature = new Signature();
+    signature.jwsSigningInput = signingInput;
+    signature.header = unprotectedHeader;
+    signature.protectedHeader = protectedHeader;
+    signature.signature = signatureBytes;
     return signature;
   }
 
@@ -177,24 +220,6 @@ public class Signature {
     if (protectedHeader.getKid() == null) {
       throw new IllegalArgumentException("The protected header must have a key ID ('kid' field) populated");
     }
-  }
-
-  /**
-   * Create instance using provided headers and signature bytes. Should be used
-   * only by classes within the library.
-   *
-   * @param protectedHeader   a JwsHeader instance
-   * @param unprotectedHeader a JwsHeader instance
-   * @param signatureBytes    signature or HMAC
-   * @return a JWS signature
-   */
-  static Signature getInstance(JwsHeader protectedHeader, JwsHeader unprotectedHeader, byte[] signatureBytes) {
-    validateProtectedHeader(protectedHeader);
-    Signature signature = new Signature();
-    signature.protectedHeader = protectedHeader;
-    signature.header = unprotectedHeader;
-    signature.signature = signatureBytes;
-    return signature;
   }
 
   /**
@@ -222,6 +247,18 @@ public class Signature {
    */
   public byte[] getSignatureBytes() {
     return signature;
+  }
+
+  /**
+   * Get the signing input bytes
+   *
+   * @return byte array
+   */
+  public byte[] getSigningInput() {
+    if (jwsSigningInput == null) {
+      throw new IllegalStateException("JWS Signing Input not available");
+    }
+    return jwsSigningInput;
   }
 
 }

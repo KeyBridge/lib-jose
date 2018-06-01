@@ -1,17 +1,19 @@
 package org.ietf.jose.jws;
 
 import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
+import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.util.JsonMarshaller;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Andrius Druzinis-Vitkus
@@ -28,45 +30,57 @@ public class Examples {
   }
 
   @Test
+  public void printKeysAsJwk() throws IOException {
+    RsaPrivateJwk jwkPrivateKey = RsaPrivateJwk.getInstance(keyPair, keyId);
+    System.out.println("Private key:");
+    System.out.println(JsonMarshaller.toJson(jwkPrivateKey));
+    System.out.println();
+
+    RsaPublicJwk jwkPublicKey = RsaPublicJwk.getInstance((RSAPublicKey) keyPair.getPublic());
+    System.out.println("Public key:");
+    System.out.println(JsonMarshaller.toJson(jwkPublicKey));
+    System.out.println();
+  }
+
+  @Test
   public void createConsumeAndValidateExample() throws Exception {
 
     /**
      * Create a JSON Web Signature with a string as payload
      */
-    JwsBuilder jwsBuilder = JwsBuilder.getInstance()
+    JwsBuilder.Signable jwsBuilder = JwsBuilder.getInstance()
         .withStringPayload("hi")
         // sign it with our private key and specify a random UUID as the key ID
         .sign(keyPair.getPrivate(), JwsAlgorithmType.RS256, keyId);
-    String jwsJsonFlattened = jwsBuilder.buildJsonFlattened().toJson();
-    String jwsJsonGeneral = jwsBuilder.buildJsonGeneral().toJson();
+    String jwsJsonGeneral = jwsBuilder.buildJsonWebSignature().toJson();
     String jwsCompact = jwsBuilder.buildCompact();
 
-    System.out.println("JWS JSON flattened:\n" + JsonMarshaller.toJsonPrettyFormatted(jwsBuilder.buildJsonFlattened()));
-    System.out.println();
-    System.out.println("JWS JSON general:\n" + JsonMarshaller.toJsonPrettyFormatted(jwsBuilder.buildJsonGeneral()));
+    System.out.println("JWS JSON general:\n" + JsonMarshaller.toJsonPrettyFormatted(jwsBuilder.buildJsonWebSignature
+        ()));
     System.out.println();
     System.out.println("JWS compact form:\n" + jwsCompact);
     System.out.println();
+
+
+    System.out.println("jwsJsonGeneral = " + jwsJsonGeneral);
 
     /**
      * Consume the JWS
      */
     // From compact form
-    FlattenedJsonSignature decodedFromCompactForm = FlattenedJsonSignature.fromCompactForm(jwsCompact);
-    // From JSON Flattened form
-    FlattenedJsonSignature decodedFromJsonFlattened = FlattenedJsonSignature.fromJson(jwsJsonFlattened);
+    JsonWebSignature decodedFromCompactForm = JsonWebSignature.fromCompactForm(jwsCompact);
     // From JSON General form
-    GeneralJsonSignature decodedFromJsonGeneral = GeneralJsonSignature.fromJson(jwsJsonGeneral);
+    JsonWebSignature decodedFromJson = JsonWebSignature.fromJson(jwsJsonGeneral);
 
-    assertEquals(jwsBuilder.buildJsonFlattened(), decodedFromCompactForm);
-    assertEquals(jwsBuilder.buildJsonFlattened(), decodedFromJsonFlattened);
-    assertEquals(jwsBuilder.buildJsonFlattened(), decodedFromJsonGeneral.toFlattened());
+    Assert.assertEquals(jwsBuilder.buildJsonWebSignature(), decodedFromCompactForm);
+    Assert.assertEquals(jwsBuilder.buildJsonWebSignature(), decodedFromJson);
 
     /**
      * Validate the JWT
      */
-    boolean isValid = SignatureValidator.isValid(decodedFromCompactForm, keyPair.getPublic());
-    assertTrue(isValid);
+    boolean isValid = SignatureValidator.isValid(decodedFromCompactForm.getSignatures().get(0), keyPair.getPublic());
+    Assert.assertTrue(isValid);
     System.out.println("JWS is valid: " + isValid);
   }
+
 }

@@ -4,16 +4,20 @@
 * [How to consume](#jwe-consume)
 * [How to verify](#jwe-verify)
 
+See the [unit test](https://github.com/KeyBridge/lib-jose/blob/master/src/test/java/org/ietf/jose/jwe/Examples.java) for a working example of the following code extracts. 
+
 ## <a name="jwe-create"></a> How to create a JSON Web Signature
 
 ```java
 /**
  * Create a JSON Web Encryption object with a string as payload
  */
-JweJsonFlattened jwe = JweBuilder.getInstance()
+publicKey = ... // the recipient's public key used for wrapping (encrypting) the randomly generated content encryption key. 
+
+JsonWebEncryption jwe = JweBuilder.getInstance()
     .withStringPayload("hi")
     // sign it with our private key and specify a random UUID as the key ID
-    .buildJweJsonFlattened(keyPair.getPublic());
+    .buildJweJsonFlattened(publicKey);
 String jweCompact = jwe.toCompactForm();
 
 System.out.println("JWE JSON flattened:\n" + JsonMarshaller.toJsonPrettyFormatted(jwe));
@@ -40,6 +44,8 @@ JWE JSON flattened:
 }
 ```
 
+The above output is pretty-formatted. By default the generated JSON is not pretty-formatted (that is, the output JSON not contain spaces or new line symbols between JSON tokens). 
+
 JWE compact form:
 
 ```
@@ -50,11 +56,9 @@ eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.CqB4JwpDDQ-9-lwcxGLFi-56uJAA
 
 ```java
 // From compact form
-FlattenedJsonSignature decodedFromCompactForm = FlattenedJsonSignature.fromCompactForm(jwsCompact);
+JsonWebEncryption fromCompact = JsonWebEncryption.fromCompactForm(jweCompact);
 // From JSON Flattened form
-FlattenedJsonSignature decodedFromJsonFlattened = FlattenedJsonSignature.fromJson(jwsJsonFlattened);
-// From JSON General form
-GeneralJsonSignature decodedFromJsonGeneral = GeneralJsonSignature.fromJson(jwsJsonGeneral);
+JsonWebEncryption fromJson = JsonWebEncryption.fromJson(jwe.toJson());
 ```
 
 ## <a name="jwe-verify"></a> How to verify a JSON Web Signature

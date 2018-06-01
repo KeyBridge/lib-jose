@@ -18,7 +18,7 @@ package org.ietf.jose.jwk.key;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
-import org.ietf.jose.jwk.JWK;
+import org.ietf.jose.jwk.JsonWebKey;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -42,7 +42,7 @@ import java.security.spec.RSAPublicKeySpec;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RsaPublicJwk extends JWK {
+public class RsaPublicJwk extends JsonWebKey {
 
   /**
    * 6.3.1.1. "n" (Modulus) Parameter

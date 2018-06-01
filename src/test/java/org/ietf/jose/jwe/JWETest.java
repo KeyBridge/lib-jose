@@ -57,13 +57,13 @@ public class JWETest {
     generator.initialize(2048);
     KeyPair pair = generator.generateKeyPair();
 
-    JweJsonFlattened jwe = JweBuilder.getInstance()
+    JsonWebEncryption jwe = JweBuilder.getInstance()
       .withBinaryPayload(payload)
       .buildJweJsonFlattened(pair.getPublic());
 
     String compactForm = jwe.toCompactForm();
 
-    JweJsonFlattened fromCompact = JweJsonFlattened.fromCompactForm(compactForm);
+    JsonWebEncryption fromCompact = JsonWebEncryption.fromCompactForm(compactForm);
 
     assertEquals(jwe, fromCompact);
 
@@ -83,7 +83,7 @@ public class JWETest {
     generator.initialize(1024);
     KeyPair pair = generator.generateKeyPair();
 
-    JweJsonFlattened jwe = JweBuilder.getInstance()
+    JsonWebEncryption jwe = JweBuilder.getInstance()
       .withBinaryPayload(payload)
       .buildJweJsonFlattened(pair.getPublic());
 
@@ -96,22 +96,32 @@ public class JWETest {
 
   @Test
   public void encryptDecryptStringTest() throws Exception {
-    String payloadString = "some text to test with";
-    byte[] payload = toBase64Url(payloadString).getBytes(US_ASCII);
+    String stringPayload = "some text to test with";
+    byte[] binaryPayload = stringPayload.getBytes(StandardCharsets.UTF_8);
 
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
     generator.initialize(1024);
     KeyPair pair = generator.generateKeyPair();
 
-    JweJsonFlattened jwe = JweBuilder.getInstance()
-      .withBinaryPayload(payload)
+    JsonWebEncryption jwe = JweBuilder.getInstance()
+        .withStringPayload(stringPayload)
       .buildJweJsonFlattened(pair.getPublic());
 
     String decrypted = JweDecryptor.createFor(jwe)
         .decrypt(pair.getPrivate())
         .getAsString();
 
-    assertEquals(payloadString, decrypted);
+    assertEquals(stringPayload, decrypted);
+
+    jwe = JweBuilder.getInstance()
+        .withStringPayload(stringPayload)
+        .buildJweJsonFlattened(pair.getPublic());
+
+    byte[] decryptedBytes = JweDecryptor.createFor(jwe)
+        .decrypt(pair.getPrivate())
+        .getAsBytes();
+
+    assertArrayEquals(binaryPayload, decryptedBytes);
   }
 
   @Test

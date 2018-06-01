@@ -19,6 +19,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.adapter.XmlAdapterJweHeader;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwe.encryption.EncryptionResult;
@@ -56,12 +57,13 @@ import static org.ietf.jose.util.Base64Utility.*;
 @ToString
 @Getter
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JweJsonFlattened extends JsonSerializable {
+public class JsonWebEncryption extends JsonSerializable {
 
   /**
    * Integrity-protected header contents
    */
   @XmlElement(name = "protected", required = true)
+  @XmlJavaTypeAdapter(type = JweHeader.class, value = XmlAdapterJweHeader.class)
   private JweHeader protectedHeader;
   /**
    * Non-integrity-protected header contents
@@ -99,7 +101,7 @@ public class JweJsonFlattened extends JsonSerializable {
   @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] additionalAuthenticationData;
 
-  public JweJsonFlattened() {
+  public JsonWebEncryption() {
   }
 
   /**
@@ -121,13 +123,13 @@ public class JweJsonFlattened extends JsonSerializable {
    * @throws GeneralSecurityException thrown if requested algorithms are not
    *                                  available
    */
-  public static JweJsonFlattened getInstance(final byte[] payload,
-                                             final JweEncryptionAlgorithmType contentEnc,
-                                             JweKeyAlgorithmType keyMgmt,
-                                             Key key,
-                                             JweHeader protectedHeader,
-                                             JweHeader uprotected) throws IOException, GeneralSecurityException {
-    JweJsonFlattened jwe = new JweJsonFlattened();
+  public static JsonWebEncryption getInstance(final byte[] payload,
+                                              final JweEncryptionAlgorithmType contentEnc,
+                                              JweKeyAlgorithmType keyMgmt,
+                                              Key key,
+                                              JweHeader protectedHeader,
+                                              JweHeader uprotected) throws IOException, GeneralSecurityException {
+    JsonWebEncryption jwe = new JsonWebEncryption();
     /**
      * Populate the protected header with mandatory information on how the
      * content and the content encryption key are encrypted
@@ -159,8 +161,8 @@ public class JweJsonFlattened extends JsonSerializable {
    * @return a JweJsonFlattened instance
    * @throws IOException in case of failure to deserialise the JSON string
    */
-  public static JweJsonFlattened fromJson(String json) throws IOException {
-    return JsonMarshaller.fromJson(json, JweJsonFlattened.class);
+  public static JsonWebEncryption fromJson(String json) throws IOException {
+    return JsonMarshaller.fromJson(json, JsonWebEncryption.class);
   }
 
   /**
@@ -184,13 +186,13 @@ public class JweJsonFlattened extends JsonSerializable {
    * @throws IllegalArgumentException if the provided input is not a valid
    *                                  compact JWE string
    */
-  public static JweJsonFlattened fromCompactForm(String text) throws IOException {
+  public static JsonWebEncryption fromCompactForm(String text) throws IOException {
     StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
     if (tokenizer.countTokens() != 5) {
       throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string " +
           "has " + tokenizer.countTokens() + ".");
     }
-    JweJsonFlattened jwe = new JweJsonFlattened();
+    JsonWebEncryption jwe = new JsonWebEncryption();
     String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
     jwe.protectedHeader = JsonMarshaller.fromJson(protectedHeaderJson, JweHeader.class);
     jwe.encryptedKey = fromBase64Url(tokenizer.nextToken());

@@ -58,5 +58,5 @@ public class JwkSet {
    * assign a meaning to the order for their purposes, if desired.
    */
   @XmlElement(required = true)
-  private List<? extends JWK> keys;
+  private List<? extends JsonWebKey> keys;
 }

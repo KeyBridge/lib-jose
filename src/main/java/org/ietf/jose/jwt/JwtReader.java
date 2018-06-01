@@ -3,8 +3,8 @@ package org.ietf.jose.jwt;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.ietf.jose.jwe.JweJsonFlattened;
-import org.ietf.jose.jws.FlattenedJsonSignature;
+import org.ietf.jose.jwe.JsonWebEncryption;
+import org.ietf.jose.jws.JsonWebSignature;
 
 import java.io.IOException;
 
@@ -25,13 +25,21 @@ public class JwtReader {
    */
   private Type type;
   /**
-   * If signed, the jwsFlattenedObject field holds the value
+   * If signed, the jsonWebSignature field holds the value
    */
-  private FlattenedJsonSignature jwsFlattenedObject;
+  private JsonWebSignature jsonWebSignature;
   /**
-   * If encrypted, the jweFlattenedObject field holds the value
+   * If encrypted, the jsonWebEncryption field holds the value
    */
-  private JweJsonFlattened jweFlattenedObject;
+  private JsonWebEncryption jsonWebEncryption;
+
+  /**
+   * Private constructor because the class should be accessed via static readCompactForm method
+   *
+   * @see JwtReader#readCompactForm(String)
+   */
+  private JwtReader() {
+  }
 
   /**
    * Parse a JWT in a compact form string
@@ -42,13 +50,13 @@ public class JwtReader {
    * @throws IllegalArgumentException if the JWT (compact form) is not valid
    */
   public static JwtReader readCompactForm(String compactForm) throws IOException {
-    final int dots = coundDots(compactForm);
+    final int dots = countDots(compactForm);
     JwtReader jwt = new JwtReader();
     if (dots == 2) {
-      jwt.jwsFlattenedObject = FlattenedJsonSignature.fromCompactForm(compactForm);
+      jwt.jsonWebSignature = JsonWebSignature.fromCompactForm(compactForm);
       jwt.type = Type.Signed;
     } else if (dots == 4) {
-      jwt.jweFlattenedObject = JweJsonFlattened.fromCompactForm(compactForm);
+      jwt.jsonWebEncryption = JsonWebEncryption.fromCompactForm(compactForm);
       jwt.type = Type.Encrypted;
     } else {
       throw new IllegalArgumentException("Unable to parse JWT as JWS or JWE");
@@ -59,10 +67,10 @@ public class JwtReader {
   /**
    * Count how many dots there are in the token string
    *
-   * @param string
-   * @return
+   * @param string non-null string
+   * @return number of '.' symbol occurrences in the string
    */
-  private static int coundDots(String string) {
+  private static int countDots(String string) {
     int dots = 0;
     for (int i = 0; i < string.length(); i++) {
       if (string.charAt(i) == '.') dots++;

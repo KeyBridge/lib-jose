@@ -25,7 +25,6 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static org.ietf.jose.util.Base64Utility.toBase64Url;
 
 /**
  * RFC 7516
@@ -112,7 +111,7 @@ public class JweBuilder {
    * @return this builder
    */
   public JweBuilder withStringPayload(String payload) {
-    this.payload = toBase64Url(payload).getBytes(US_ASCII);
+    this.payload = payload.getBytes(US_ASCII);
     return this;
   }
 
@@ -169,11 +168,11 @@ public class JweBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
-  public JweJsonFlattened buildJweJsonFlattened(PublicKey key) throws IOException, GeneralSecurityException {
+  public JsonWebEncryption buildJweJsonFlattened(PublicKey key) throws IOException, GeneralSecurityException {
     if (keyMgmtAlgo == null) {
       keyMgmtAlgo = KEY_MGMT_ALGO_ASYM;
     }
-    return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
+    return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
                                         protectedHeader, unprotectedHeader);
   }
 
@@ -186,9 +185,9 @@ public class JweBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
-  public JweJsonFlattened buildJweJsonFlattened(SecretKey key) throws IOException, GeneralSecurityException {
+  public JsonWebEncryption buildJweJsonFlattened(SecretKey key) throws IOException, GeneralSecurityException {
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
-    return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
+    return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
                                         protectedHeader, unprotectedHeader);
   }
 
@@ -201,9 +200,10 @@ public class JweBuilder {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
-  public JweJsonFlattened buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException, GeneralSecurityException {
+  public JsonWebEncryption buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException,
+      GeneralSecurityException {
     SecretKey key = KeyUtility.convertBase64UrlSecretToKey("AES", base64UrlEncodedSecret);
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
-    return JweJsonFlattened.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);
+    return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);
   }
 }

@@ -21,8 +21,8 @@
  * Note the use of chained setters.
  */
 JwtClaims joseClaims = new JwtClaims()
-  .setIssuer("Issuer")
-  .setAudience("Audience");
+    .setIssuer("Issuer")
+    .setAudience("Audience");
 // Set the expiration time of this JWT to be two hours from now
 joseClaims.setExpirationTime(Instant.now().plus(2, ChronoUnit.HOURS));
 // A JWT must be processed on or after the Not Before values. Let's set this to one minute from now
@@ -54,7 +54,7 @@ System.out.println();
 /**
  * Create a JSON Web Signature with the serialized JWT Claims as payload.
  */
-JwsBuilder jwsBuilder = JwsBuilder.getInstance()
+JwsBuilder.Signable jwsBuilder = JwsBuilder.getInstance()
     .withStringPayload(joseClaimsJson)
     // sign it with our private key
     .sign(keyPair.getPrivate(), JwsAlgorithmType.RS256, keyId);
@@ -79,7 +79,7 @@ assertEquals(JwtReader.Type.Signed, jwtDecoded.getType());
 /**
  * In this instance we have a JWS.
  */
-FlattenedJsonSignature decodedFromCompactForm = jwtDecoded.getJwsFlattenedObject();
+JsonWebSignature decodedFromCompactForm = jwtDecoded.getJsonWebSignature();
 /**
  * Get the payload as string:
  */
@@ -89,12 +89,6 @@ System.out.println("JWT Claims as JSON: " + payload);
  * Deserialize the payload as a JwtClaims object
  */
 JwtClaims claims = JwtClaims.fromJson(payload);
-
-System.out.println("claims.getIssuer() = " + claims.getIssuer());
-System.out.println("claims.getAudience() = " + claims.getAudience());
-System.out.println("claims.getSubject() = " + claims.getSubject());
-
-assertEquals(jwsBuilder.buildJsonFlattened(), decodedFromCompactForm);
 ```
 
 ### <a name="signed-verify"></a> How to verify a signed JWT
@@ -103,9 +97,7 @@ assertEquals(jwsBuilder.buildJsonFlattened(), decodedFromCompactForm);
 /**
  * Validate the JWT by using the SignatureValidator class
  */
-boolean isValid = SignatureValidator.isValid(decodedFromCompactForm, keyPair.getPublic());
-assertTrue(isValid);
-System.out.println();
+boolean isValid = SignatureValidator.isValid(decodedFromCompactForm.getSignatures().get(0), keyPair.getPublic());;
 ```
 
 ## <a name="encrypted"></a> Encrypted JSON Web Tokens
@@ -120,15 +112,15 @@ System.out.println();
  * Note the use of chained setters.
  */
 JwtClaims joseClaims = new JwtClaims()
-  .setIssuer("Issuer")
-  .setAudience("Audience")
-  .setExpirationTime(Instant.now().plus(2, ChronoUnit.HOURS))
-  .setNotBefore(Instant.now().minus(1, ChronoUnit.MINUTES))
-  .setIssuedAt(Instant.now())
-  .setJwtId(UUID.randomUUID().toString())
-  .setSubject("Subject")
-  .addClaim("domain", "somedomain.com")
-  .addClaim("email", "someone@somedomain.com");
+    .setIssuer("Issuer")
+    .setAudience("Audience")
+    .setExpirationTime(Instant.now().plus(2, ChronoUnit.HOURS))
+    .setNotBefore(Instant.now().minus(1, ChronoUnit.MINUTES))
+    .setIssuedAt(Instant.now())
+    .setJwtId(UUID.randomUUID().toString())
+    .setSubject("Subject")
+    .addClaim("domain", "somedomain.com")
+    .addClaim("email", "someone@somedomain.com");
 
 /**
  * Convert the JWT Claims objects to JSON
@@ -149,7 +141,7 @@ secureRandom.nextBytes(secret);
 /**
  * Create a JSON Web Signature with the serialized JWT Claims as payload.
  */
-JweJsonFlattened jwe = JweBuilder.getInstance()
+JsonWebEncryption jwe = JweBuilder.getInstance()
     .withStringPayload(joseClaimsJson)
     .buildJweJsonFlattened(Base64Utility.toBase64Url(secret));
 String jwt = jwe.toCompactForm();
@@ -169,7 +161,7 @@ JwtReader jwtDecoded = JwtReader.readCompactForm(jwt);
  * In this instance we have a JWE.
  */
 assertEquals(JwtReader.Type.Encrypted, jwtDecoded.getType());
-JweJsonFlattened jweDecoded = jwtDecoded.getJweFlattenedObject();
+JsonWebEncryption jweDecoded = jwtDecoded.getJsonWebEncryption();
 
 String plaintext = JweDecryptor.createFor(jweDecoded)
     .decrypt(secret)

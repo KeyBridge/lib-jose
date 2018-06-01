@@ -1,12 +1,13 @@
 package org.ietf.jose.jws;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import org.ietf.TestUtil;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.key.SymmetricJwk;
 import org.ietf.jose.util.CryptographyUtility;
 import org.junit.Test;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.ietf.jose.util.Base64Utility.toBase64Url;
@@ -165,7 +166,7 @@ public class JwsJsonTest {
     /**
      * Check whether the EncryptionUtility returns the same result
      */
-    byte[] signatureUtility = CryptographyUtility.sign(jwsSigningInput.getBytes(UTF_8), key);
+    byte[] signatureUtility = CryptographyUtility.sign(jwsSigningInput.getBytes(UTF_8), key, JwsAlgorithmType.HS256);
     assertEquals(expectedSignature, toBase64Url(signatureUtility));
   }
 

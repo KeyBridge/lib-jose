@@ -16,20 +16,22 @@
 package ch.keybridge.lib.jose;
 
 import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
 import org.ietf.jose.jwe.JweDecryptor;
 import org.ietf.jose.jwe.JweHeader;
-import org.ietf.jose.jwe.JweJsonFlattened;
-import org.ietf.jose.jws.FlattenedJsonSignature;
+import org.ietf.jose.jws.JsonWebSignature;
 import org.ietf.jose.jws.JwsBuilder;
+import org.ietf.jose.jws.Signature;
 import org.ietf.jose.jws.SignatureValidator;
 import org.ietf.jose.util.JsonMarshaller;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,8 +86,8 @@ public class JOSE {
      * @throws IllegalArgumentException if the provided input is not a valid
      *                                  compact JWE string
      */
-    public static JweJsonFlattened fromCompactForm(String compactForm) throws IOException {
-      return JweJsonFlattened.fromCompactForm(compactForm);
+    public static JsonWebEncryption fromCompactForm(String compactForm) throws IOException {
+      return JsonWebEncryption.fromCompactForm(compactForm);
     }
 
     /**
@@ -94,11 +96,11 @@ public class JOSE {
      * @param json json string representing the object
      * @return a non-null object instance
      */
-    public static JweJsonFlattened fromJson(String json) throws IOException {
-      return JsonMarshaller.fromJson(json, JweJsonFlattened.class);
+    public static JsonWebEncryption fromJson(String json) throws IOException {
+      return JsonMarshaller.fromJson(json, JsonWebEncryption.class);
     }
 
-    public static JweDecryptor decrypt(JweJsonFlattened jwe) {
+    public static JweDecryptor decrypt(JsonWebEncryption jwe) {
       return JweDecryptor.createFor(jwe);
     }
 
@@ -141,8 +143,8 @@ public class JOSE {
      * @throws IllegalArgumentException if the provided input is not a valid
      *                                  compact JWS string
      */
-    public static FlattenedJsonSignature fromCompactForm(String compactForm) throws IOException {
-      return FlattenedJsonSignature.fromCompactForm(compactForm);
+    public static JsonWebSignature fromCompactForm(String compactForm) throws IOException {
+      return JsonWebSignature.fromCompactForm(compactForm);
     }
 
     /**
@@ -151,24 +153,19 @@ public class JOSE {
      * @param json json string representing the object
      * @return a non-null object instance
      */
-    public static FlattenedJsonSignature fromJson(String json) throws IOException {
-      return JsonMarshaller.fromJson(json, FlattenedJsonSignature.class);
+    public static JsonWebSignature fromJson(String json) throws IOException {
+      return JsonMarshaller.fromJson(json, JsonWebSignature.class);
     }
 
     /**
      * Validate signature using a Key instance
      *
-     * @param jws a valid FlattendedJsonSignature instance
+     * @param signature a valid Signature instance
      * @param key       a Key instance
      * @return true if signature is valid
-     * @throws IOException              in case of failure to serialise the
-     *                                  protected header to JSON
-     * @throws GeneralSecurityException in case of failure to validate the
-     *                                  signature
      */
-    public static boolean verify(FlattenedJsonSignature jws, Key key) throws IOException, GeneralSecurityException {
-      return SignatureValidator.isValid(jws.getProtectedHeader(), jws.getPayload(), key, jws
-          .getSignatureBytes());
+    public static boolean verify(Signature signature, SecretKey key) {
+      return SignatureValidator.isValid(signature, key);
     }
   }
 
@@ -193,17 +190,24 @@ public class JOSE {
      */
     public static <T> T read(String json, Class<T> type, PrivateKey receiverKey, PublicKey senderKey) {
       try {
-        JweJsonFlattened jwe = JweJsonFlattened.fromJson(json);
+        JsonWebEncryption jwe = JsonWebEncryption.fromJson(json);
         String payload = JweDecryptor.createFor(jwe)
             .decrypt(receiverKey)
             .getAsString();
 
-        FlattenedJsonSignature jws = FlattenedJsonSignature.fromJson(payload);
-
+        JsonWebSignature jws = JsonWebSignature.fromJson(payload);
+        List<Signature> signatures = jws.getSignatures();
+        if (signatures.isEmpty()) {
+          throw new IllegalArgumentException("A JWS must have at least one signature");
+        }
+        if (signatures.size() > 1) {
+          LOG.log(Level.WARNING, "JWS {1} signatures instead of the expected 1. Validating only the first signature" +
+              ".", new Object[]{signatures.size()});
+        }
         /**
          * The payload is rejected if the digital signature cannot be validated.
          */
-        boolean signatureValid = SignatureValidator.isValid(jws, senderKey);
+        boolean signatureValid = SignatureValidator.isValid(signatures.get(0), senderKey);
         if (!signatureValid) {
           return null;
         }
@@ -230,7 +234,7 @@ public class JOSE {
      */
     public static <T> T read(String json, Class<T> type, String base64UrlEncodedSecret) {
       try {
-        JweJsonFlattened jwe = JweJsonFlattened.fromJson(json);
+        JsonWebEncryption jwe = JsonWebEncryption.fromJson(json);
         String payload = JweDecryptor.createFor(jwe)
             .decrypt(base64UrlEncodedSecret)
             .getAsString();
@@ -238,9 +242,16 @@ public class JOSE {
         /**
          * The payload is rejected if the digital signature cannot be validated.
          */
-        FlattenedJsonSignature jws = FlattenedJsonSignature.fromJson(payload);
-
-        boolean signatureValid = SignatureValidator.isValid(jws, base64UrlEncodedSecret);
+        JsonWebSignature jws = JsonWebSignature.fromJson(payload);
+        List<Signature> signatures = jws.getSignatures();
+        if (signatures.isEmpty()) {
+          throw new IllegalArgumentException("A JWS must have at least one signature");
+        }
+        if (signatures.size() > 1) {
+          LOG.log(Level.WARNING, "JWS {0} signatures instead of the expected 1. Validating only the first signature" +
+              ".", new Object[]{signatures.size()});
+        }
+        boolean signatureValid = SignatureValidator.isValid(signatures.get(0), base64UrlEncodedSecret);
         if (!signatureValid) {
           return null;
         }
@@ -271,10 +282,10 @@ public class JOSE {
       try {
         String jsonPayload = JsonMarshaller.toJson(object);
 
-        FlattenedJsonSignature jws = JwsBuilder.getInstance()
+        JsonWebSignature jws = JwsBuilder.getInstance()
             .withStringPayload(jsonPayload)
             .sign(senderPrivateKey, JwsAlgorithmType.RS256, signatureKeyId)
-            .buildJsonFlattened();
+            .buildJsonWebSignature();
 
         return JweBuilder.getInstance()
             .withStringPayload(jws.toJson())
@@ -305,10 +316,10 @@ public class JOSE {
       try {
         String jsonPayload = JsonMarshaller.toJson(object);
 
-        FlattenedJsonSignature jws = JwsBuilder.getInstance()
+        JsonWebSignature jws = JwsBuilder.getInstance()
             .withStringPayload(jsonPayload)
             .sign(base64UrlEncodedSecret, JwsAlgorithmType.HS256, senderId)
-            .buildJsonFlattened();
+            .buildJsonWebSignature();
 
         JweHeader jweHeader = new JweHeader();
         jweHeader.setKid(senderId);

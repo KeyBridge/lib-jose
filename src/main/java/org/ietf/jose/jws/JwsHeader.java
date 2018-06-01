@@ -17,7 +17,8 @@ package org.ietf.jose.jws;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.ietf.jose.jwk.JWK;
+import lombok.ToString;
+import org.ietf.jose.jwk.JsonWebKey;
 
 import java.net.URI;
 import java.util.List;
@@ -44,6 +45,7 @@ import java.util.List;
  * @since 0.0.1 created 02/01/2018
  */
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Data
 public class JwsHeader extends AbstractHeader {
 
@@ -68,7 +70,7 @@ public class JwsHeader extends AbstractHeader {
    * represented as a JSON Web Key [JWK]. Use of this Header Parameter is
    * OPTIONAL.
    */
-  protected JWK jwk;
+  protected JsonWebKey jwk;
   /**
    * 4.1.9. "typ" (Type) Header Parameter
    * <p>
