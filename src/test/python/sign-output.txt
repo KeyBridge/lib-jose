@@ -1,0 +1,8 @@
+Generated Key used for signing: 
+{"k":"kGpikVaixila7_ItL2TUntsXseU6nsiDB70rypC7Pnc","kty":"oct"}
+
+Signed JWT: 
+{"header":{"kid":"I02Tv_pkGNw_rYNYERVA7QV6SxvmJmuRg32POLdPt5c"},"payload":"RGVtbyBJbnRlZ3JpdHkgcHJvdGVjdGVkIG1lc3NhZ2U","protected":"eyJhbGciOiJIUzI1NiJ9","signature":"MMmrjdjBxnUrqcFt9iMZlmRE3VRw-0J6Dd3uUx-qBvc"}
+
+Verified payload at other end:
+Demo Integrity protected message
