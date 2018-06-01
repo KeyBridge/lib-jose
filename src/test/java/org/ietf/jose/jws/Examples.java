@@ -4,6 +4,7 @@ import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.util.JsonMarshaller;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,8 +58,8 @@ public class Examples {
     System.out.println("JWS JSON general:\n" + JsonMarshaller.toJsonPrettyFormatted(jwsBuilder.buildJsonWebSignature
         ()));
     System.out.println();
-//    System.out.println("JWS compact form:\n" + jwsCompact);
-//    System.out.println();
+    System.out.println("JWS compact form:\n" + jwsCompact);
+    System.out.println();
 
 
     System.out.println("jwsJsonGeneral = " + jwsJsonGeneral);
@@ -67,19 +68,19 @@ public class Examples {
      * Consume the JWS
      */
     // From compact form
-//    GeneralJsonSignature decodedFromCompactForm = GeneralJsonSignature.fromCompactForm(jwsCompact);
+    JsonWebSignature decodedFromCompactForm = JsonWebSignature.fromCompactForm(jwsCompact);
     // From JSON General form
-    JsonWebSignature decodedFromJsonGeneral = JsonWebSignature.fromJson(jwsJsonGeneral);
+    JsonWebSignature decodedFromJson = JsonWebSignature.fromJson(jwsJsonGeneral);
 
-//    assertEquals(jwsBuilder.buildJsonWebSignature(), decodedFromCompactForm);
-//    assertEquals(jwsBuilder.buildJsonWebSignature(), decodedFromJsonGeneral);
+    Assert.assertEquals(jwsBuilder.buildJsonWebSignature(), decodedFromCompactForm);
+    Assert.assertEquals(jwsBuilder.buildJsonWebSignature(), decodedFromJson);
 
     /**
      * Validate the JWT
      */
-//    boolean isValid = SignatureValidator.isValid(decodedFromCompactForm.getSignatures().get(0), keyPair.getPublic());
-//    assertTrue(isValid);
-//    System.out.println("JWS is valid: " + isValid);
+    boolean isValid = SignatureValidator.isValid(decodedFromCompactForm.getSignatures().get(0), keyPair.getPublic());
+    Assert.assertTrue(isValid);
+    System.out.println("JWS is valid: " + isValid);
   }
 
 }
