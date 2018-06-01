@@ -16,8 +16,9 @@
 package org.ietf.jose.adapter;
 
 import org.ietf.jose.util.Base64Utility;
-import java.math.BigInteger;
+
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+import java.math.BigInteger;
 
 /**
  * Converts BigInteger instances into Base64URL-encoded strings and vice versa

@@ -15,8 +15,6 @@
  */
 package org.ietf.jose.jwk.key;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.jwk.JsonWebKey;
 
@@ -36,8 +34,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * the application uses another means or convention to determine the algorithm
  * used.
  */
-@EqualsAndHashCode(callSuper = true)
-@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SymmetricJwk extends JsonWebKey {
 
@@ -50,4 +46,41 @@ public class SymmetricJwk extends JsonWebKey {
    */
   @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] k;
+
+  public SymmetricJwk() {
+  }
+
+  public byte[] getK() {
+    return this.k;
+  }
+
+  public void setK(byte[] k) {
+    this.k = k;
+  }
+
+  public String toString() {
+    return "SymmetricJwk(k=" + java.util.Arrays.toString(this.getK()) + ")";
+  }
+
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof SymmetricJwk)) return false;
+    final SymmetricJwk other = (SymmetricJwk) o;
+    if (!other.canEqual((Object) this)) return false;
+    if (!super.equals(o)) return false;
+    if (!java.util.Arrays.equals(this.getK(), other.getK())) return false;
+    return true;
+  }
+
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    result = result * PRIME + super.hashCode();
+    result = result * PRIME + java.util.Arrays.hashCode(this.getK());
+    return result;
+  }
+
+  protected boolean canEqual(Object other) {
+    return other instanceof SymmetricJwk;
+  }
 }

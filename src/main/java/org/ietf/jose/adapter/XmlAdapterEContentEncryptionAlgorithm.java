@@ -16,6 +16,7 @@
 package org.ietf.jose.adapter;
 
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
+
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**

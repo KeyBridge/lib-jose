@@ -16,7 +16,6 @@
 package org.ietf.jose.jws;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
 import org.ietf.jose.adapter.XmlAdapterX509Certificate;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwa.JwsAlgorithmType;
@@ -85,7 +84,6 @@ import java.util.List;
  * <a href="https://fasterxml.github.io/jackson-annotations/javadoc/2.6/com/fasterxml/jackson/annotation/JsonIgnoreProperties.html#ignoreUnknown()">ignoreUnknown</a>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Data
 public abstract class AbstractHeader {
 
   /**
@@ -180,6 +178,9 @@ public abstract class AbstractHeader {
   @XmlElement(name = "x5t#S256")
   protected String x5tS256;
 
+  public AbstractHeader() {
+  }
+
   //<editor-fold defaultstate="collapsed" desc="Typed getters and setters for JWS and JWE algorithms">
   public JwsAlgorithmType getJwsAlgorithmType() {
     return JwsAlgorithmType.resolveAlgorithm(alg);
@@ -195,6 +196,107 @@ public abstract class AbstractHeader {
 
   public void setJwsAlgorithmType(JweKeyAlgorithmType alg) {
     this.alg = alg.getJoseAlgorithmName();
+  }
+
+  public String getAlg() {
+    return this.alg;
+  }
+
+  public void setAlg(String alg) {
+    this.alg = alg;
+  }
+
+  public String getKid() {
+    return this.kid;
+  }
+
+  public void setKid(String kid) {
+    this.kid = kid;
+  }
+
+  public URI getX5u() {
+    return this.x5u;
+  }
+
+  public void setX5u(URI x5u) {
+    this.x5u = x5u;
+  }
+
+  public List<X509CertificateHeader> getX5c() {
+    return this.x5c;
+  }
+
+  public void setX5c(List<X509CertificateHeader> x5c) {
+    this.x5c = x5c;
+  }
+
+  public String getX5t() {
+    return this.x5t;
+  }
+
+  public void setX5t(String x5t) {
+    this.x5t = x5t;
+  }
+
+  public String getX5tS256() {
+    return this.x5tS256;
+  }
+
+  public void setX5tS256(String x5tS256) {
+    this.x5tS256 = x5tS256;
+  }
+
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof AbstractHeader)) return false;
+    final AbstractHeader other = (AbstractHeader) o;
+    if (!other.canEqual((Object) this)) return false;
+    final Object this$alg = this.getAlg();
+    final Object other$alg = other.getAlg();
+    if (this$alg == null ? other$alg != null : !this$alg.equals(other$alg)) return false;
+    final Object this$kid = this.getKid();
+    final Object other$kid = other.getKid();
+    if (this$kid == null ? other$kid != null : !this$kid.equals(other$kid)) return false;
+    final Object this$x5u = this.getX5u();
+    final Object other$x5u = other.getX5u();
+    if (this$x5u == null ? other$x5u != null : !this$x5u.equals(other$x5u)) return false;
+    final Object this$x5c = this.getX5c();
+    final Object other$x5c = other.getX5c();
+    if (this$x5c == null ? other$x5c != null : !this$x5c.equals(other$x5c)) return false;
+    final Object this$x5t = this.getX5t();
+    final Object other$x5t = other.getX5t();
+    if (this$x5t == null ? other$x5t != null : !this$x5t.equals(other$x5t)) return false;
+    final Object this$x5tS256 = this.getX5tS256();
+    final Object other$x5tS256 = other.getX5tS256();
+    if (this$x5tS256 == null ? other$x5tS256 != null : !this$x5tS256.equals(other$x5tS256)) return false;
+    return true;
+  }
+
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    final Object $alg = this.getAlg();
+    result = result * PRIME + ($alg == null ? 43 : $alg.hashCode());
+    final Object $kid = this.getKid();
+    result = result * PRIME + ($kid == null ? 43 : $kid.hashCode());
+    final Object $x5u = this.getX5u();
+    result = result * PRIME + ($x5u == null ? 43 : $x5u.hashCode());
+    final Object $x5c = this.getX5c();
+    result = result * PRIME + ($x5c == null ? 43 : $x5c.hashCode());
+    final Object $x5t = this.getX5t();
+    result = result * PRIME + ($x5t == null ? 43 : $x5t.hashCode());
+    final Object $x5tS256 = this.getX5tS256();
+    result = result * PRIME + ($x5tS256 == null ? 43 : $x5tS256.hashCode());
+    return result;
+  }
+
+  protected boolean canEqual(Object other) {
+    return other instanceof AbstractHeader;
+  }
+
+  public String toString() {
+    return "AbstractHeader(alg=" + this.getAlg() + ", kid=" + this.getKid() + ", x5u=" + this.getX5u() + ", x5c=" +
+        this.getX5c() + ", x5t=" + this.getX5t() + ", x5tS256=" + this.getX5tS256() + ")";
   }
   //</editor-fold>
 }

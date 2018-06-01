@@ -15,10 +15,6 @@
  */
 package org.ietf.jose.jwt;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.experimental.Accessors;
 import org.ietf.jose.adapter.XmlAdapterInstantLong;
 import org.ietf.jose.jws.JsonSerializable;
 import org.ietf.jose.util.JsonMarshaller;
@@ -66,9 +62,6 @@ import java.util.stream.Collectors;
  * JWTs is for the representation to be compact.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@Data
-@Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
 public class JwtClaims extends JsonSerializable {
 
   /**
@@ -150,6 +143,9 @@ public class JwtClaims extends JsonSerializable {
   @XmlElement(name = "jti")
   private String jwtId;
 
+  public JwtClaims() {
+  }
+
   /**
    * Strip the sub-second component of a java.time.Instant to
    * ensure conformance with the JWT NumericDate timestamp format
@@ -189,7 +185,6 @@ public class JwtClaims extends JsonSerializable {
   @XmlTransient
   private static final Class<?> UNMARSHALLING_CLASS = (new HashMap<String, Object>()).getClass();
   @XmlTransient
-  @Getter
   private Map<String, Object> claims = new HashMap<>();
 
   /**
@@ -258,5 +253,127 @@ public class JwtClaims extends JsonSerializable {
     if (jwtId != null) jsonObject.put("jti", jwtId);
     jsonObject.putAll(claims);
     return JsonMarshaller.toJson(jsonObject);
+  }
+
+  public String getIssuer() {
+    return this.issuer;
+  }
+
+  public JwtClaims setIssuer(String issuer) {
+    this.issuer = issuer;
+    return this;
+  }
+
+  public String getSubject() {
+    return this.subject;
+  }
+
+  public JwtClaims setSubject(String subject) {
+    this.subject = subject;
+    return this;
+  }
+
+  public String getAudience() {
+    return this.audience;
+  }
+
+  public JwtClaims setAudience(String audience) {
+    this.audience = audience;
+    return this;
+  }
+
+  public Instant getExpirationTime() {
+    return this.expirationTime;
+  }
+
+  public Instant getNotBefore() {
+    return this.notBefore;
+  }
+
+  public Instant getIssuedAt() {
+    return this.issuedAt;
+  }
+
+  public String getJwtId() {
+    return this.jwtId;
+  }
+
+  public JwtClaims setJwtId(String jwtId) {
+    this.jwtId = jwtId;
+    return this;
+  }
+
+  public String toString() {
+    return "JwtClaims(issuer=" + this.getIssuer() + ", subject=" + this.getSubject() + ", audience=" + this
+        .getAudience() + ", expirationTime=" + this.getExpirationTime() + ", notBefore=" + this.getNotBefore() + ", " +
+        "issuedAt=" + this.getIssuedAt() + ", jwtId=" + this.getJwtId() + ", claims=" + this.getClaims() + ")";
+  }
+
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof JwtClaims)) return false;
+    final JwtClaims other = (JwtClaims) o;
+    if (!other.canEqual((Object) this)) return false;
+    final Object this$issuer = this.getIssuer();
+    final Object other$issuer = other.getIssuer();
+    if (this$issuer == null ? other$issuer != null : !this$issuer.equals(other$issuer)) return false;
+    final Object this$subject = this.getSubject();
+    final Object other$subject = other.getSubject();
+    if (this$subject == null ? other$subject != null : !this$subject.equals(other$subject)) return false;
+    final Object this$audience = this.getAudience();
+    final Object other$audience = other.getAudience();
+    if (this$audience == null ? other$audience != null : !this$audience.equals(other$audience)) return false;
+    final Object this$expirationTime = this.getExpirationTime();
+    final Object other$expirationTime = other.getExpirationTime();
+    if (this$expirationTime == null ? other$expirationTime != null : !this$expirationTime.equals(other$expirationTime))
+      return false;
+    final Object this$notBefore = this.getNotBefore();
+    final Object other$notBefore = other.getNotBefore();
+    if (this$notBefore == null ? other$notBefore != null : !this$notBefore.equals(other$notBefore)) return false;
+    final Object this$issuedAt = this.getIssuedAt();
+    final Object other$issuedAt = other.getIssuedAt();
+    if (this$issuedAt == null ? other$issuedAt != null : !this$issuedAt.equals(other$issuedAt)) return false;
+    final Object this$jwtId = this.getJwtId();
+    final Object other$jwtId = other.getJwtId();
+    if (this$jwtId == null ? other$jwtId != null : !this$jwtId.equals(other$jwtId)) return false;
+    final Object this$claims = this.getClaims();
+    final Object other$claims = other.getClaims();
+    if (this$claims == null ? other$claims != null : !this$claims.equals(other$claims)) return false;
+    return true;
+  }
+
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    final Object $issuer = this.getIssuer();
+    result = result * PRIME + ($issuer == null ? 43 : $issuer.hashCode());
+    final Object $subject = this.getSubject();
+    result = result * PRIME + ($subject == null ? 43 : $subject.hashCode());
+    final Object $audience = this.getAudience();
+    result = result * PRIME + ($audience == null ? 43 : $audience.hashCode());
+    final Object $expirationTime = this.getExpirationTime();
+    result = result * PRIME + ($expirationTime == null ? 43 : $expirationTime.hashCode());
+    final Object $notBefore = this.getNotBefore();
+    result = result * PRIME + ($notBefore == null ? 43 : $notBefore.hashCode());
+    final Object $issuedAt = this.getIssuedAt();
+    result = result * PRIME + ($issuedAt == null ? 43 : $issuedAt.hashCode());
+    final Object $jwtId = this.getJwtId();
+    result = result * PRIME + ($jwtId == null ? 43 : $jwtId.hashCode());
+    final Object $claims = this.getClaims();
+    result = result * PRIME + ($claims == null ? 43 : $claims.hashCode());
+    return result;
+  }
+
+  protected boolean canEqual(Object other) {
+    return other instanceof JwtClaims;
+  }
+
+  public Map<String, Object> getClaims() {
+    return this.claims;
+  }
+
+  public JwtClaims setClaims(Map<String, Object> claims) {
+    this.claims = claims;
+    return this;
   }
 }
