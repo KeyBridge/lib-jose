@@ -95,7 +95,7 @@ public class Examples {
      * The JWT can be either a JWS (JSON Web Signature) or a JWE (JSON Web Encryption) object,
      * and the type can be determined with JWT::getType.
      */
-    assertEquals(JwtReader.Type.Signed, jwtDecoded.getType());
+    assertEquals(JwtReader.JwtType.signed, jwtDecoded.getType());
     /**
      * In this instance we have a JWS.
      */
@@ -177,7 +177,7 @@ public class Examples {
     /**
      * In this instance we have a JWE.
      */
-    assertEquals(JwtReader.Type.Encrypted, jwtDecoded.getType());
+    assertEquals(JwtReader.JwtType.encrypted, jwtDecoded.getType());
     JsonWebEncryption jweDecoded = jwtDecoded.getJsonWebEncryption();
 
     String plaintext = JweDecryptor.createFor(jweDecoded)

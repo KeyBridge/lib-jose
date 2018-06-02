@@ -61,7 +61,7 @@ public class JOSE {
     /**
      * Create new JWE object from scratch.
      *
-     * @return
+     * @return a new JWE object
      */
     public static JweBuilder newBuilder() {
       return JweBuilder.getInstance();
@@ -87,6 +87,7 @@ public class JOSE {
      * @return non-null JWE instance
      * @throws IllegalArgumentException if the provided input is not a valid
      *                                  compact JWE string
+     * @throws java.io.IOException      on serialization error
      */
     public static JsonWebEncryption fromCompactForm(String compactForm) throws IOException {
       return JsonWebEncryption.fromCompactForm(compactForm);
@@ -97,6 +98,7 @@ public class JOSE {
      *
      * @param json json string representing the object
      * @return a non-null object instance
+     * @throws java.io.IOException on serialization error
      */
     public static JsonWebEncryption fromJson(String json) throws IOException {
       return JsonMarshaller.fromJson(json, JsonWebEncryption.class);
@@ -116,7 +118,7 @@ public class JOSE {
     /**
      * Create new JWS object from scratch.
      *
-     * @return
+     * @return a new JWS object
      */
     public static JwsBuilder newBuilder() {
       return JwsBuilder.getInstance();
@@ -139,7 +141,7 @@ public class JOSE {
      *
      * @param compactForm a valid compact JWS string
      * @return non-null JWE instance
-     * @throws IOException
+     * @throws IOException              on serialization error
      * @throws IllegalArgumentException if the provided input is not a valid
      *                                  compact JWS string
      */
@@ -152,6 +154,7 @@ public class JOSE {
      *
      * @param json json string representing the object
      * @return a non-null object instance
+     * @throws java.io.IOException on serialization error
      */
     public static JsonWebSignature fromJson(String json) throws IOException {
       return JsonMarshaller.fromJson(json, JsonWebSignature.class);

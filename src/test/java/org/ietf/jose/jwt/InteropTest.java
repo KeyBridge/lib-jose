@@ -87,7 +87,7 @@ public class InteropTest {
     // representation, which is a string consisting of three dot ('.') separated
     // base64url-encoded parts in the form Header.Payload.Signature
     // If you wanted to encrypt it, you can simply set this jwt as the payload
-    // of a JsonWebEncryption object and set the cty (Content Type) header to "jwt".
+    // of a JsonWebEncryption object and set the cty (Content JwtType) header to "jwt".
     String jwt = jws.getCompactSerialization();
 
     JwtConsumer jwtConsumer = new JwtConsumerBuilder()
@@ -109,7 +109,7 @@ public class InteropTest {
     System.out.println("jose4j JWT: " + jwt);
 
     JwtReader reader = JwtReader.readCompactForm(jwt);
-    assertEquals(JwtReader.Type.Signed, reader.getType());
+    assertEquals(JwtReader.JwtType.signed, reader.getType());
     JsonWebSignature jwsDecoded = reader.getJsonWebSignature();
     System.out.println(jwsDecoded);
 

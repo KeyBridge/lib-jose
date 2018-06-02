@@ -665,7 +665,7 @@ public class JWETest {
     assertEquals(authTag.length, calculatedAuthTag.length);
     assertArrayEquals(authTag, calculatedAuthTag);
 
-    Encrypter encrypter = new DefaultEncrypter(DefaultEncrypter.Configuration.AES_128_CBC_HMAC_SHA_256);
+    Encrypter encrypter = new DefaultEncrypter(DefaultEncrypter.AesConfigurationType.AES_128_CBC_HMAC_SHA_256);
     EncryptionResult encryptionResult = encrypter.encrypt(plaintextBytes, initVector, aad,
         new SecretKeySpec(cekBytes, encrypter.getSecretKeyAlgorithm()));
 
@@ -749,9 +749,9 @@ public class JWETest {
 
   @Test
   public void testAesCbcHmacSha2Encrypter() throws Exception {
-    testEncrypter(new DefaultEncrypter(DefaultEncrypter.Configuration.AES_128_CBC_HMAC_SHA_256));
-    testEncrypter(new DefaultEncrypter(DefaultEncrypter.Configuration.AES_192_CBC_HMAC_SHA_384));
-    testEncrypter(new DefaultEncrypter(DefaultEncrypter.Configuration.AES_256_CBC_HMAC_SHA_512));
+    testEncrypter(new DefaultEncrypter(DefaultEncrypter.AesConfigurationType.AES_128_CBC_HMAC_SHA_256));
+    testEncrypter(new DefaultEncrypter(DefaultEncrypter.AesConfigurationType.AES_192_CBC_HMAC_SHA_384));
+    testEncrypter(new DefaultEncrypter(DefaultEncrypter.AesConfigurationType.AES_256_CBC_HMAC_SHA_512));
   }
 
   public void testEncrypter(Encrypter encrypter) throws GeneralSecurityException {

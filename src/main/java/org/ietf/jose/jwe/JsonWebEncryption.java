@@ -15,6 +15,16 @@
  */
 package org.ietf.jose.jwe;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.StringTokenizer;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.adapter.XmlAdapterJweHeader;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
@@ -23,16 +33,6 @@ import org.ietf.jose.jwe.encryption.EncryptionResult;
 import org.ietf.jose.jws.JsonSerializable;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonMarshaller;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.util.Objects;
-import java.util.StringTokenizer;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.ietf.jose.util.Base64Utility.*;
@@ -77,13 +77,17 @@ public class JsonWebEncryption extends JsonSerializable {
   @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] initializationVector;
   /**
-   * Ciphertext contents
+   * Ciphertext contents are encrypted plaintext.
    */
   @XmlElement(name = "ciphertext")
   @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] ciphertext;
   /**
-   * Authentication tag contents
+   * Authentication tag contents the first half (128 bits) of the HMAC output M
+   * as the Authentication Tag output.
+   * <p>
+   * See RFC 7516 JSON Web Encryption (JWE) at B.7. Truncate HMAC Value to
+   * Create Authentication Tag
    */
   @XmlElement(name = "tag")
   @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
@@ -177,14 +181,15 @@ public class JsonWebEncryption extends JsonSerializable {
    *
    * @param text a valid compact JWE string
    * @return non-null JWE instance
+   * @throws java.io.IOException      on serialization error
    * @throws IllegalArgumentException if the provided input is not a valid
    *                                  compact JWE string
    */
   public static JsonWebEncryption fromCompactForm(String text) throws IOException {
     StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
     if (tokenizer.countTokens() != 5) {
-      throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string " +
-          "has " + tokenizer.countTokens() + ".");
+      throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string "
+        + "has " + tokenizer.countTokens() + ".");
     }
     JsonWebEncryption jwe = new JsonWebEncryption();
     String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
@@ -252,53 +257,37 @@ public class JsonWebEncryption extends JsonSerializable {
     return this.additionalAuthenticationData;
   }
 
-  public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof JsonWebEncryption)) return false;
-    final JsonWebEncryption other = (JsonWebEncryption) o;
-    if (!other.canEqual((Object) this)) return false;
-    final Object this$protectedHeader = this.getProtectedHeader();
-    final Object other$protectedHeader = other.getProtectedHeader();
-    if (this$protectedHeader == null ? other$protectedHeader != null : !this$protectedHeader.equals
-        (other$protectedHeader))
-      return false;
-    final Object this$unprotected = this.getUnprotected();
-    final Object other$unprotected = other.getUnprotected();
-    if (this$unprotected == null ? other$unprotected != null : !this$unprotected.equals(other$unprotected))
-      return false;
-    if (!java.util.Arrays.equals(this.getEncryptedKey(), other.getEncryptedKey())) return false;
-    if (!java.util.Arrays.equals(this.getInitializationVector(), other.getInitializationVector())) return false;
-    if (!java.util.Arrays.equals(this.getCiphertext(), other.getCiphertext())) return false;
-    if (!java.util.Arrays.equals(this.getAuthenticationTag(), other.getAuthenticationTag())) return false;
-    if (!java.util.Arrays.equals(this.getAdditionalAuthenticationData(), other.getAdditionalAuthenticationData()))
-      return false;
-    return true;
-  }
-
+  @Override
   public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    final Object $protectedHeader = this.getProtectedHeader();
-    result = result * PRIME + ($protectedHeader == null ? 43 : $protectedHeader.hashCode());
-    final Object $unprotected = this.getUnprotected();
-    result = result * PRIME + ($unprotected == null ? 43 : $unprotected.hashCode());
-    result = result * PRIME + java.util.Arrays.hashCode(this.getEncryptedKey());
-    result = result * PRIME + java.util.Arrays.hashCode(this.getInitializationVector());
-    result = result * PRIME + java.util.Arrays.hashCode(this.getCiphertext());
-    result = result * PRIME + java.util.Arrays.hashCode(this.getAuthenticationTag());
-    result = result * PRIME + java.util.Arrays.hashCode(this.getAdditionalAuthenticationData());
-    return result;
+    int hash = 5;
+    hash = 29 * hash + Arrays.hashCode(this.ciphertext);
+    return hash;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final JsonWebEncryption other = (JsonWebEncryption) obj;
+    return Arrays.equals(this.ciphertext, other.ciphertext);
+  }
+
+  @Override
   protected boolean canEqual(Object other) {
     return other instanceof JsonWebEncryption;
   }
 
+  @Override
   public String toString() {
-    return "JsonWebEncryption(protectedHeader=" + this.getProtectedHeader() + ", unprotected=" + this.getUnprotected
-        () + ", encryptedKey=" + java.util.Arrays.toString(this.getEncryptedKey()) + ", initializationVector=" + java
-        .util.Arrays.toString(this.getInitializationVector()) + ", ciphertext=" + java.util.Arrays.toString(this
-        .getCiphertext()) + ", authenticationTag=" + java.util.Arrays.toString(this.getAuthenticationTag()) + ", " +
-        "additionalAuthenticationData=" + java.util.Arrays.toString(this.getAdditionalAuthenticationData()) + ")";
+    return "JsonWebEncryption(protectedHeader=" + this.getProtectedHeader() + ", unprotected=" + this.getUnprotected() + ", encryptedKey=" + java.util.Arrays.toString(this.getEncryptedKey()) + ", initializationVector=" + java.util.Arrays.toString(this.getInitializationVector()) + ", ciphertext=" + java.util.Arrays.toString(this
+      .getCiphertext()) + ", authenticationTag=" + java.util.Arrays.toString(this.getAuthenticationTag()) + ", "
+      + "additionalAuthenticationData=" + java.util.Arrays.toString(this.getAdditionalAuthenticationData()) + ")";
   }
 }

@@ -15,13 +15,12 @@
  */
 package org.ietf.jose.jwk.key;
 
-import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
-import org.ietf.jose.jwk.JsonWebKey;
-
+import java.math.BigInteger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.math.BigInteger;
+import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
+import org.ietf.jose.jwk.JsonWebKey;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -125,48 +124,4 @@ public class EllipticCurveJwk extends JsonWebKey {
     this.d = d;
   }
 
-  public String toString() {
-    return "EllipticCurveJwk(crv=" + this.getCrv() + ", x=" + this.getX() + ", y=" + this.getY() + ", d=" + this.getD
-        () + ")";
-  }
-
-  public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof EllipticCurveJwk)) return false;
-    final EllipticCurveJwk other = (EllipticCurveJwk) o;
-    if (!other.canEqual((Object) this)) return false;
-    if (!super.equals(o)) return false;
-    final Object this$crv = this.getCrv();
-    final Object other$crv = other.getCrv();
-    if (this$crv == null ? other$crv != null : !this$crv.equals(other$crv)) return false;
-    final Object this$x = this.getX();
-    final Object other$x = other.getX();
-    if (this$x == null ? other$x != null : !this$x.equals(other$x)) return false;
-    final Object this$y = this.getY();
-    final Object other$y = other.getY();
-    if (this$y == null ? other$y != null : !this$y.equals(other$y)) return false;
-    final Object this$d = this.getD();
-    final Object other$d = other.getD();
-    if (this$d == null ? other$d != null : !this$d.equals(other$d)) return false;
-    return true;
-  }
-
-  public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    result = result * PRIME + super.hashCode();
-    final Object $crv = this.getCrv();
-    result = result * PRIME + ($crv == null ? 43 : $crv.hashCode());
-    final Object $x = this.getX();
-    result = result * PRIME + ($x == null ? 43 : $x.hashCode());
-    final Object $y = this.getY();
-    result = result * PRIME + ($y == null ? 43 : $y.hashCode());
-    final Object $d = this.getD();
-    result = result * PRIME + ($d == null ? 43 : $d.hashCode());
-    return result;
-  }
-
-  protected boolean canEqual(Object other) {
-    return other instanceof EllipticCurveJwk;
-  }
 }
