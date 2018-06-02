@@ -15,8 +15,6 @@
  */
 package org.ietf.jose.jwe;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.ietf.jose.adapter.XmlAdapterEContentEncryptionAlgorithm;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jws.AbstractHeader;
@@ -64,8 +62,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *
  * @author Key Bridge
  */
-@EqualsAndHashCode(callSuper = true)
-@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JweHeader extends AbstractHeader {
 
@@ -110,4 +106,57 @@ public class JweHeader extends AbstractHeader {
    * processed by implementations.
    */
   private String zip;
+
+  public JweHeader() {
+  }
+
+  public JweEncryptionAlgorithmType getEnc() {
+    return this.enc;
+  }
+
+  public void setEnc(JweEncryptionAlgorithmType enc) {
+    this.enc = enc;
+  }
+
+  public String getZip() {
+    return this.zip;
+  }
+
+  public void setZip(String zip) {
+    this.zip = zip;
+  }
+
+  public String toString() {
+    return "JweHeader(enc=" + this.getEnc() + ", zip=" + this.getZip() + ")";
+  }
+
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof JweHeader)) return false;
+    final JweHeader other = (JweHeader) o;
+    if (!other.canEqual((Object) this)) return false;
+    if (!super.equals(o)) return false;
+    final Object this$enc = this.getEnc();
+    final Object other$enc = other.getEnc();
+    if (this$enc == null ? other$enc != null : !this$enc.equals(other$enc)) return false;
+    final Object this$zip = this.getZip();
+    final Object other$zip = other.getZip();
+    if (this$zip == null ? other$zip != null : !this$zip.equals(other$zip)) return false;
+    return true;
+  }
+
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    result = result * PRIME + super.hashCode();
+    final Object $enc = this.getEnc();
+    result = result * PRIME + ($enc == null ? 43 : $enc.hashCode());
+    final Object $zip = this.getZip();
+    result = result * PRIME + ($zip == null ? 43 : $zip.hashCode());
+    return result;
+  }
+
+  protected boolean canEqual(Object other) {
+    return other instanceof JweHeader;
+  }
 }

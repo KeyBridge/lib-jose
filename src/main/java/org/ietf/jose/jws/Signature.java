@@ -15,8 +15,6 @@
  */
 package org.ietf.jose.jws;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JsonWebKey;
@@ -68,8 +66,6 @@ import static org.ietf.jose.util.Base64Utility.toBase64Url;
  * }</pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@EqualsAndHashCode
-@ToString
 public class Signature {
 
   /**
@@ -261,4 +257,43 @@ public class Signature {
     return jwsSigningInput;
   }
 
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof Signature)) return false;
+    final Signature other = (Signature) o;
+    if (!other.canEqual((Object) this)) return false;
+    final Object this$protectedHeader = this.getProtectedHeader();
+    final Object other$protectedHeader = other.getProtectedHeader();
+    if (this$protectedHeader == null ? other$protectedHeader != null : !this$protectedHeader.equals
+        (other$protectedHeader))
+      return false;
+    final Object this$header = this.getHeader();
+    final Object other$header = other.getHeader();
+    if (this$header == null ? other$header != null : !this$header.equals(other$header)) return false;
+    if (!java.util.Arrays.equals(this.signature, other.signature)) return false;
+    if (!java.util.Arrays.equals(this.jwsSigningInput, other.jwsSigningInput)) return false;
+    return true;
+  }
+
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    final Object $protectedHeader = this.getProtectedHeader();
+    result = result * PRIME + ($protectedHeader == null ? 43 : $protectedHeader.hashCode());
+    final Object $header = this.getHeader();
+    result = result * PRIME + ($header == null ? 43 : $header.hashCode());
+    result = result * PRIME + java.util.Arrays.hashCode(this.signature);
+    result = result * PRIME + java.util.Arrays.hashCode(this.jwsSigningInput);
+    return result;
+  }
+
+  protected boolean canEqual(Object other) {
+    return other instanceof Signature;
+  }
+
+  public String toString() {
+    return "Signature(protectedHeader=" + this.getProtectedHeader() + ", header=" + this.getHeader() + ", signature="
+        + java.util.Arrays.toString(this.signature) + ", jwsSigningInput=" + java.util.Arrays.toString(this
+        .jwsSigningInput) + ")";
+  }
 }

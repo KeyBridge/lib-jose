@@ -15,8 +15,6 @@
  */
 package org.ietf.jose.jwk.key;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -48,8 +46,6 @@ import java.security.spec.RSAPublicKeySpec;
  * present, with the exception of "oth", which MUST only be present when more
  * than two prime factors were used.
  */
-@EqualsAndHashCode(callSuper = true)
-@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RsaPrivateJwk extends RsaPublicJwk {
 
@@ -109,6 +105,9 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    */
   @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger qi;
+
+  public RsaPrivateJwk() {
+  }
 
   /**
    * Developer note: the "oth" field is not supported.
@@ -193,5 +192,110 @@ public class RsaPrivateJwk extends RsaPublicJwk {
     KeyFactory kf = KeyFactory.getInstance("RSA");
     return new KeyPair(kf.generatePublic(new RSAPublicKeySpec(getModulus(), getPublicExponent())),
         kf.generatePrivate(new RSAPrivateKeySpec(getModulus(), getPrivateExponent())));
+  }
+
+  public BigInteger getPrivateExponent() {
+    return this.privateExponent;
+  }
+
+  public void setPrivateExponent(BigInteger privateExponent) {
+    this.privateExponent = privateExponent;
+  }
+
+  public BigInteger getP() {
+    return this.p;
+  }
+
+  public void setP(BigInteger p) {
+    this.p = p;
+  }
+
+  public BigInteger getQ() {
+    return this.q;
+  }
+
+  public void setQ(BigInteger q) {
+    this.q = q;
+  }
+
+  public BigInteger getDp() {
+    return this.dp;
+  }
+
+  public void setDp(BigInteger dp) {
+    this.dp = dp;
+  }
+
+  public BigInteger getDq() {
+    return this.dq;
+  }
+
+  public void setDq(BigInteger dq) {
+    this.dq = dq;
+  }
+
+  public BigInteger getQi() {
+    return this.qi;
+  }
+
+  public void setQi(BigInteger qi) {
+    this.qi = qi;
+  }
+
+  public String toString() {
+    return "RsaPrivateJwk(privateExponent=" + this.getPrivateExponent() + ", p=" + this.getP() + ", q=" + this.getQ()
+        + ", dp=" + this.getDp() + ", dq=" + this.getDq() + ", qi=" + this.getQi() + ")";
+  }
+
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof RsaPrivateJwk)) return false;
+    final RsaPrivateJwk other = (RsaPrivateJwk) o;
+    if (!other.canEqual((Object) this)) return false;
+    if (!super.equals(o)) return false;
+    final Object this$privateExponent = this.getPrivateExponent();
+    final Object other$privateExponent = other.getPrivateExponent();
+    if (this$privateExponent == null ? other$privateExponent != null : !this$privateExponent.equals
+        (other$privateExponent))
+      return false;
+    final Object this$p = this.getP();
+    final Object other$p = other.getP();
+    if (this$p == null ? other$p != null : !this$p.equals(other$p)) return false;
+    final Object this$q = this.getQ();
+    final Object other$q = other.getQ();
+    if (this$q == null ? other$q != null : !this$q.equals(other$q)) return false;
+    final Object this$dp = this.getDp();
+    final Object other$dp = other.getDp();
+    if (this$dp == null ? other$dp != null : !this$dp.equals(other$dp)) return false;
+    final Object this$dq = this.getDq();
+    final Object other$dq = other.getDq();
+    if (this$dq == null ? other$dq != null : !this$dq.equals(other$dq)) return false;
+    final Object this$qi = this.getQi();
+    final Object other$qi = other.getQi();
+    if (this$qi == null ? other$qi != null : !this$qi.equals(other$qi)) return false;
+    return true;
+  }
+
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    result = result * PRIME + super.hashCode();
+    final Object $privateExponent = this.getPrivateExponent();
+    result = result * PRIME + ($privateExponent == null ? 43 : $privateExponent.hashCode());
+    final Object $p = this.getP();
+    result = result * PRIME + ($p == null ? 43 : $p.hashCode());
+    final Object $q = this.getQ();
+    result = result * PRIME + ($q == null ? 43 : $q.hashCode());
+    final Object $dp = this.getDp();
+    result = result * PRIME + ($dp == null ? 43 : $dp.hashCode());
+    final Object $dq = this.getDq();
+    result = result * PRIME + ($dq == null ? 43 : $dq.hashCode());
+    final Object $qi = this.getQi();
+    result = result * PRIME + ($qi == null ? 43 : $qi.hashCode());
+    return result;
+  }
+
+  protected boolean canEqual(Object other) {
+    return other instanceof RsaPrivateJwk;
   }
 }

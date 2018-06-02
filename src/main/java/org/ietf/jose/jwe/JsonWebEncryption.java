@@ -15,9 +15,6 @@
  */
 package org.ietf.jose.jwe;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.adapter.XmlAdapterJweHeader;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
@@ -53,9 +50,6 @@ import static org.ietf.jose.util.Base64Utility.*;
  * than this syntax difference, JWE JSON Serialization objects using the
  * flattened syntax are processed identically to those using the general syntax.
  */
-@EqualsAndHashCode(callSuper = false)
-@ToString
-@Getter
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JsonWebEncryption extends JsonSerializable {
 
@@ -228,5 +222,83 @@ public class JsonWebEncryption extends JsonSerializable {
       + toBase64Url(initializationVector) + '.'
       + toBase64Url(ciphertext) + '.'
       + toBase64Url(authenticationTag);
+  }
+
+  public JweHeader getProtectedHeader() {
+    return this.protectedHeader;
+  }
+
+  public JweHeader getUnprotected() {
+    return this.unprotected;
+  }
+
+  public byte[] getEncryptedKey() {
+    return this.encryptedKey;
+  }
+
+  public byte[] getInitializationVector() {
+    return this.initializationVector;
+  }
+
+  public byte[] getCiphertext() {
+    return this.ciphertext;
+  }
+
+  public byte[] getAuthenticationTag() {
+    return this.authenticationTag;
+  }
+
+  public byte[] getAdditionalAuthenticationData() {
+    return this.additionalAuthenticationData;
+  }
+
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof JsonWebEncryption)) return false;
+    final JsonWebEncryption other = (JsonWebEncryption) o;
+    if (!other.canEqual((Object) this)) return false;
+    final Object this$protectedHeader = this.getProtectedHeader();
+    final Object other$protectedHeader = other.getProtectedHeader();
+    if (this$protectedHeader == null ? other$protectedHeader != null : !this$protectedHeader.equals
+        (other$protectedHeader))
+      return false;
+    final Object this$unprotected = this.getUnprotected();
+    final Object other$unprotected = other.getUnprotected();
+    if (this$unprotected == null ? other$unprotected != null : !this$unprotected.equals(other$unprotected))
+      return false;
+    if (!java.util.Arrays.equals(this.getEncryptedKey(), other.getEncryptedKey())) return false;
+    if (!java.util.Arrays.equals(this.getInitializationVector(), other.getInitializationVector())) return false;
+    if (!java.util.Arrays.equals(this.getCiphertext(), other.getCiphertext())) return false;
+    if (!java.util.Arrays.equals(this.getAuthenticationTag(), other.getAuthenticationTag())) return false;
+    if (!java.util.Arrays.equals(this.getAdditionalAuthenticationData(), other.getAdditionalAuthenticationData()))
+      return false;
+    return true;
+  }
+
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    final Object $protectedHeader = this.getProtectedHeader();
+    result = result * PRIME + ($protectedHeader == null ? 43 : $protectedHeader.hashCode());
+    final Object $unprotected = this.getUnprotected();
+    result = result * PRIME + ($unprotected == null ? 43 : $unprotected.hashCode());
+    result = result * PRIME + java.util.Arrays.hashCode(this.getEncryptedKey());
+    result = result * PRIME + java.util.Arrays.hashCode(this.getInitializationVector());
+    result = result * PRIME + java.util.Arrays.hashCode(this.getCiphertext());
+    result = result * PRIME + java.util.Arrays.hashCode(this.getAuthenticationTag());
+    result = result * PRIME + java.util.Arrays.hashCode(this.getAdditionalAuthenticationData());
+    return result;
+  }
+
+  protected boolean canEqual(Object other) {
+    return other instanceof JsonWebEncryption;
+  }
+
+  public String toString() {
+    return "JsonWebEncryption(protectedHeader=" + this.getProtectedHeader() + ", unprotected=" + this.getUnprotected
+        () + ", encryptedKey=" + java.util.Arrays.toString(this.getEncryptedKey()) + ", initializationVector=" + java
+        .util.Arrays.toString(this.getInitializationVector()) + ", ciphertext=" + java.util.Arrays.toString(this
+        .getCiphertext()) + ", authenticationTag=" + java.util.Arrays.toString(this.getAuthenticationTag()) + ", " +
+        "additionalAuthenticationData=" + java.util.Arrays.toString(this.getAdditionalAuthenticationData()) + ")";
   }
 }
