@@ -15,8 +15,6 @@
  */
 package org.ietf.jose.jws;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.adapter.XmlAdapterJwsHeader;
 import org.ietf.jose.util.Base64Utility;
@@ -98,8 +96,6 @@ import static org.ietf.jose.util.Base64Utility.fromBase64UrlToString;
  * }</pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@EqualsAndHashCode(callSuper = false)
-@ToString
 public class JsonWebSignature extends JsonSerializable {
   /**
    * The "payload" member MUST be present and contain the value BASE64URL(JWS
@@ -304,13 +300,61 @@ public class JsonWebSignature extends JsonSerializable {
         + '.' + Base64Utility.toBase64Url(signature);
   }
 
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof JsonWebSignature)) return false;
+    final JsonWebSignature other = (JsonWebSignature) o;
+    if (!other.canEqual((Object) this)) return false;
+    if (!Arrays.equals(this.payload, other.payload)) return false;
+    final Object this$protectedHeader = this.protectedHeader;
+    final Object other$protectedHeader = other.protectedHeader;
+    if (this$protectedHeader == null ? other$protectedHeader != null : !this$protectedHeader.equals
+        (other$protectedHeader))
+      return false;
+    final Object this$unprotectedHeader = this.unprotectedHeader;
+    final Object other$unprotectedHeader = other.unprotectedHeader;
+    if (this$unprotectedHeader == null ? other$unprotectedHeader != null : !this$unprotectedHeader.equals
+        (other$unprotectedHeader))
+      return false;
+    if (!Arrays.equals(this.signature, other.signature)) return false;
+    if (!Arrays.equals(this.jwsSigningInput, other.jwsSigningInput)) return false;
+    final Object this$signatures = this.getSignatures();
+    final Object other$signatures = other.getSignatures();
+    if (this$signatures == null ? other$signatures != null : !this$signatures.equals(other$signatures)) return false;
+    return true;
+  }
+
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    result = result * PRIME + Arrays.hashCode(this.payload);
+    final Object $protectedHeader = this.protectedHeader;
+    result = result * PRIME + ($protectedHeader == null ? 43 : $protectedHeader.hashCode());
+    final Object $unprotectedHeader = this.unprotectedHeader;
+    result = result * PRIME + ($unprotectedHeader == null ? 43 : $unprotectedHeader.hashCode());
+    result = result * PRIME + Arrays.hashCode(this.signature);
+    result = result * PRIME + Arrays.hashCode(this.jwsSigningInput);
+    final Object $signatures = this.getSignatures();
+    result = result * PRIME + ($signatures == null ? 43 : $signatures.hashCode());
+    return result;
+  }
+
+  protected boolean canEqual(Object other) {
+    return other instanceof JsonWebSignature;
+  }
+
+  public String toString() {
+    return "JsonWebSignature(payload=" + Arrays.toString(this.payload) + ", protectedHeader=" + this.protectedHeader
+        + ", unprotectedHeader=" + this.unprotectedHeader + ", signature=" + Arrays.toString(this.signature) + ", " +
+        "jwsSigningInput=" + Arrays.toString(this.jwsSigningInput) + ", signatures=" + this.getSignatures() + ")";
+  }
+
   /**
    * A loosely-typed JWS representation that retains order of elements as in the
    * original JSON string.
    */
   @XmlTransient
   @XmlAccessorType(XmlAccessType.FIELD)
-  @ToString
   private static final class JwsFrame {
     String payload;
     @XmlElement(name = "protected")
@@ -318,5 +362,11 @@ public class JsonWebSignature extends JsonSerializable {
     Map<String, String> header;
     String signature;
     List<JwsFrame> signatures;
+
+    public String toString() {
+      return "JsonWebSignature.JwsFrame(payload=" + this.payload + ", protectedHeaderJsonBase64Url=" + this
+          .protectedHeaderJsonBase64Url + ", header=" + this.header + ", signature=" + this.signature + ", " +
+          "signatures=" + this.signatures + ")";
+    }
   }
 }

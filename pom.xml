@@ -4,7 +4,7 @@
 
   <groupId>keybridge.lib</groupId>
   <artifactId>jose</artifactId>
-  <version>0.6.0</version>
+  <version>0.7.0</version>
   <packaging>jar</packaging>
 
   <name>lib-jose</name>
@@ -30,7 +30,10 @@
     v0.3.0 - package a JAR, not OSGI bundle
     v0.4.0 - refactor into org.ietf base package
     v0.5.0 - refactor and rename classes to better match the specifications; significant javadoc
-    v0.6.0 - harmonize  entity names, bug fixes</description>
+    v0.6.0 - harmonize  entity names, bug fixes
+    v0.7.0 - remove lombok shortcut annotations
+
+  </description>
 
   <organization>
     <name>Key Bridge</name>
@@ -69,13 +72,6 @@
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
       <version>2.3.0</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.16.22</version>
       <scope>provided</scope>
     </dependency>
 

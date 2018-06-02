@@ -15,8 +15,8 @@
  */
 package org.ietf.jose.jwa;
 
-import java.security.spec.AlgorithmParameterSpec;
 import javax.xml.bind.annotation.XmlEnumValue;
+import java.security.spec.AlgorithmParameterSpec;
 
 /**
  * RFC-7518

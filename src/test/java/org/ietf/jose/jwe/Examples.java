@@ -70,6 +70,11 @@ public class Examples {
     assertEquals(jwe, fromCompact);
     assertEquals(jwe, fromJson);
 
+    String decryptedPlaintext = JweDecryptor.createFor(fromJson)
+        .decrypt(keyPair.getPrivate())
+        .getAsString();
+    System.out.println("plaintext: " + decryptedPlaintext);
+
     /**
      * Validate the JWT
      *

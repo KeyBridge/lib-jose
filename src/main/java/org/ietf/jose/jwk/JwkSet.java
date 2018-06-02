@@ -15,8 +15,6 @@
  */
 package org.ietf.jose.jwk;
 
-import lombok.Data;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -45,7 +43,6 @@ import java.util.List;
  * values that are not understood by them, that are missing required members, or
  * for which values are out of the supported ranges.
  */
-@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JwkSet {
 
@@ -59,4 +56,42 @@ public class JwkSet {
    */
   @XmlElement(required = true)
   private List<? extends JsonWebKey> keys;
+
+  public JwkSet() {
+  }
+
+  public List<? extends JsonWebKey> getKeys() {
+    return this.keys;
+  }
+
+  public void setKeys(List<? extends JsonWebKey> keys) {
+    this.keys = keys;
+  }
+
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof JwkSet)) return false;
+    final JwkSet other = (JwkSet) o;
+    if (!other.canEqual((Object) this)) return false;
+    final Object this$keys = this.getKeys();
+    final Object other$keys = other.getKeys();
+    if (this$keys == null ? other$keys != null : !this$keys.equals(other$keys)) return false;
+    return true;
+  }
+
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    final Object $keys = this.getKeys();
+    result = result * PRIME + ($keys == null ? 43 : $keys.hashCode());
+    return result;
+  }
+
+  protected boolean canEqual(Object other) {
+    return other instanceof JwkSet;
+  }
+
+  public String toString() {
+    return "JwkSet(keys=" + this.getKeys() + ")";
+  }
 }

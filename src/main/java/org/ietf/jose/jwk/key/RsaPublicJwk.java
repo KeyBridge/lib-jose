@@ -15,8 +15,6 @@
  */
 package org.ietf.jose.jwk.key;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
 import org.ietf.jose.jwk.JsonWebKey;
 
@@ -39,8 +37,6 @@ import java.security.spec.RSAPublicKeySpec;
  * <p>
  * The following members MUST be present for RSA public keys.
  */
-@EqualsAndHashCode(callSuper = true)
-@Data
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RsaPublicJwk extends JsonWebKey {
 
@@ -74,6 +70,9 @@ public class RsaPublicJwk extends JsonWebKey {
   @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   protected BigInteger publicExponent;
 
+  public RsaPublicJwk() {
+  }
+
   public static RsaPublicJwk getInstance(RSAPublicKey publicKey) {
     RsaPublicJwk jwkRsaKey = new RsaPrivateJwk();
     jwkRsaKey.setPublicExponent(publicKey.getPublicExponent());
@@ -85,5 +84,56 @@ public class RsaPublicJwk extends JsonWebKey {
     KeyFactory kf = KeyFactory.getInstance("RSA");
     RSAPublicKeySpec spec = new RSAPublicKeySpec(getModulus(), getPublicExponent());
     return kf.generatePublic(spec);
+  }
+
+  public BigInteger getModulus() {
+    return this.modulus;
+  }
+
+  public void setModulus(BigInteger modulus) {
+    this.modulus = modulus;
+  }
+
+  public BigInteger getPublicExponent() {
+    return this.publicExponent;
+  }
+
+  public void setPublicExponent(BigInteger publicExponent) {
+    this.publicExponent = publicExponent;
+  }
+
+  public String toString() {
+    return "RsaPublicJwk(modulus=" + this.getModulus() + ", publicExponent=" + this.getPublicExponent() + ")";
+  }
+
+  public boolean equals(Object o) {
+    if (o == this) return true;
+    if (!(o instanceof RsaPublicJwk)) return false;
+    final RsaPublicJwk other = (RsaPublicJwk) o;
+    if (!other.canEqual((Object) this)) return false;
+    if (!super.equals(o)) return false;
+    final Object this$modulus = this.getModulus();
+    final Object other$modulus = other.getModulus();
+    if (this$modulus == null ? other$modulus != null : !this$modulus.equals(other$modulus)) return false;
+    final Object this$publicExponent = this.getPublicExponent();
+    final Object other$publicExponent = other.getPublicExponent();
+    if (this$publicExponent == null ? other$publicExponent != null : !this$publicExponent.equals(other$publicExponent))
+      return false;
+    return true;
+  }
+
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    result = result * PRIME + super.hashCode();
+    final Object $modulus = this.getModulus();
+    result = result * PRIME + ($modulus == null ? 43 : $modulus.hashCode());
+    final Object $publicExponent = this.getPublicExponent();
+    result = result * PRIME + ($publicExponent == null ? 43 : $publicExponent.hashCode());
+    return result;
+  }
+
+  protected boolean canEqual(Object other) {
+    return other instanceof RsaPublicJwk;
   }
 }
