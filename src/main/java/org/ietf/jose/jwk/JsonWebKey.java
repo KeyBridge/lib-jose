@@ -64,10 +64,17 @@ import java.util.List;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kty")
 @JsonSubTypes({
+<<<<<<< HEAD:src/main/java/org/ietf/jose/jwk/JWK.java
+  @JsonSubTypes.Type(value = EllipticCurveJwk.class, name = "EC")
+  , @JsonSubTypes.Type(value = RsaPublicJwk.class, name = "RSA")
+  , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
+  , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
+=======
     @JsonSubTypes.Type(value = EllipticCurveJwk.class, name = "EC")
     , @JsonSubTypes.Type(value = RsaPublicJwk.class, name = "RSA")
     , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
     , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
+>>>>>>> 804b747accee030270c0ec3f47253914e3a38c69:src/main/java/org/ietf/jose/jwk/JsonWebKey.java
 )
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class JsonWebKey extends AbstractHeader {
