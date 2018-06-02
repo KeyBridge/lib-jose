@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +15,13 @@
  */
 package org.ietf.jose.jwe;
 
-import org.ietf.jose.adapter.XmlAdapterEContentEncryptionAlgorithm;
-import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
-import org.ietf.jose.jws.AbstractHeader;
-
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.ietf.jose.adapter.XmlAdapterEContentEncryptionAlgorithm;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
+import org.ietf.jose.jws.AbstractHeader;
 
 /**
  * RFC 7516 JSON Web Encryption (JWE)
@@ -126,36 +126,38 @@ public class JweHeader extends AbstractHeader {
     this.zip = zip;
   }
 
+  @Override
   public String toString() {
     return "JweHeader(enc=" + this.getEnc() + ", zip=" + this.getZip() + ")";
   }
 
-  public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof JweHeader)) return false;
-    final JweHeader other = (JweHeader) o;
-    if (!other.canEqual((Object) this)) return false;
-    if (!super.equals(o)) return false;
-    final Object this$enc = this.getEnc();
-    final Object other$enc = other.getEnc();
-    if (this$enc == null ? other$enc != null : !this$enc.equals(other$enc)) return false;
-    final Object this$zip = this.getZip();
-    final Object other$zip = other.getZip();
-    if (this$zip == null ? other$zip != null : !this$zip.equals(other$zip)) return false;
-    return true;
-  }
-
+  @Override
   public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    result = result * PRIME + super.hashCode();
-    final Object $enc = this.getEnc();
-    result = result * PRIME + ($enc == null ? 43 : $enc.hashCode());
-    final Object $zip = this.getZip();
-    result = result * PRIME + ($zip == null ? 43 : $zip.hashCode());
-    return result;
+    int hash = 7;
+    hash = 71 * hash + Objects.hashCode(this.enc);
+    hash = 71 * hash + Objects.hashCode(this.zip);
+    return hash;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final JweHeader other = (JweHeader) obj;
+    if (!Objects.equals(this.zip, other.zip)) {
+      return false;
+    }
+    return this.enc == other.enc;
+  }
+
+  @Override
   protected boolean canEqual(Object other) {
     return other instanceof JweHeader;
   }

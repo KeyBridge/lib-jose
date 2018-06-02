@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,13 @@
  */
 package org.ietf.jose.jwe.encryption;
 
-import org.ietf.jose.util.SecureRandomUtility;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.Arrays;
+import javax.crypto.Cipher;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import org.ietf.jose.util.SecureRandomUtility;
 
 /**
  * A content encrypter that uses AES as the block cipher and Galois/Counter mode
@@ -153,7 +152,8 @@ public class AesGcmEncrypter implements Encrypter {
    * @param key     An AES secret key
    * @return A DTO containing the initialisation vector (IV), the addidional
    *         authenticated data (same as input)
-   * @throws GeneralSecurityException
+   * @throws GeneralSecurityException in case of failure to unwrap the key or
+   *                                  decrypt
    */
   @Override
   public EncryptionResult encrypt(final byte[] payload, byte[] iv, byte[] aad, final Key key)
@@ -211,7 +211,8 @@ public class AesGcmEncrypter implements Encrypter {
    * @param authTag    authentication tag (message authentication code)
    * @param key        AES key
    * @return plaintext bytes
-   * @throws GeneralSecurityException
+   * @throws GeneralSecurityException in case of failure to unwrap the key or
+   *                                  decrypt
    */
   @Override
   public byte[] decrypt(byte[] ciphertext, byte[] iv, byte[] aad, byte[] authTag, Key key) throws

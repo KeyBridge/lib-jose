@@ -15,20 +15,20 @@
  */
 package org.ietf.jose.jws;
 
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JsonWebKey;
-import org.ietf.jose.util.CryptographyUtility;
-import org.ietf.jose.util.JsonMarshaller;
-
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.util.Arrays;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.Key;
+import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.util.CryptographyUtility;
+import org.ietf.jose.util.JsonMarshaller;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.ietf.jose.util.Base64Utility.toBase64Url;
@@ -105,15 +105,16 @@ public class Signature {
   /**
    * Create signature for the provided payload and JSON Web Key
    *
-   * @param payload data to sign
-   * @param key     a valid JWK instance
+   * @param payload   data to sign
+   * @param key       a valid JWK instance
+   * @param algorithm the JwsAlgorithmType
    * @return a JWS instance
    * @throws IOException              in case of failure to serialise the
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
   public static Signature getInstance(byte[] payload, JsonWebKey key, JwsAlgorithmType algorithm) throws IOException,
-      GeneralSecurityException {
+    GeneralSecurityException {
     Signature signature = new Signature();
     JwsHeader ph = new JwsHeader();
     ph.setAlg(algorithm.getJoseAlgorithmName());
@@ -129,7 +130,6 @@ public class Signature {
     signature.signature = CryptographyUtility.sign(signature.jwsSigningInput, key, algorithm);
     return signature;
   }
-
 
   /**
    * JWS Signing Input
@@ -153,11 +153,13 @@ public class Signature {
    * @param protectedHeader a JwsHeader that will be integrity-protected by the
    *                        signature
    * @return Signature instance
-   * @throws IOException in case of failure to serialize the protected header to JSON
-   * @throws GeneralSecurityException in case of failure to digitally sign or compute HMAC
+   * @throws IOException              in case of failure to serialize the
+   *                                  protected header to JSON
+   * @throws GeneralSecurityException in case of failure to digitally sign or
+   *                                  compute HMAC
    */
   public static Signature getInstance(byte[] payload, Key key, JwsHeader protectedHeader) throws IOException,
-      GeneralSecurityException {
+    GeneralSecurityException {
     return getInstance(payload, key, protectedHeader, null);
   }
 
@@ -171,11 +173,12 @@ public class Signature {
    * @param unprotectedHeader a JwsHeader that will not be integrity-protected
    *                          by the signature
    * @return Signature instance
-   * @throws IOException in case of failure to serialize the protected header to JSON
-   * @throws GeneralSecurityException in case of failure to digitally sign or compute HMAC
+   * @throws IOException              in case of failure to serialize the
+   *                                  protected header to JSON
+   * @throws GeneralSecurityException in case of failure to digitally sign or
+   *                                  compute HMAC
    */
-  public static Signature getInstance(byte[] payload, Key key, JwsHeader protectedHeader, JwsHeader
-      unprotectedHeader) throws IOException, GeneralSecurityException {
+  public static Signature getInstance(byte[] payload, Key key, JwsHeader protectedHeader, JwsHeader unprotectedHeader) throws IOException, GeneralSecurityException {
     validateProtectedHeader(protectedHeader);
     Signature signature = new Signature();
     signature.protectedHeader = protectedHeader;
@@ -183,7 +186,7 @@ public class Signature {
     signature.jwsSigningInput = createJwsSigningInput(protectedHeader, payload);
 
     signature.signature = CryptographyUtility.sign(signature.jwsSigningInput, key,
-        protectedHeader.getJwsAlgorithmType().getJavaAlgorithmName());
+                                                   protectedHeader.getJwsAlgorithmType().getJavaAlgorithmName());
     return signature;
   }
 
@@ -197,8 +200,7 @@ public class Signature {
    *                          by the signature
    * @return Signature instance
    */
-  static Signature getInstance(byte[] signingInput, byte[] signatureBytes, JwsHeader protectedHeader, JwsHeader
-      unprotectedHeader) {
+  static Signature getInstance(byte[] signingInput, byte[] signatureBytes, JwsHeader protectedHeader, JwsHeader unprotectedHeader) {
     Signature signature = new Signature();
     signature.jwsSigningInput = signingInput;
     signature.header = unprotectedHeader;
@@ -208,7 +210,8 @@ public class Signature {
   }
 
   /**
-   * Checks if the 'kid' field is set. Other checks can be added in future versions of the library.
+   * Checks if the 'kid' field is set. Other checks can be added in future
+   * versions of the library.
    *
    * @param protectedHeader non-null protected header
    */
@@ -257,43 +260,26 @@ public class Signature {
     return jwsSigningInput;
   }
 
-  public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof Signature)) return false;
-    final Signature other = (Signature) o;
-    if (!other.canEqual((Object) this)) return false;
-    final Object this$protectedHeader = this.getProtectedHeader();
-    final Object other$protectedHeader = other.getProtectedHeader();
-    if (this$protectedHeader == null ? other$protectedHeader != null : !this$protectedHeader.equals
-        (other$protectedHeader))
-      return false;
-    final Object this$header = this.getHeader();
-    final Object other$header = other.getHeader();
-    if (this$header == null ? other$header != null : !this$header.equals(other$header)) return false;
-    if (!java.util.Arrays.equals(this.signature, other.signature)) return false;
-    if (!java.util.Arrays.equals(this.jwsSigningInput, other.jwsSigningInput)) return false;
-    return true;
-  }
-
+  @Override
   public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    final Object $protectedHeader = this.getProtectedHeader();
-    result = result * PRIME + ($protectedHeader == null ? 43 : $protectedHeader.hashCode());
-    final Object $header = this.getHeader();
-    result = result * PRIME + ($header == null ? 43 : $header.hashCode());
-    result = result * PRIME + java.util.Arrays.hashCode(this.signature);
-    result = result * PRIME + java.util.Arrays.hashCode(this.jwsSigningInput);
-    return result;
+    int hash = 3;
+    hash = 89 * hash + Arrays.hashCode(this.signature);
+    return hash;
   }
 
-  protected boolean canEqual(Object other) {
-    return other instanceof Signature;
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final Signature other = (Signature) obj;
+    return Arrays.equals(this.signature, other.signature);
   }
 
-  public String toString() {
-    return "Signature(protectedHeader=" + this.getProtectedHeader() + ", header=" + this.getHeader() + ", signature="
-        + java.util.Arrays.toString(this.signature) + ", jwsSigningInput=" + java.util.Arrays.toString(this
-        .jwsSigningInput) + ")";
-  }
 }

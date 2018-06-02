@@ -4,7 +4,7 @@
 
   <groupId>keybridge.lib</groupId>
   <artifactId>jose</artifactId>
-  <version>0.5.0</version>
+  <version>0.9.0</version>
   <packaging>jar</packaging>
 
   <name>lib-jose</name>
@@ -30,7 +30,10 @@
     v0.3.0 - package a JAR, not OSGI bundle
     v0.4.0 - refactor into org.ietf base package
     v0.5.0 - refactor and rename classes to better match the specifications; significant javadoc
-
+    v0.6.0 - harmonize  entity names, bug fixes
+    v0.7.0 - remove lombok shortcut annotations
+    v0.8.0 - clean up hashcode, equals, tostring, javadoc
+    v0.9.0 - rewrite JwtClaims to use ZonedDateTime, fix marshal, unmarshal, equality test error
   </description>
 
   <organization>

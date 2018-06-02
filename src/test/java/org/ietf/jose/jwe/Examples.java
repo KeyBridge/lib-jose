@@ -1,17 +1,16 @@
 package org.ietf.jose.jwe;
 
-import org.ietf.jose.jwk.key.RsaPrivateJwk;
-import org.ietf.jose.jwk.key.RsaPublicJwk;
-import org.ietf.jose.util.JsonMarshaller;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
+import org.ietf.jose.jwk.key.RsaPublicJwk;
+import org.ietf.jose.util.JsonMarshaller;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -49,9 +48,9 @@ public class Examples {
      * Create a JSON Web Encryption object with a string as payload
      */
     JsonWebEncryption jwe = JweBuilder.getInstance()
-        .withStringPayload("hi")
-        // sign it with our private key and specify a random UUID as the key ID
-        .buildJweJsonFlattened(keyPair.getPublic());
+      .withStringPayload("hi")
+      // sign it with our private key and specify a random UUID as the key ID
+      .buildJweJsonFlattened(keyPair.getPublic());
     String jweCompact = jwe.toCompactForm();
 
     System.out.println("JWE JSON flattened:\n" + JsonMarshaller.toJsonPrettyFormatted(jwe));
@@ -71,16 +70,16 @@ public class Examples {
     assertEquals(jwe, fromJson);
 
     String decryptedPlaintext = JweDecryptor.createFor(fromJson)
-        .decrypt(keyPair.getPrivate())
-        .getAsString();
+      .decrypt(keyPair.getPrivate())
+      .getAsString();
     System.out.println("plaintext: " + decryptedPlaintext);
 
     /**
      * Validate the JWT
-     *
-     * A JWE object is implicitly validated during decryption. Unsuccessful decryption means
-     * that either an incorrect decryption key has been used or that the encrypted message has been
-     * tampered with and is invalid.
+     * <p>
+     * A JWE object is implicitly validated during decryption. Unsuccessful
+     * decryption means that either an incorrect decryption key has been used or
+     * that the encrypted message has been tampered with and is invalid.
      */
   }
 }

@@ -15,13 +15,6 @@
  */
 package org.ietf.jose.jwk.key;
 
-import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
-import org.ietf.jose.jwk.JsonWebKey;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -29,6 +22,12 @@ import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
+import org.ietf.jose.jwk.JsonWebKey;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -102,38 +101,9 @@ public class RsaPublicJwk extends JsonWebKey {
     this.publicExponent = publicExponent;
   }
 
+  @Override
   public String toString() {
     return "RsaPublicJwk(modulus=" + this.getModulus() + ", publicExponent=" + this.getPublicExponent() + ")";
   }
 
-  public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof RsaPublicJwk)) return false;
-    final RsaPublicJwk other = (RsaPublicJwk) o;
-    if (!other.canEqual((Object) this)) return false;
-    if (!super.equals(o)) return false;
-    final Object this$modulus = this.getModulus();
-    final Object other$modulus = other.getModulus();
-    if (this$modulus == null ? other$modulus != null : !this$modulus.equals(other$modulus)) return false;
-    final Object this$publicExponent = this.getPublicExponent();
-    final Object other$publicExponent = other.getPublicExponent();
-    if (this$publicExponent == null ? other$publicExponent != null : !this$publicExponent.equals(other$publicExponent))
-      return false;
-    return true;
-  }
-
-  public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    result = result * PRIME + super.hashCode();
-    final Object $modulus = this.getModulus();
-    result = result * PRIME + ($modulus == null ? 43 : $modulus.hashCode());
-    final Object $publicExponent = this.getPublicExponent();
-    result = result * PRIME + ($publicExponent == null ? 43 : $publicExponent.hashCode());
-    return result;
-  }
-
-  protected boolean canEqual(Object other) {
-    return other instanceof RsaPublicJwk;
-  }
 }

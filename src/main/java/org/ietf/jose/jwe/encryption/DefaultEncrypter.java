@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +15,15 @@
  */
 package org.ietf.jose.jwe.encryption;
 
-import org.ietf.jose.util.SecureRandomUtility;
-
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.util.Arrays;
+import org.ietf.jose.util.SecureRandomUtility;
 
 /**
  * A (default) content encrypter implementation that uses AES as the block
@@ -63,13 +62,62 @@ import java.util.Arrays;
  */
 public class DefaultEncrypter implements Encrypter {
 
+  /**
+   * Initialisation vector byte length
+   */
   final static int IV_BYTE_LENGTH = 128 / 8;
+  /**
+   * The name of the cipher transformation. See the Cipher section in the Java
+   * Cryptography Architecture Standard Algorithm Name Documentation for
+   * information about standard transformation names.
+   */
   private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
+  /**
+   * The name of the secret-key algorithm to be associated with the given key
+   * material. See Appendix A in the Java Cryptography Architecture Reference
+   * Guide for information about standard algorithm names.
+   */
   private static final String SECRET_KEY_ALGORITHM = "AES";
-  private final Configuration configuration;
+  /**
+   * Immutable configuration parameters for the AES-CBC-HMAC-SHA2 encryption
+   * scheme.
+   */
+  private final AesConfigurationType configuration;
 
-  public DefaultEncrypter(Configuration configuration) {
+  public DefaultEncrypter(AesConfigurationType configuration) {
     this.configuration = configuration;
+  }
+
+  /**
+   * Get a default instance using the AES_128_CBC_HMAC_SHA_256 authenticated
+   * encryption algorithm, as defined in RFC 7518 Section 5.2.3.
+   * <p>
+   * This is the preferred default.
+   *
+   * @return a Content Encryption Algorithm instance
+   */
+  public static DefaultEncrypter getInstance() {
+    return new DefaultEncrypter(AesConfigurationType.AES_128_CBC_HMAC_SHA_256);
+  }
+
+  /**
+   * Get a default instance using the AES_192_CBC_HMAC_SHA_384 authenticated
+   * encryption algorithm, as defined in RFC 7518 Section 5.2.4
+   *
+   * @return a Content Encryption Algorithm instance
+   */
+  public static DefaultEncrypter getInstance384() {
+    return new DefaultEncrypter(AesConfigurationType.AES_192_CBC_HMAC_SHA_384);
+  }
+
+  /**
+   * Get a default instance using the AES_256_CBC_HMAC_SHA_512 authenticated
+   * encryption algorithm, as defined in RFC 7518 Section 5.2.5
+   *
+   * @return a Content Encryption Algorithm instance
+   */
+  public static DefaultEncrypter getInstance512() {
+    return new DefaultEncrypter(AesConfigurationType.AES_256_CBC_HMAC_SHA_512);
   }
 
   /**
@@ -181,7 +229,7 @@ public class DefaultEncrypter implements Encrypter {
    * Immutable configuration parameters for the AES-CBC-HMAC-SHA2 encryption
    * scheme.
    */
-  public enum Configuration {
+  public enum AesConfigurationType {
     AES_128_CBC_HMAC_SHA_256(32, 16, 16, "SHA-256", "HmacSHA256", 16),
     AES_192_CBC_HMAC_SHA_384(48, 24, 24, "SHA-384", "HmacSHA384", 24),
     AES_256_CBC_HMAC_SHA_512(64, 32, 32, "SHA-512", "HmacSHA512", 32);
@@ -204,7 +252,7 @@ public class DefaultEncrypter implements Encrypter {
      * @param jce_mac_alg      Java (JCE) MAC algorithm name
      * @param t_LEN            Authentication tag length in bytes
      */
-    Configuration(int INPUT_KEY_LENGTH, int ENC_KEY_LEN, int MAC_KEY_LEN, String MAC_ALG, String jce_mac_alg, int t_LEN) {
+    AesConfigurationType(int INPUT_KEY_LENGTH, int ENC_KEY_LEN, int MAC_KEY_LEN, String MAC_ALG, String jce_mac_alg, int t_LEN) {
       this.INPUT_KEY_LENGTH = INPUT_KEY_LENGTH;
       this.ENC_KEY_LEN = ENC_KEY_LEN;
       this.MAC_KEY_LEN = MAC_KEY_LEN;

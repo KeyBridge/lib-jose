@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,11 +35,11 @@ package org.ietf.jose.jws;
  *
  * @author Key Bridge
  */
-public class X509CertificateHeader {
+public class X5CHeaderParameter {
 
   private byte[] data;
 
-  public X509CertificateHeader() {
+  public X5CHeaderParameter() {
   }
 
   public byte[] getData() {
@@ -50,27 +50,4 @@ public class X509CertificateHeader {
     this.data = data;
   }
 
-  public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof X509CertificateHeader)) return false;
-    final X509CertificateHeader other = (X509CertificateHeader) o;
-    if (!other.canEqual((Object) this)) return false;
-    if (!java.util.Arrays.equals(this.getData(), other.getData())) return false;
-    return true;
-  }
-
-  public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    result = result * PRIME + java.util.Arrays.hashCode(this.getData());
-    return result;
-  }
-
-  protected boolean canEqual(Object other) {
-    return other instanceof X509CertificateHeader;
-  }
-
-  public String toString() {
-    return "X509CertificateHeader(data=" + java.util.Arrays.toString(this.getData()) + ")";
-  }
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,8 @@ public interface Encrypter {
    * Generate a valid key for the algorithm
    *
    * @return a valid encryption key
-   * @throws GeneralSecurityException
+   * @throws GeneralSecurityException in case of failure to unwrap the key or
+   *                                  decrypt
    */
   Key generateKey() throws GeneralSecurityException;
 
@@ -41,7 +42,8 @@ public interface Encrypter {
    *                is provided.
    * @param aad     additional authenticated data
    * @param key     a valid encryption key.
-   * @return
+   * @return A DTO for storing the result of an authenticated encryption (AE)
+   *         operation.
    * @throws GeneralSecurityException encryption operation failed
    */
   EncryptionResult encrypt(byte[] payload, byte[] iv, byte[] aad, Key key) throws GeneralSecurityException;
@@ -61,7 +63,8 @@ public interface Encrypter {
   byte[] decrypt(byte[] ciphertext, byte[] iv, byte[] aad, byte[] authTag, Key key) throws GeneralSecurityException;
 
   /**
-   * Get the JCA algorithm name for the secret key used in this encryption scheme
+   * Get the JCA algorithm name for the secret key used in this encryption
+   * scheme
    *
    * @return secret key JCA algorithm name
    */

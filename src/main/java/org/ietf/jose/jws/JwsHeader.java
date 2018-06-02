@@ -15,10 +15,9 @@
  */
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwk.JsonWebKey;
-
 import java.net.URI;
 import java.util.List;
+import org.ietf.jose.jwk.JsonWebKey;
 
 /**
  * RFC 7515 JSON Web Signature (JWS)
@@ -196,55 +195,5 @@ public class JwsHeader extends AbstractHeader {
 
   public void setCrit(List<String> crit) {
     this.crit = crit;
-  }
-
-  public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof JwsHeader)) return false;
-    final JwsHeader other = (JwsHeader) o;
-    if (!other.canEqual((Object) this)) return false;
-    if (!super.equals(o)) return false;
-    final Object this$jku = this.getJku();
-    final Object other$jku = other.getJku();
-    if (this$jku == null ? other$jku != null : !this$jku.equals(other$jku)) return false;
-    final Object this$jwk = this.getJwk();
-    final Object other$jwk = other.getJwk();
-    if (this$jwk == null ? other$jwk != null : !this$jwk.equals(other$jwk)) return false;
-    final Object this$typ = this.getTyp();
-    final Object other$typ = other.getTyp();
-    if (this$typ == null ? other$typ != null : !this$typ.equals(other$typ)) return false;
-    final Object this$cty = this.getCty();
-    final Object other$cty = other.getCty();
-    if (this$cty == null ? other$cty != null : !this$cty.equals(other$cty)) return false;
-    final Object this$crit = this.getCrit();
-    final Object other$crit = other.getCrit();
-    if (this$crit == null ? other$crit != null : !this$crit.equals(other$crit)) return false;
-    return true;
-  }
-
-  public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    result = result * PRIME + super.hashCode();
-    final Object $jku = this.getJku();
-    result = result * PRIME + ($jku == null ? 43 : $jku.hashCode());
-    final Object $jwk = this.getJwk();
-    result = result * PRIME + ($jwk == null ? 43 : $jwk.hashCode());
-    final Object $typ = this.getTyp();
-    result = result * PRIME + ($typ == null ? 43 : $typ.hashCode());
-    final Object $cty = this.getCty();
-    result = result * PRIME + ($cty == null ? 43 : $cty.hashCode());
-    final Object $crit = this.getCrit();
-    result = result * PRIME + ($crit == null ? 43 : $crit.hashCode());
-    return result;
-  }
-
-  protected boolean canEqual(Object other) {
-    return other instanceof JwsHeader;
-  }
-
-  public String toString() {
-    return "JwsHeader(super=" + super.toString() + ", jku=" + this.getJku() + ", jwk=" + this.getJwk() + ", typ=" +
-        this.getTyp() + ", cty=" + this.getCty() + ", crit=" + this.getCrit() + ")";
   }
 }

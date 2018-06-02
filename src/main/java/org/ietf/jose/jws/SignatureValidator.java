@@ -1,13 +1,12 @@
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JsonWebKey;
-import org.ietf.jose.util.CryptographyUtility;
-
-import javax.crypto.SecretKey;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.PublicKey;
+import javax.crypto.SecretKey;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.util.CryptographyUtility;
 
 import static org.ietf.jose.util.KeyUtility.convertBase64UrlSecretToKey;
 import static org.ietf.jose.util.KeyUtility.convertSecretToKey;
@@ -21,30 +20,35 @@ import static org.ietf.jose.util.KeyUtility.convertSecretToKey;
 public class SignatureValidator {
 
   /**
-   * Validate signature using a Key instance
+   * Validate signature using a {@code java.security.Key} instance
    *
    * @param protectedHeader a JwsHeader instance
    * @param signingInput    the signing input
-   * @param key             a Key instance
+   * @param key             a {@code java.security.Key} instance
+   * @param signature       the signature bytes
    * @return true if signature is valid
    */
   public static boolean isValid(AbstractHeader protectedHeader, byte[] signingInput, Key key, byte[] signature) {
     JwsAlgorithmType algorithm = protectedHeader.getJwsAlgorithmType();
     /**
-     * The 'none' algorithm assumes an outside mechanism for validating integrity is in place
-     * and in itself should be considered invalid.
+     * The 'none' algorithm assumes an outside mechanism for validating
+     * integrity is in place and in itself should be considered invalid.
      */
-    if (algorithm == JwsAlgorithmType.NONE) return false;
+    if (algorithm == JwsAlgorithmType.NONE) {
+      return false;
+    }
     try {
-      return CryptographyUtility.validateSignature(signature, signingInput, key, algorithm
-          .getJavaAlgorithmName());
+      return CryptographyUtility.validateSignature(signature,
+                                                   signingInput,
+                                                   key,
+                                                   algorithm.getJavaAlgorithmName());
     } catch (GeneralSecurityException e) {
       return false;
     }
   }
 
   /**
-   * Validate signature using a Key instance
+   * Validate signature using a JsonWebKey instance
    *
    * @param signature a valid signature instance
    * @param key       a JSON Web Key instance
@@ -52,8 +56,10 @@ public class SignatureValidator {
    */
   public static boolean isValid(Signature signature, JsonWebKey key) {
     try {
-      return CryptographyUtility.validateSignature(signature.getSignatureBytes(), signature.getSigningInput(),
-          key, signature.getProtectedHeader().getJwsAlgorithmType().getJavaAlgorithmName());
+      return CryptographyUtility.validateSignature(signature.getSignatureBytes(),
+                                                   signature.getSigningInput(),
+                                                   key,
+                                                   signature.getProtectedHeader().getJwsAlgorithmType().getJavaAlgorithmName());
     } catch (GeneralSecurityException e) {
       return false;
     }
@@ -63,7 +69,7 @@ public class SignatureValidator {
    * Validate signature using a Key instance
    *
    * @param signature a valid signature instance
-   * @param key     a Key instance
+   * @param key       a Key instance
    * @return true if signature is valid
    */
   public static boolean isValid(Signature signature, PublicKey key) {

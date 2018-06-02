@@ -21,7 +21,7 @@ import org.ietf.jose.jwe.encryption.Encrypter;
 
 import javax.xml.bind.annotation.XmlEnumValue;
 
-import static org.ietf.jose.jwe.encryption.DefaultEncrypter.Configuration.*;
+import static org.ietf.jose.jwe.encryption.DefaultEncrypter.AesConfigurationType.*;
 
 /**
  * RFC-7518

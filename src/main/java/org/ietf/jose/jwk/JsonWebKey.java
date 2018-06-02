@@ -17,15 +17,14 @@ package org.ietf.jose.jwk;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.jwk.key.SymmetricJwk;
 import org.ietf.jose.jws.AbstractHeader;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import java.util.List;
 
 /**
  * RFC-7517 JSON Web Key (JWK)
@@ -64,10 +63,10 @@ import java.util.List;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kty")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = EllipticCurveJwk.class, name = "EC")
-    , @JsonSubTypes.Type(value = RsaPublicJwk.class, name = "RSA")
-    , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
-    , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
+  @JsonSubTypes.Type(value = EllipticCurveJwk.class, name = "EC")
+  , @JsonSubTypes.Type(value = RsaPublicJwk.class, name = "RSA")
+  , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
+  , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
 )
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class JsonWebKey extends AbstractHeader {
@@ -169,38 +168,17 @@ public abstract class JsonWebKey extends AbstractHeader {
     this.key_ops = key_ops;
   }
 
-  public String toString() {
-    return "JsonWebKey(use=" + this.getUse() + ", key_ops=" + this.getKey_ops() + ")";
-  }
-
-  public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof JsonWebKey)) return false;
-    final JsonWebKey other = (JsonWebKey) o;
-    if (!other.canEqual((Object) this)) return false;
-    if (!super.equals(o)) return false;
-    final Object this$use = this.getUse();
-    final Object other$use = other.getUse();
-    if (this$use == null ? other$use != null : !this$use.equals(other$use)) return false;
-    final Object this$key_ops = this.getKey_ops();
-    final Object other$key_ops = other.getKey_ops();
-    if (this$key_ops == null ? other$key_ops != null : !this$key_ops.equals(other$key_ops)) return false;
-    return true;
-  }
-
-  public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    result = result * PRIME + super.hashCode();
-    final Object $use = this.getUse();
-    result = result * PRIME + ($use == null ? 43 : $use.hashCode());
-    final Object $key_ops = this.getKey_ops();
-    result = result * PRIME + ($key_ops == null ? 43 : $key_ops.hashCode());
-    return result;
-  }
-
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   protected boolean canEqual(Object other) {
     return other instanceof JsonWebKey;
+  }
+
+  @Override
+  public String toString() {
+    return "JsonWebKey(use=" + this.getUse() + ", key_ops=" + this.getKey_ops() + ")";
   }
 
   /**
