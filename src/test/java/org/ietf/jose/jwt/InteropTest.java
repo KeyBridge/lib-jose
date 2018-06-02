@@ -4,6 +4,8 @@ import java.io.StringWriter;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.UUID;
 import javax.crypto.SecretKey;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.ietf.TestFileReader;
+import org.ietf.jose.adapter.XmlAdapterEpochZonedDateTime;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JsonWebEncryption;
@@ -120,17 +123,23 @@ public class InteropTest {
     assertEquals(claims.getIssuer(), claimsDecoded.getIssuer());
     assertEquals(claims.getSubject(), claimsDecoded.getSubject());
     assertEquals(claims.getAudience().get(0), claimsDecoded.getAudience());
-    assertEquals(Instant.ofEpochSecond(claims.getExpirationTime().getValue()), claimsDecoded.getExpirationTime());
-    assertEquals(Instant.ofEpochSecond(claims.getNotBefore().getValue()), claimsDecoded.getNotBefore());
-    assertEquals(Instant.ofEpochSecond(claims.getIssuedAt().getValue()), claimsDecoded.getIssuedAt());
+
+    XmlAdapterEpochZonedDateTime epochAdapter = new XmlAdapterEpochZonedDateTime();
+
+    assertEquals(epochAdapter.unmarshal(claims.getExpirationTime().getValue()),
+                 claimsDecoded.getExpirationTime());
+    assertEquals(epochAdapter.unmarshal(claims.getNotBefore().getValue()),
+                 claimsDecoded.getNotBefore());
+    assertEquals(epochAdapter.unmarshal(claims.getIssuedAt().getValue()),
+                 claimsDecoded.getIssuedAt());
     assertEquals(claims.getJwtId(), claimsDecoded.getJwtId());
 
     JwtClaims joseClaims = new JwtClaims();
     joseClaims.setIssuer("Issuer");
     joseClaims.setAudience("Audience");
-    joseClaims.setExpirationTime(Instant.ofEpochSecond(claims.getExpirationTime().getValue()));
-    joseClaims.setNotBefore(Instant.ofEpochSecond(claims.getNotBefore().getValue()));
-    joseClaims.setIssuedAt(Instant.ofEpochMilli(claims.getIssuedAt().getValue()));
+    joseClaims.setExpirationTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(claims.getExpirationTime().getValue()), ZoneId.of("UTC")));
+    joseClaims.setNotBefore(ZonedDateTime.ofInstant(Instant.ofEpochSecond(claims.getNotBefore().getValue()), ZoneId.of("UTC")));
+    joseClaims.setIssuedAt(ZonedDateTime.ofInstant(Instant.ofEpochSecond(claims.getIssuedAt().getValue()), ZoneId.of("UTC")));
     joseClaims.setJwtId(claims.getJwtId());
     joseClaims.setSubject(claims.getSubject());
 
@@ -204,8 +213,8 @@ public class InteropTest {
     JwtClaims claims = new JwtClaims()
       .setAudience("Quality assurance")
       .setIssuer("tester")
-      .setIssuedAt(Instant.now())
-      .setExpirationTime(Instant.now().plus(5, ChronoUnit.MINUTES))
+      .setIssuedAt(ZonedDateTime.now(ZoneId.of("UTC")))
+      .setExpirationTime(ZonedDateTime.now().plus(5, ChronoUnit.MINUTES))
       .setJwtId(UUID.randomUUID().toString())
       .setSubject("Test")
       .addClaim("email", "foo@bar.com");

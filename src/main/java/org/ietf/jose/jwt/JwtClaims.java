@@ -17,7 +17,9 @@ package org.ietf.jose.jwt;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.time.temporal.ChronoField;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -25,7 +27,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterInstantLong;
+import org.ietf.jose.adapter.XmlAdapterEpochZonedDateTime;
 import org.ietf.jose.jws.JsonSerializable;
 import org.ietf.jose.util.JsonMarshaller;
 
@@ -106,8 +108,8 @@ public class JwtClaims extends JsonSerializable {
    * number containing a NumericDate value. Use of this claim is OPTIONAL.
    */
   @XmlElement(name = "exp")
-  @XmlJavaTypeAdapter(type = Instant.class, value = XmlAdapterInstantLong.class)
-  private Instant expirationTime;
+  @XmlJavaTypeAdapter(XmlAdapterEpochZonedDateTime.class)
+  private ZonedDateTime expirationTime;
   /**
    * 4.1.5. "nbf" (Not Before) Claim The "nbf" (not before) claim identifies the
    * time before which the JWT MUST NOT be accepted for processing. The
@@ -118,8 +120,8 @@ public class JwtClaims extends JsonSerializable {
    * NumericDate value. Use of this claim is OPTIONAL.
    */
   @XmlElement(name = "nbf")
-  @XmlJavaTypeAdapter(type = Instant.class, value = XmlAdapterInstantLong.class)
-  private Instant notBefore;
+  @XmlJavaTypeAdapter(XmlAdapterEpochZonedDateTime.class)
+  private ZonedDateTime notBefore;
   /**
    * 4.1.6. "iat" (Issued At) Claim The "iat" (issued at) claim identifies the
    * time at which the JWT was issued. This claim can be used to determine the
@@ -127,8 +129,8 @@ public class JwtClaims extends JsonSerializable {
    * Use of this claim is OPTIONAL.
    */
   @XmlElement(name = "iat")
-  @XmlJavaTypeAdapter(type = Instant.class, value = XmlAdapterInstantLong.class)
-  private Instant issuedAt;
+  @XmlJavaTypeAdapter(XmlAdapterEpochZonedDateTime.class)
+  private ZonedDateTime issuedAt;
   /**
    * 4.1.7. "jti" (JWT ID) Claim The "jti" (JWT ID) claim provides a unique
    * identifier for the JWT. The identifier value MUST be assigned in a manner
@@ -142,108 +144,27 @@ public class JwtClaims extends JsonSerializable {
   @XmlElement(name = "jti")
   private String jwtId;
 
+  /**
+   * TODO: White an XML adapter to handle claims.
+   * <p>
+   * A collection of Public and/or Private claims. See RFC 7519 JSON Web Token
+   * (JWT) sections 4.2 and 4.3.
+   * <p>
+   * 4.2. Public Claim Names. Claim Names can be defined at will by those using
+   * JWTs. Any new Claim Name should either be registered in the IANA "JSON Web
+   * Token Claims" registry.
+   * <p>
+   * 4.3. Private Claim Names. A producer and consumer of a JWT MAY agree to use
+   * Private Claim Names. Private Claim Names are subject to collision and
+   * should be used with caution.
+   */
+  @XmlTransient
+  private Map<String, Object> claims;
+
   public JwtClaims() {
   }
 
-  /**
-   * Strip the sub-second component of a java.time.Instant to ensure conformance
-   * with the JWT NumericDate timestamp format
-   *
-   * @param instant non-null Instant
-   * @return an instance with sub-second component set to 0
-   * @see <a href="">RCF 7519 § 2. Terminology</a>
-   */
-  private static Instant removeSubseconds(Instant instant) {
-    return instant.with(ChronoField.MILLI_OF_SECOND, 0L);
-  }
-
-  public JwtClaims setExpirationTime(Instant expirationTime) {
-    this.expirationTime = removeSubseconds(expirationTime);
-    return this;
-  }
-
-  public JwtClaims setNotBefore(Instant notBefore) {
-    this.notBefore = removeSubseconds(notBefore);
-    return this;
-  }
-
-  public JwtClaims setIssuedAt(Instant issuedAt) {
-    this.issuedAt = removeSubseconds(issuedAt);
-    return this;
-  }
-
-  @XmlTransient
-  private static final Set<String> RESERVED_CLAIM_NAMES = Arrays.stream(JwtClaims.class.getDeclaredFields())
-    .filter(field -> field.isAnnotationPresent(XmlElement.class))
-    .flatMap(field -> Arrays.stream(field.getAnnotationsByType(XmlElement.class)))
-    .map(XmlElement::name)
-    .collect(Collectors.toSet());
-
-  @XmlTransient
-  private static final XmlAdapterInstantLong DATE_ADAPTER = new XmlAdapterInstantLong();
-  @XmlTransient
-  private static final Class<?> UNMARSHALLING_CLASS = (new HashMap<String, Object>()).getClass();
-  @XmlTransient
-  private Map<String, Object> claims = new HashMap<>();
-
-  /**
-   * Create JWT Claims instance from JSON string
-   *
-   * @param json a valid JSON string representing JWT claims
-   * @return A JwtClaims object
-   * @throws IOException on json marshal error
-   */
-  @SuppressWarnings("unchecked")
-  public static JwtClaims fromJson(String json) throws IOException {
-    Map<String, Object> valueMap = (Map<String, Object>) JsonMarshaller.fromJson(json, UNMARSHALLING_CLASS);
-    JwtClaims claims = new JwtClaims();
-    claims.issuer = (String) valueMap.remove("iss");
-    claims.subject = (String) valueMap.remove("sub");
-    claims.audience = (String) valueMap.remove("aud");
-    claims.jwtId = (String) valueMap.remove("jti");
-    claims.expirationTime = convertToInstant(valueMap.remove("exp"));
-    claims.notBefore = convertToInstant(valueMap.remove("nbf"));
-    claims.issuedAt = convertToInstant(valueMap.remove("iat"));
-    claims.claims = valueMap;
-
-    return claims;
-  }
-
-  /**
-   * Internal utility method for converting a value to Instant
-   *
-   * @param value
-   * @return
-   */
-  private static Instant convertToInstant(Object value) {
-    if (value == null) {
-      return null;
-    }
-    if (value instanceof Integer) {
-      return DATE_ADAPTER.unmarshal((long) (int) value);
-    }
-    if (value instanceof Long) {
-      return DATE_ADAPTER.unmarshal((Long) value);
-    }
-    throw new IllegalArgumentException("Unsupported type for date field: " + value.getClass());
-  }
-
-  /**
-   * Fluent method to add a claim with an arbitrary name that does not clash
-   * with one of the standard claim names.
-   *
-   * @param claimName  claim name
-   * @param claimValue claim value
-   * @return this JwtClaims instance
-   */
-  public JwtClaims addClaim(String claimName, Object claimValue) {
-    if (RESERVED_CLAIM_NAMES.contains(claimName)) {
-      throw new IllegalArgumentException("Cannot use reserved claim name " + claimName);
-    }
-    claims.put(claimName, claimValue);
-    return this;
-  }
-
+  //<editor-fold defaultstate="collapsed" desc="Getter and Setter">
   public String getIssuer() {
     return this.issuer;
   }
@@ -271,16 +192,35 @@ public class JwtClaims extends JsonSerializable {
     return this;
   }
 
-  public Instant getExpirationTime() {
-    return this.expirationTime;
+  public ZonedDateTime getExpirationTime() {
+    return expirationTime;
   }
 
-  public Instant getNotBefore() {
-    return this.notBefore;
+  public JwtClaims setExpirationTime(ZonedDateTime expirationTime) {
+    /**
+     * Developer note: Must truncate the ZonedDateTime to seconds or EQUALS will
+     * fail to match due to nanosecond time component.
+     */
+    this.expirationTime = expirationTime == null ? null : expirationTime.truncatedTo(ChronoUnit.SECONDS);
+    return this;
   }
 
-  public Instant getIssuedAt() {
-    return this.issuedAt;
+  public ZonedDateTime getNotBefore() {
+    return notBefore;
+  }
+
+  public JwtClaims setNotBefore(ZonedDateTime notBefore) {
+    this.notBefore = notBefore == null ? null : notBefore.truncatedTo(ChronoUnit.SECONDS);
+    return this;
+  }
+
+  public ZonedDateTime getIssuedAt() {
+    return issuedAt;
+  }
+
+  public JwtClaims setIssuedAt(ZonedDateTime issuedAt) {
+    this.issuedAt = issuedAt == null ? null : issuedAt.truncatedTo(ChronoUnit.SECONDS);
+    return this;
   }
 
   public String getJwtId() {
@@ -301,9 +241,75 @@ public class JwtClaims extends JsonSerializable {
     return this;
   }
 
+  @XmlTransient
+  private static final Set<String> RESERVED_CLAIM_NAMES = Arrays.stream(JwtClaims.class.getDeclaredFields())
+    .filter(field -> field.isAnnotationPresent(XmlElement.class))
+    .flatMap(field -> Arrays.stream(field.getAnnotationsByType(XmlElement.class)))
+    .map(XmlElement::name)
+    .collect(Collectors.toSet());
+
+  /**
+   * Fluent method to add a claim with an arbitrary name that does not clash
+   * with one of the standard claim names.
+   *
+   * @param claimName  claim name
+   * @param claimValue claim value
+   * @return this JwtClaims instance
+   */
+  public JwtClaims addClaim(String claimName, Object claimValue) {
+    if (RESERVED_CLAIM_NAMES.contains(claimName)) {
+      throw new IllegalArgumentException("Cannot use reserved claim name " + claimName);
+    }
+    if (claims == null) {
+      claims = new HashMap<>();
+    }
+    claims.put(claimName, claimValue);
+    return this;
+  }//</editor-fold>
+
+  /**
+   * Create JWT Claims instance from JSON string
+   *
+   * @param json a valid JSON string representing JWT claims
+   * @return A JwtClaims object
+   * @throws IOException on json marshal error
+   * @throws Exception   if the date times fail to unmarshal
+   */
+  public static JwtClaims fromJson(final String json) throws IOException, Exception {
+    Class<?> unmarshallingClass = (new HashMap<String, Object>()).getClass();
+    Map<String, Object> valueMap = (Map<String, Object>) JsonMarshaller.fromJson(json, unmarshallingClass);
+    JwtClaims claims = new JwtClaims();
+    claims.issuer = (String) valueMap.remove("iss");
+    claims.subject = (String) valueMap.remove("sub");
+    claims.audience = (String) valueMap.remove("aud");
+    claims.jwtId = (String) valueMap.remove("jti");
+    claims.expirationTime = unmarshalZonedDateTime(valueMap.remove("exp"));
+    claims.notBefore = unmarshalZonedDateTime(valueMap.remove("nbf"));
+    claims.issuedAt = unmarshalZonedDateTime(valueMap.remove("iat"));
+    claims.claims = valueMap.isEmpty() ? null : valueMap;
+    return claims;
+  }
+
+  /**
+   * Internal helper method to unmarshal an object (expect String, Integer, Long
+   * or NULL) to a UTC ZonedDateTime instance.
+   *
+   * @param v the object instance
+   * @return a ZonedDateTime instance, null if the input is null
+   */
+  private static ZonedDateTime unmarshalZonedDateTime(Object v) {
+    return v == null
+           ? null
+           : ZonedDateTime.ofInstant(Instant.ofEpochSecond(Long.parseLong(String.valueOf(v))), ZoneId.of("UTC"));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String toJson() throws IOException {
     Map<String, Object> jsonObject = new LinkedHashMap<>();
+
     if (issuer != null) {
       jsonObject.put("iss", issuer);
     }
@@ -313,19 +319,21 @@ public class JwtClaims extends JsonSerializable {
     if (audience != null) {
       jsonObject.put("aud", audience);
     }
-    if (expirationTime != null) {
-      jsonObject.put("exp", DATE_ADAPTER.marshal(expirationTime));
-    }
-    if (notBefore != null) {
-      jsonObject.put("nbf", DATE_ADAPTER.marshal(notBefore));
-    }
-    if (issuedAt != null) {
-      jsonObject.put("iat", DATE_ADAPTER.marshal(issuedAt));
-    }
     if (jwtId != null) {
       jsonObject.put("jti", jwtId);
     }
-    jsonObject.putAll(claims);
+    if (expirationTime != null) {
+      jsonObject.put("exp", expirationTime.toEpochSecond());
+    }
+    if (notBefore != null) {
+      jsonObject.put("nbf", notBefore.toEpochSecond());
+    }
+    if (issuedAt != null) {
+      jsonObject.put("iat", issuedAt.toEpochSecond());
+    }
+    if (claims != null) {
+      jsonObject.putAll(claims);
+    }
     return JsonMarshaller.toJson(jsonObject);
   }
 

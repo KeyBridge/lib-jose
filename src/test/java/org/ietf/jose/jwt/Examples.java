@@ -1,5 +1,12 @@
 package org.ietf.jose.jwt;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
@@ -10,14 +17,6 @@ import org.ietf.jose.jws.SignatureValidator;
 import org.ietf.jose.util.Base64Utility;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -39,32 +38,33 @@ public class Examples {
   @Test
   public void createConsumeAndValidateSignedExample() throws Exception {
     /**
-     * Create a JWT claims set object. Please refer to RFC 7519 § 4.1. Registered Claim Names for details
-     * about each claim.
-     *
+     * Create a JWT claims set object. Please refer to RFC 7519 § 4.1.
+     * Registered Claim Names for details about each claim.
+     * <p>
      * Note the use of chained setters.
      */
     JwtClaims joseClaims = new JwtClaims()
-        .setIssuer("Issuer")
-        .setAudience("Audience");
+      .setIssuer("Issuer")
+      .setAudience("Audience");
     // Set the expiration time of this JWT to be two hours from now
-    joseClaims.setExpirationTime(Instant.now().plus(2, ChronoUnit.HOURS));
+    joseClaims.setExpirationTime(ZonedDateTime.now().plus(2, ChronoUnit.HOURS));
     // A JWT must be processed on or after the Not Before values. Let's set this to one minute from now
-    joseClaims.setNotBefore(Instant.now().minus(1, ChronoUnit.MINUTES));
-    joseClaims.setIssuedAt(Instant.now());
+    joseClaims.setNotBefore(ZonedDateTime.now().minus(1, ChronoUnit.MINUTES));
+    joseClaims.setIssuedAt(ZonedDateTime.now());
     /**
-     * The JWT ID is used a nonce to prevent replay attacks. It is recommended to use a random UUID
+     * The JWT ID is used a nonce to prevent replay attacks. It is recommended
+     * to use a random UUID
      */
     joseClaims
-        .setJwtId(UUID.randomUUID().toString())
-        .setSubject("Subject");
+      .setJwtId(UUID.randomUUID().toString())
+      .setSubject("Subject");
 
     /**
      * Custom claims are also supported.
      */
     joseClaims
-        .addClaim("domain", "somedomain.com")
-        .addClaim("email", "someone@somedomain.com");
+      .addClaim("domain", "somedomain.com")
+      .addClaim("email", "someone@somedomain.com");
 
     /**
      * Convert the JWT Claims objects to JSON
@@ -79,9 +79,9 @@ public class Examples {
      * Create a JSON Web Signature with the serialized JWT Claims as payload.
      */
     JwsBuilder.Signable jwsBuilder = JwsBuilder.getInstance()
-        .withStringPayload(joseClaimsJson)
-        // sign it with our private key
-        .sign(keyPair.getPrivate(), JwsAlgorithmType.RS256, keyId);
+      .withStringPayload(joseClaimsJson)
+      // sign it with our private key
+      .sign(keyPair.getPrivate(), JwsAlgorithmType.RS256, keyId);
     String jwt = jwsBuilder.buildCompact();
     System.out.println("JWT:");
     System.out.println(jwt);
@@ -92,8 +92,8 @@ public class Examples {
      */
     JwtReader jwtDecoded = JwtReader.readCompactForm(jwt);
     /**
-     * The JWT can be either a JWS (JSON Web Signature) or a JWE (JSON Web Encryption) object,
-     * and the type can be determined with JWT::getType.
+     * The JWT can be either a JWS (JSON Web Signature) or a JWE (JSON Web
+     * Encryption) object, and the type can be determined with JWT::getType.
      */
     assertEquals(JwtReader.JwtType.signed, jwtDecoded.getType());
     /**
@@ -127,21 +127,21 @@ public class Examples {
   @Test
   public void createConsumeAndValidateEncryptedExample() throws Exception {
     /**
-     * Create a JWT claims set object. Please refer to RFC 7519 § 4.1. Registered Claim Names for details
-     * about each claim.
-     *
+     * Create a JWT claims set object. Please refer to RFC 7519 § 4.1.
+     * Registered Claim Names for details about each claim.
+     * <p>
      * Note the use of chained setters.
      */
     JwtClaims joseClaims = new JwtClaims()
-        .setIssuer("Issuer")
-        .setAudience("Audience")
-        .setExpirationTime(Instant.now().plus(2, ChronoUnit.HOURS))
-        .setNotBefore(Instant.now().minus(1, ChronoUnit.MINUTES))
-        .setIssuedAt(Instant.now())
-        .setJwtId(UUID.randomUUID().toString())
-        .setSubject("Subject")
-        .addClaim("domain", "somedomain.com")
-        .addClaim("email", "someone@somedomain.com");
+      .setIssuer("Issuer")
+      .setAudience("Audience")
+      .setExpirationTime(ZonedDateTime.now().plus(2, ChronoUnit.HOURS))
+      .setNotBefore(ZonedDateTime.now().minus(1, ChronoUnit.MINUTES))
+      .setIssuedAt(ZonedDateTime.now())
+      .setJwtId(UUID.randomUUID().toString())
+      .setSubject("Subject")
+      .addClaim("domain", "somedomain.com")
+      .addClaim("email", "someone@somedomain.com");
 
     /**
      * Convert the JWT Claims objects to JSON
@@ -163,8 +163,8 @@ public class Examples {
      * Create a JSON Web Signature with the serialized JWT Claims as payload.
      */
     JsonWebEncryption jwe = JweBuilder.getInstance()
-        .withStringPayload(joseClaimsJson)
-        .buildJweJsonFlattened(Base64Utility.toBase64Url(secret));
+      .withStringPayload(joseClaimsJson)
+      .buildJweJsonFlattened(Base64Utility.toBase64Url(secret));
     String jwt = jwe.toCompactForm();
     System.out.println("JWT:");
     System.out.println(jwt);
@@ -181,8 +181,8 @@ public class Examples {
     JsonWebEncryption jweDecoded = jwtDecoded.getJsonWebEncryption();
 
     String plaintext = JweDecryptor.createFor(jweDecoded)
-        .decrypt(secret)
-        .getAsString();
+      .decrypt(secret)
+      .getAsString();
 
     System.out.println("JWT Claims as JSON: " + plaintext);
     JwtClaims claims = JwtClaims.fromJson(plaintext);
@@ -195,10 +195,10 @@ public class Examples {
 
     /**
      * Validate the JWT
-     *
-     * An encrypted JWT is implicitly validated during decryption. Unsuccessful decryption means
-     * that either an incorrect decryption key has been used or that the encrypted message has been
-     * tampered with and is invalid.
+     * <p>
+     * An encrypted JWT is implicitly validated during decryption. Unsuccessful
+     * decryption means that either an incorrect decryption key has been used or
+     * that the encrypted message has been tampered with and is invalid.
      */
   }
 }

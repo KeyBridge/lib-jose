@@ -28,7 +28,7 @@ public abstract class JsonSerializable {
   @Override
   public String toString() {
     try {
-      return JsonMarshaller.toJson(this);
+      return JsonMarshaller.toJsonPrettyFormatted(this);
     } catch (IOException ex) {
       return this.getClass().getSimpleName() + " serializer error " + ex.getMessage();
     }
