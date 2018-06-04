@@ -15,10 +15,11 @@
  */
 package org.ietf.jose.jwk;
 
+import java.util.List;
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.List;
 
 /**
  * RFC 7517 JSON Web Key (JWK)
@@ -68,29 +69,33 @@ public class JwkSet {
     this.keys = keys;
   }
 
-  public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof JwkSet)) return false;
-    final JwkSet other = (JwkSet) o;
-    if (!other.canEqual((Object) this)) return false;
-    final Object this$keys = this.getKeys();
-    final Object other$keys = other.getKeys();
-    if (this$keys == null ? other$keys != null : !this$keys.equals(other$keys)) return false;
-    return true;
+  @Override
+  public int hashCode() {
+    int hash = 3;
+    hash = 43 * hash + Objects.hashCode(this.keys);
+    return hash;
   }
 
-  public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    final Object $keys = this.getKeys();
-    result = result * PRIME + ($keys == null ? 43 : $keys.hashCode());
-    return result;
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final JwkSet other = (JwkSet) obj;
+    return Objects.equals(this.keys, other.keys);
   }
 
   protected boolean canEqual(Object other) {
     return other instanceof JwkSet;
   }
 
+  @Override
   public String toString() {
     return "JwkSet(keys=" + this.getKeys() + ")";
   }

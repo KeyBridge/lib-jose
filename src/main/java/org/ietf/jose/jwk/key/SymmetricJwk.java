@@ -15,12 +15,11 @@
  */
 package org.ietf.jose.jwk.key;
 
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.jwk.JsonWebKey;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.jwk.JsonWebKey;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -58,29 +57,4 @@ public class SymmetricJwk extends JsonWebKey {
     this.k = k;
   }
 
-  public String toString() {
-    return "SymmetricJwk(k=" + java.util.Arrays.toString(this.getK()) + ")";
-  }
-
-  public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof SymmetricJwk)) return false;
-    final SymmetricJwk other = (SymmetricJwk) o;
-    if (!other.canEqual((Object) this)) return false;
-    if (!super.equals(o)) return false;
-    if (!java.util.Arrays.equals(this.getK(), other.getK())) return false;
-    return true;
-  }
-
-  public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    result = result * PRIME + super.hashCode();
-    result = result * PRIME + java.util.Arrays.hashCode(this.getK());
-    return result;
-  }
-
-  protected boolean canEqual(Object other) {
-    return other instanceof SymmetricJwk;
-  }
 }

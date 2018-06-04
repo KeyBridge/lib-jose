@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,8 @@
  */
 package org.ietf.jose.jwa;
 
-import javax.xml.bind.annotation.XmlEnumValue;
 import java.security.spec.AlgorithmParameterSpec;
+import javax.xml.bind.annotation.XmlEnumValue;
 
 /**
  * RFC-7518
@@ -163,8 +163,8 @@ public enum JweKeyAlgorithmType {
    * Returns UNSUPPORTED for incorrect 'alg' values or unsupported key
    * management algorithms
    *
-   * @param alg
-   * @return
+   * @param alg the JOSE algorithm name
+   * @return the corresponding JweKeyAlgorithmType instance
    */
   public static JweKeyAlgorithmType resolveAlgorithm(String alg) {
     if (alg == null || alg.isEmpty()) {
@@ -181,7 +181,7 @@ public enum JweKeyAlgorithmType {
   /**
    * Algorithm name as per the Java Cryptography Architecture (JCA)
    *
-   * @return
+   * @return the JCA algorithm name
    */
   public String getJavaAlgorithm() {
     return javaAlgorithmName;

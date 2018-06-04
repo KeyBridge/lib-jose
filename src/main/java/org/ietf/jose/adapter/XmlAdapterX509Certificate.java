@@ -15,25 +15,25 @@
  */
 package org.ietf.jose.adapter;
 
-import org.ietf.jose.jws.X509CertificateHeader;
+import org.ietf.jose.jws.X5CHeaderParameter;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.Base64;
 
 /**
- * Converts X509CertificateHeader instances into Base64URL-encoded strings and vice
+ * Converts X5CHeaderParameter instances into Base64URL-encoded strings and vice
  versa
  */
-public class XmlAdapterX509Certificate extends XmlAdapter<String, X509CertificateHeader> {
+public class XmlAdapterX509Certificate extends XmlAdapter<String, X5CHeaderParameter> {
 
   @Override
-  public String marshal(X509CertificateHeader v) {
+  public String marshal(X5CHeaderParameter v) {
     return v.toString();
   }
 
   @Override
-  public X509CertificateHeader unmarshal(String v) {
-    X509CertificateHeader certificate = new X509CertificateHeader();
+  public X5CHeaderParameter unmarshal(String v) {
+    X5CHeaderParameter certificate = new X5CHeaderParameter();
     certificate.setData(Base64.getDecoder().decode(v));
     return certificate;
   }

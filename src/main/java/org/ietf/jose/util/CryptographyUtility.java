@@ -15,20 +15,19 @@
  */
 package org.ietf.jose.util;
 
+import java.security.*;
+import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JsonWebKey;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.jwk.key.SymmetricJwk;
-
-import javax.crypto.Cipher;
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.*;
-import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
 
 /**
  * A utility class for common cryptographic operations
@@ -239,11 +238,12 @@ public class CryptographyUtility {
    *
    * @param payloadBytes data to sign
    * @param jwk          JSON Web Key instance
+   * @param algorithm    the JwsAlgorithmType
    * @return bytes of the signature or HMAC
    * @throws GeneralSecurityException in case of failure
    */
   public static byte[] sign(byte[] payloadBytes, JsonWebKey jwk, JwsAlgorithmType algorithm) throws
-      GeneralSecurityException {
+    GeneralSecurityException {
     if (jwk instanceof SymmetricJwk) {
       SymmetricJwk symmetricKey = (SymmetricJwk) jwk;
       String jcaAlgorithm = algorithm.getJavaAlgorithmName();
@@ -278,17 +278,18 @@ public class CryptographyUtility {
   }
 
   /**
-   * Validate digital signature of a keyed message authentication code (HMAC) using a JSON Web Key
+   * Validate digital signature of a keyed message authentication code (HMAC)
+   * using a JSON Web Key
    *
    * @param signature signature bytes
    * @param payload   data used to create the signature
    * @param jwk       a valid JWK
    * @param algorithm JCA algorithm
-   * @return
+   * @return TRUE if the signature is valid
    * @throws GeneralSecurityException in case of failure
    */
   public static boolean validateSignature(byte[] signature, byte[] payload, JsonWebKey jwk, String algorithm) throws
-      GeneralSecurityException {
+    GeneralSecurityException {
     if (jwk instanceof SymmetricJwk) {
       SymmetricJwk symmetricKey = (SymmetricJwk) jwk;
       SecretKey key = new SecretKeySpec(symmetricKey.getK(), algorithm);

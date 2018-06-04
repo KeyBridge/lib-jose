@@ -16,16 +16,16 @@
 package org.ietf.jose.jws;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.ietf.jose.adapter.XmlAdapterX509Certificate;
-import org.ietf.jose.jwa.JweKeyAlgorithmType;
-import org.ietf.jose.jwa.JwsAlgorithmType;
-
+import java.net.URI;
+import java.util.List;
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.net.URI;
-import java.util.List;
+import org.ietf.jose.adapter.XmlAdapterX509Certificate;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
+import org.ietf.jose.jwa.JwsAlgorithmType;
 
 /**
  * An abstract JOSE object.
@@ -77,8 +77,9 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 /**
- * Developer note: When deserialising from JSON, ignore unknown fields without
- * throwing exceptions.
+ * Developer note: JsonIgnoreProperties annotation ensures that when
+ * deserialising from JSON, unknown fields are ignored without throwing
+ * exceptions.
  *
  * @see
  * <a href="https://fasterxml.github.io/jackson-annotations/javadoc/2.6/com/fasterxml/jackson/annotation/JsonIgnoreProperties.html#ignoreUnknown()">ignoreUnknown</a>
@@ -154,8 +155,8 @@ public abstract class AbstractHeader {
    * certificate or certificate chain to be invalid if any validation failure
    * occurs. Use of this Header Parameter is OPTIONAL.
    */
-  @XmlJavaTypeAdapter(type = X509CertificateHeader.class, value = XmlAdapterX509Certificate.class)
-  protected List<X509CertificateHeader> x5c;
+  @XmlJavaTypeAdapter(type = X5CHeaderParameter.class, value = XmlAdapterX509Certificate.class)
+  protected List<X5CHeaderParameter> x5c;
   /**
    * 4.1.7. "x5t" (X.509 Certificate SHA-1 Thumbprint) Header Parameter
    * <p>
@@ -222,11 +223,11 @@ public abstract class AbstractHeader {
     this.x5u = x5u;
   }
 
-  public List<X509CertificateHeader> getX5c() {
+  public List<X5CHeaderParameter> getX5c() {
     return this.x5c;
   }
 
-  public void setX5c(List<X509CertificateHeader> x5c) {
+  public void setX5c(List<X5CHeaderParameter> x5c) {
     this.x5c = x5c;
   }
 
@@ -244,59 +245,65 @@ public abstract class AbstractHeader {
 
   public void setX5tS256(String x5tS256) {
     this.x5tS256 = x5tS256;
-  }
+  }//</editor-fold>
 
-  public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof AbstractHeader)) return false;
-    final AbstractHeader other = (AbstractHeader) o;
-    if (!other.canEqual((Object) this)) return false;
-    final Object this$alg = this.getAlg();
-    final Object other$alg = other.getAlg();
-    if (this$alg == null ? other$alg != null : !this$alg.equals(other$alg)) return false;
-    final Object this$kid = this.getKid();
-    final Object other$kid = other.getKid();
-    if (this$kid == null ? other$kid != null : !this$kid.equals(other$kid)) return false;
-    final Object this$x5u = this.getX5u();
-    final Object other$x5u = other.getX5u();
-    if (this$x5u == null ? other$x5u != null : !this$x5u.equals(other$x5u)) return false;
-    final Object this$x5c = this.getX5c();
-    final Object other$x5c = other.getX5c();
-    if (this$x5c == null ? other$x5c != null : !this$x5c.equals(other$x5c)) return false;
-    final Object this$x5t = this.getX5t();
-    final Object other$x5t = other.getX5t();
-    if (this$x5t == null ? other$x5t != null : !this$x5t.equals(other$x5t)) return false;
-    final Object this$x5tS256 = this.getX5tS256();
-    final Object other$x5tS256 = other.getX5tS256();
-    if (this$x5tS256 == null ? other$x5tS256 != null : !this$x5tS256.equals(other$x5tS256)) return false;
-    return true;
-  }
-
+  @Override
   public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    final Object $alg = this.getAlg();
-    result = result * PRIME + ($alg == null ? 43 : $alg.hashCode());
-    final Object $kid = this.getKid();
-    result = result * PRIME + ($kid == null ? 43 : $kid.hashCode());
-    final Object $x5u = this.getX5u();
-    result = result * PRIME + ($x5u == null ? 43 : $x5u.hashCode());
-    final Object $x5c = this.getX5c();
-    result = result * PRIME + ($x5c == null ? 43 : $x5c.hashCode());
-    final Object $x5t = this.getX5t();
-    result = result * PRIME + ($x5t == null ? 43 : $x5t.hashCode());
-    final Object $x5tS256 = this.getX5tS256();
-    result = result * PRIME + ($x5tS256 == null ? 43 : $x5tS256.hashCode());
-    return result;
+    int hash = 5;
+    hash = 41 * hash + Objects.hashCode(this.alg);
+    hash = 41 * hash + Objects.hashCode(this.kid);
+    hash = 41 * hash + Objects.hashCode(this.x5u);
+    hash = 41 * hash + Objects.hashCode(this.x5c);
+    hash = 41 * hash + Objects.hashCode(this.x5t);
+    hash = 41 * hash + Objects.hashCode(this.x5tS256);
+    return hash;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final AbstractHeader other = (AbstractHeader) obj;
+    if (!Objects.equals(this.alg, other.alg)) {
+      return false;
+    }
+    if (!Objects.equals(this.kid, other.kid)) {
+      return false;
+    }
+    if (!Objects.equals(this.x5t, other.x5t)) {
+      return false;
+    }
+    if (!Objects.equals(this.x5tS256, other.x5tS256)) {
+      return false;
+    }
+    if (!Objects.equals(this.x5u, other.x5u)) {
+      return false;
+    }
+    return Objects.equals(this.x5c, other.x5c);
+  }
+
+  /**
+   * Inspect the other class to determine if this and the other class are the
+   * same instance type.
+   *
+   * @param other the other class
+   * @return TRUE if {@code this} is an instance of {@code other}
+   */
   protected boolean canEqual(Object other) {
-    return other instanceof AbstractHeader;
+    return this.getClass().isInstance(other);
   }
 
+  @Override
   public String toString() {
-    return "AbstractHeader(alg=" + this.getAlg() + ", kid=" + this.getKid() + ", x5u=" + this.getX5u() + ", x5c=" +
-        this.getX5c() + ", x5t=" + this.getX5t() + ", x5tS256=" + this.getX5tS256() + ")";
+    return "AbstractHeader(alg=" + this.getAlg() + ", kid=" + this.getKid() + ", x5u=" + this.getX5u() + ", x5c="
+      + this.getX5c() + ", x5t=" + this.getX5t() + ", x5tS256=" + this.getX5tS256() + ")";
   }
-  //</editor-fold>
+
 }

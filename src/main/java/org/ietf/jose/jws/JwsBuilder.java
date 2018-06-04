@@ -15,17 +15,16 @@
  */
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JsonWebKey;
-import org.ietf.jose.util.Base64Utility;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.util.Base64Utility;
 
 /**
  * A builder for JSON Web Signature objects.
@@ -75,10 +74,10 @@ public class JwsBuilder {
      */
     private byte[] payload;
     /**
-     * The "signature" member MUST be present and contain the value BASE64URL(JWS
-     * Signature).
+     * The "signature" member MUST be present and contain the value
+     * BASE64URL(JWS Signature).
      */
-    private List<Signature> signatures = new ArrayList<>();
+    private final List<Signature> signatures = new ArrayList<>();
 
     /**
      * The "protected" member MUST be present and contain the value
@@ -130,7 +129,8 @@ public class JwsBuilder {
     /**
      * Sign using a JWK
      *
-     * @param key a JWK instance
+     * @param key       a JWK instance
+     * @param algorithm the JwsAlgorithmType
      * @return this builder
      * @throws IOException              in case of failure to serialise the
      *                                  protected header to JSON
@@ -146,14 +146,15 @@ public class JwsBuilder {
      *
      * @param key       Key instance (either a PrivateKey or a SecretKey)
      * @param algorithm a signature algorithm suitable for the provided key
-     * @param keyId     a key ID which is put in the protected header's 'kid' field
+     * @param keyId     a key ID which is put in the protected header's 'kid'
+     *                  field
      * @return this builder
      * @throws IOException              in case of failure to serialise the
      *                                  protected header to JSON
      * @throws GeneralSecurityException in case of failure to sign
      */
     public Signable sign(Key key, JwsAlgorithmType algorithm, String keyId) throws IOException,
-        GeneralSecurityException {
+      GeneralSecurityException {
       if (protectedHeader == null) {
         this.protectedHeader = new JwsHeader();
       }
@@ -168,14 +169,15 @@ public class JwsBuilder {
      *
      * @param secret    a base64URL-encoded secret (e.g. a passphrase)
      * @param algorithm a signature algorithm suitable for the provided key
-     * @param keyId     a key ID which is put in the protected header's 'kid' field
+     * @param keyId     a key ID which is put in the protected header's 'kid'
+     *                  field
      * @return this builder
      * @throws IOException              in case of failure to serialise the
      *                                  protected header to JSON
      * @throws GeneralSecurityException in case of failure to sign
      */
     public Signable sign(String secret, JwsAlgorithmType algorithm, String keyId) throws IOException,
-        GeneralSecurityException {
+      GeneralSecurityException {
       SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(secret), algorithm.getJavaAlgorithmName());
       return sign(key, algorithm, keyId);
     }
