@@ -47,20 +47,11 @@ public class InteropTest {
   public void jwkInteropTest() throws Exception {
 //    RsaJsonWebKey rsaJsonWebKey = RsaJwkGenerator.generateJwk(2048);
 
-<<<<<<< HEAD
-    KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-    kpg.initialize(2048);
-//    kpg.initialize(1024);
-    KeyPair kp = kpg.generateKeyPair();
-
-    System.out.println(kp.getPrivate().getAlgorithm());
-=======
 //org.jose4j.lang.InvalidKeyException:
 // An RSA key of size 2048 bits or larger MUST be used with the all JOSE RSA algorithms (given key was only 1024 bits).
     KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
     keyPairGenerator.initialize(2048);
     KeyPair kp = keyPairGenerator.generateKeyPair();
->>>>>>> master
 
     // Give the JWK a Key ID (kid), which is just the polite thing to do
 //    rsaJsonWebKey.setKeyId("k1");
