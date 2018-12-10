@@ -100,7 +100,7 @@
     <dependency>
       <groupId>keybridge.lib</groupId>
       <artifactId>cryptography</artifactId>
-      <version>3.8.1</version>
+      <version>4.1.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
