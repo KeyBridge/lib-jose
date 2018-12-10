@@ -80,7 +80,7 @@ public class JWETest {
     byte[] payload = payloadString.getBytes(UTF_8);
 
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-    generator.initialize(1024);
+    generator.initialize(2048);
     KeyPair pair = generator.generateKeyPair();
 
     JsonWebEncryption jwe = JweBuilder.getInstance()
@@ -100,7 +100,7 @@ public class JWETest {
     byte[] binaryPayload = stringPayload.getBytes(StandardCharsets.UTF_8);
 
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-    generator.initialize(1024);
+    generator.initialize(2048);
     KeyPair pair = generator.generateKeyPair();
 
     JsonWebEncryption jwe = JweBuilder.getInstance()

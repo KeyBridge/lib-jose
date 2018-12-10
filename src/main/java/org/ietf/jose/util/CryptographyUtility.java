@@ -75,6 +75,7 @@ public class CryptographyUtility {
    * @throws GeneralSecurityException in case of failure
    */
   public static byte[] encrypt(byte[] payload, Key key, String algo, AlgorithmParameterSpec spec, byte[] additionalAuthenticationData) throws GeneralSecurityException {
+    validateAsymmetricKey(key);
     Cipher cipher = Cipher.getInstance(algo);
     cipher.init(Cipher.ENCRYPT_MODE, key, spec);
     if (additionalAuthenticationData != null) {
@@ -96,6 +97,7 @@ public class CryptographyUtility {
    * @throws GeneralSecurityException in case of failure
    */
   public static byte[] decrypt(byte[] ciphertext, Key key, String algo, AlgorithmParameterSpec spec, byte[] additionalAuthenticationData) throws GeneralSecurityException {
+    validateAsymmetricKey(key);
     Cipher cipher = Cipher.getInstance(algo);
     cipher.init(Cipher.DECRYPT_MODE, key, spec);
     if (additionalAuthenticationData != null) {
@@ -115,6 +117,7 @@ public class CryptographyUtility {
    * @throws GeneralSecurityException in case of failure
    */
   public static byte[] wrapKey(Key payloadKey, Key key, String algo) throws GeneralSecurityException {
+    validateAsymmetricKey(key);
     Cipher cipher = Cipher.getInstance(algo);
     cipher.init(Cipher.WRAP_MODE, key);
     return cipher.wrap(payloadKey);
@@ -133,6 +136,7 @@ public class CryptographyUtility {
    * @throws GeneralSecurityException in case of failure
    */
   public static Key unwrapKey(byte[] payload, Key key, String algo, String keyAlgo) throws GeneralSecurityException {
+    validateAsymmetricKey(key);
     Cipher cipher = Cipher.getInstance(algo);
     cipher.init(Cipher.UNWRAP_MODE, key);
     return cipher.unwrap(payload, keyAlgo, Cipher.SECRET_KEY);
@@ -196,10 +200,19 @@ public class CryptographyUtility {
    * @throws GeneralSecurityException in case of failure
    */
   public static byte[] sign(byte[] payload, PrivateKey key, String alg) throws GeneralSecurityException {
+    validateAsymmetricKey(key);
     Signature signer = Signature.getInstance(alg);
     signer.initSign(key);
     signer.update(payload);
     return signer.sign();
+  }
+
+  private static void validateAsymmetricKey(Key key) {
+    if ("RSA".equals(key.getAlgorithm())) {
+      if (key.getEncoded().length < (2048 / 8)) {
+        throw new IllegalArgumentException("A key of size 2048 bits or larger MUST be used with this algorithm: RSA. ");
+      }
+    }
   }
 
   /**
@@ -213,6 +226,7 @@ public class CryptographyUtility {
    * @throws GeneralSecurityException in case of failure
    */
   public static boolean validate(byte[] signature, byte[] payload, PublicKey key, String algorithm) throws GeneralSecurityException {
+    validateAsymmetricKey(key);
     Signature sig = Signature.getInstance(algorithm);
     sig.initVerify(key);
     sig.update(payload);
