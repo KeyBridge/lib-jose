@@ -30,8 +30,8 @@ public class JwtClaimsTest {
     String json = JsonMarshaller.toJson(claim);
     String jsonDirect = claim.toJson();
 
-    System.out.println("JsonMarshaller.toJson: " + json);
-    System.out.println("claim.toJson         : " + jsonDirect);
+    System.out.println("  JsonMarshaller.toJson: " + json);
+    System.out.println("  claim.toJson         : " + jsonDirect);
     // test json text
     assertEquals(json, jsonDirect);
     // test object vs reconstituted object
@@ -52,9 +52,10 @@ public class JwtClaimsTest {
 //    but was : org.ietf.jose.jwt.JwtClaims<{"aud":"someAudience","exp":1527964352,"nbf":1527960752,"iat":1527957152}>
     // test object vs. directly reconstituted object
     JwtClaims reconstituted = JwtClaims.fromJson(json);
-    System.out.println("original      " + claim.toJson());
-    System.out.println("reconstituted " + reconstituted.toJson());
+    System.out.println("  original      " + claim.toJson());
+    System.out.println("  reconstituted " + reconstituted.toJson());
     assertEquals(claim, JwtClaims.fromJson(json));
+    System.out.println("JwtClaimsTest equals   OK ");
   }
 
   @Test
@@ -64,8 +65,10 @@ public class JwtClaimsTest {
     claims.addClaim("friends", Arrays.asList("John", "Jack", "Jeremy"));
 
     String json = claims.toJson();
-    System.out.println(json);
+    System.out.println("  toJson   " + json);
     JwtClaims deserialized = JwtClaims.fromJson(json);
     assertEquals(claims, deserialized);
+
+    System.out.println("JwtClaimsTest testCustomClaims   OK ");
   }
 }
