@@ -1,14 +1,14 @@
 package org.ietf.jose.jws;
 
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.PublicKey;
-import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JsonWebKey;
 import org.ietf.jose.util.CryptographyUtility;
 
-import static org.ietf.jose.util.KeyUtility.convertBase64UrlSecretToKey;
+import javax.crypto.SecretKey;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.security.PublicKey;
+
 import static org.ietf.jose.util.KeyUtility.convertSecretToKey;
 
 /**
@@ -84,19 +84,6 @@ public class SignatureValidator {
    * @return true if signature is valid
    */
   public static boolean isValid(Signature signature, SecretKey key) {
-    return isValid(signature.getProtectedHeader(), signature.getSigningInput(), key, signature.getSignatureBytes());
-  }
-
-  /**
-   * Validate signature using shared secret
-   *
-   * @param signature              a valid signature instance
-   * @param base64UrlEncodedSecret base64Url-encoded bytes of the shared secret
-   * @return true if signature is valid
-   */
-  public static boolean isValid(Signature signature, String base64UrlEncodedSecret) {
-    String keyAlgorithm = signature.getProtectedHeader().getJwsAlgorithmType().getJavaAlgorithmName();
-    Key key = convertBase64UrlSecretToKey(keyAlgorithm, base64UrlEncodedSecret);
     return isValid(signature.getProtectedHeader(), signature.getSigningInput(), key, signature.getSignatureBytes());
   }
 

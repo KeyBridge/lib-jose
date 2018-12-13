@@ -17,7 +17,6 @@ package org.ietf.jose.jwe;
 
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
-import org.ietf.jose.util.KeyUtility;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -189,21 +188,5 @@ public class JweBuilder {
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
                                         protectedHeader, unprotectedHeader);
-  }
-
-  /**
-   * Encrypt the payload with the shared secret
-   *
-   * @param base64UrlEncodedSecret base64URL-encoded bytes of the shared secret
-   * @return a JweJsonFlattened instance
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to encrypt
-   */
-  public JsonWebEncryption buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException,
-      GeneralSecurityException {
-    SecretKey key = KeyUtility.convertBase64UrlSecretToKey("AES", base64UrlEncodedSecret);
-    keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
-    return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);
   }
 }
