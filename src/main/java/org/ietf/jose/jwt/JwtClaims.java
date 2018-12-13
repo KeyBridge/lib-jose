@@ -157,6 +157,9 @@ public class JwtClaims extends JsonSerializable {
    * 4.3. Private Claim Names. A producer and consumer of a JWT MAY agree to use
    * Private Claim Names. Private Claim Names are subject to collision and
    * should be used with caution.
+   *
+   * @see <a href="https://www.iana.org/assignments/jwt/jwt.xhtml">JSON Web
+   * Token Claims</a>
    */
   @XmlTransient
   private Map<String, Object> claims;
@@ -227,6 +230,19 @@ public class JwtClaims extends JsonSerializable {
     return this.jwtId;
   }
 
+  /**
+   * 4.1.7. "jti" (JWT ID) Claim The "jti" (JWT ID) claim provides a unique
+   * identifier for the JWT. The identifier value MUST be assigned in a manner
+   * that ensures that there is a negligible probability that the same value
+   * will be accidentally assigned to a different data object; if the
+   * application uses multiple issuers, collisions MUST be prevented among
+   * values produced by different issuers as well. The "jti" claim can be used
+   * to prevent the JWT from being replayed. The "jti" value is a case-
+   * sensitive string. Use of this claim is OPTIONAL.
+   *
+   * @param jwtId a unique identifier for the JWT
+   * @return this instance
+   */
   public JwtClaims setJwtId(String jwtId) {
     this.jwtId = jwtId;
     return this;
