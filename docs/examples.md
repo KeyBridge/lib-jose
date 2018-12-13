@@ -47,7 +47,8 @@ String sampleText = "sample text to sign and encrypt";
 ```
 
 ```java
-String json = JOSE.SignAndEncrypt.write(sampleText, base64UrlEncodedSecret, "myKeyId");```
+SecretKey key = SecretKeyBuilder.fromBase64UrlEncodedString(base64UrlEncodedSecret);
+String json = JOSE.SignAndEncrypt.write(sampleText, key, "myKeyId");```
 ```
 
 The **output** is a signed and encrypted JSON:
@@ -59,7 +60,8 @@ The **output** is a signed and encrypted JSON:
 This JSON string can be decrypted using the same shared secret. 
 
 ```java
-String decrypted = JOSE.SignAndEncrypt.read(json, String.class, base64UrlEncodedSecret);
+SecretKey key = SecretKeyBuilder.fromBase64UrlEncodedString(base64UrlEncodedSecret);
+String decrypted = JOSE.SignAndEncrypt.read(json, String.class, key);
 ```
 
 ## Digital signatures and HMAC codes
@@ -71,10 +73,11 @@ String decrypted = JOSE.SignAndEncrypt.read(json, String.class, base64UrlEncoded
 ```java
 JwsAlgorithmType algorithm = JwsAlgorithmType.HS256;
 String base64UrlEncodedSecret = ... // BASE64URL-encoded bytes of the shared secret
+SecretKey key = SecretKeyBuilder.fromBase64UrlEncodedString(base64UrlEncodedSecret);
 
 JwsBuilder.getInstance()
         .withStringPayload("sample text to sign")
-        .sign(base64UrlEncodedSecret, algorithm, UUID.randomUUID().toString())
+        .sign(key, algorithm, UUID.randomUUID().toString())
         .buildJsonFlattened()
         .toJson();
 ```
@@ -95,7 +98,8 @@ JsonWebSignature jws = JsonWebSignature.fromJson(json);
 
 ```java
 FlattenedJsonSignature jws = FlattenedJsonSignature.fromJson(json);
-SignatureValidator.isValid(jws.getSignatures().get(0), base64UrlEncodedSecret)
+SecretKey key = SecretKeyBuilder.fromBase64UrlEncodedString(base64UrlEncodedSecret);
+SignatureValidator.isValid(jws.getSignatures().get(0), key)
 ```
 
 ### Digital signature

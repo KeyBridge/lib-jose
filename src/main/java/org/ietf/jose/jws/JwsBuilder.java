@@ -15,16 +15,15 @@
  */
 package org.ietf.jose.jws;
 
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.util.Base64Utility;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JsonWebKey;
-import org.ietf.jose.util.Base64Utility;
 
 /**
  * A builder for JSON Web Signature objects.
@@ -162,24 +161,6 @@ public class JwsBuilder {
       this.protectedHeader.setAlg(algorithm.getJoseAlgorithmName());
       this.signatures.add(Signature.getInstance(payload, key, protectedHeader, header));
       return this;
-    }
-
-    /**
-     * Sign with a keyed hash (HMAC)
-     *
-     * @param secret    a base64URL-encoded secret (e.g. a passphrase)
-     * @param algorithm a signature algorithm suitable for the provided key
-     * @param keyId     a key ID which is put in the protected header's 'kid'
-     *                  field
-     * @return this builder
-     * @throws IOException              in case of failure to serialise the
-     *                                  protected header to JSON
-     * @throws GeneralSecurityException in case of failure to sign
-     */
-    public Signable sign(String secret, JwsAlgorithmType algorithm, String keyId) throws IOException,
-      GeneralSecurityException {
-      SecretKey key = new SecretKeySpec(Base64Utility.fromBase64Url(secret), algorithm.getJavaAlgorithmName());
-      return sign(key, algorithm, keyId);
     }
 
     /**

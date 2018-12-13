@@ -21,9 +21,8 @@ import java.security.PublicKey;
 import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
-import org.ietf.jose.util.KeyUtility;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * RFC 7516
@@ -110,7 +109,7 @@ public class JweBuilder {
    * @return this builder
    */
   public JweBuilder withStringPayload(String payload) {
-    this.payload = payload.getBytes(US_ASCII);
+    this.payload = payload.getBytes(UTF_8);
     return this;
   }
 
@@ -190,19 +189,4 @@ public class JweBuilder {
                                          protectedHeader, unprotectedHeader);
   }
 
-  /**
-   * Encrypt the payload with the shared secret
-   *
-   * @param base64UrlEncodedSecret base64URL-encoded bytes of the shared secret
-   * @return a JweJsonFlattened instance
-   * @throws IOException              in case of failure to serialise the
-   *                                  protected header to JSON
-   * @throws GeneralSecurityException in case of failure to encrypt
-   */
-  public JsonWebEncryption buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException,
-    GeneralSecurityException {
-    SecretKey key = KeyUtility.convertBase64UrlSecretToKey("AES", base64UrlEncodedSecret);
-    keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
-    return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);
-  }
 }

@@ -1,5 +1,16 @@
 package org.ietf.jose.jwt;
 
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwe.JsonWebEncryption;
+import org.ietf.jose.jwe.JweBuilder;
+import org.ietf.jose.jwe.JweDecryptor;
+import org.ietf.jose.jwe.SecretKeyBuilder;
+import org.ietf.jose.jws.JsonWebSignature;
+import org.ietf.jose.jws.JwsBuilder;
+import org.ietf.jose.jws.SignatureValidator;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -7,16 +18,6 @@ import java.security.SecureRandom;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwe.JsonWebEncryption;
-import org.ietf.jose.jwe.JweBuilder;
-import org.ietf.jose.jwe.JweDecryptor;
-import org.ietf.jose.jws.JsonWebSignature;
-import org.ietf.jose.jws.JwsBuilder;
-import org.ietf.jose.jws.SignatureValidator;
-import org.ietf.jose.util.Base64Utility;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -164,7 +165,7 @@ public class Examples {
      */
     JsonWebEncryption jwe = JweBuilder.getInstance()
       .withStringPayload(joseClaimsJson)
-      .buildJweJsonFlattened(Base64Utility.toBase64Url(secret));
+        .buildJweJsonFlattened(SecretKeyBuilder.fromBytes(secret));
     String jwt = jwe.toCompactForm();
     System.out.println("JsonWebEncryption JWT:");
     System.out.println(jwt);
