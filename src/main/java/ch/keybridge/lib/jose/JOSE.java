@@ -15,14 +15,6 @@
  */
 package ch.keybridge.lib.jose;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
@@ -33,6 +25,15 @@ import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.Signature;
 import org.ietf.jose.jws.SignatureValidator;
 import org.ietf.jose.util.JsonMarshaller;
+
+import javax.crypto.SecretKey;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * lib-jose – Javascript Object Signing and Encryption.
@@ -192,14 +193,14 @@ public class JOSE {
      *                    digital signature
      * @param <T>         class of the object contained in the message
      * @return decrypted object. null is returned in the case of invalid
-     *         signature, failure to decrypt or deserialise JSON.
+     * signature, failure to decrypt or deserialise JSON.
      */
     public static <T> T read(String json, Class<T> type, PrivateKey receiverKey, PublicKey senderKey) {
       try {
         JsonWebEncryption jwe = JsonWebEncryption.fromJson(json);
         String payload = JweDecryptor.createFor(jwe)
-          .decrypt(receiverKey)
-          .getAsString();
+            .decrypt(receiverKey)
+            .getAsString();
 
         JsonWebSignature jws = JsonWebSignature.fromJson(payload);
         List<Signature> signatures = jws.getSignatures();
@@ -208,7 +209,7 @@ public class JOSE {
         }
         if (signatures.size() > 1) {
           LOG.log(Level.WARNING, "JWS {1} signatures instead of the expected 1. Validating only the first signature"
-                  + ".", new Object[]{signatures.size()});
+              + ".", new Object[]{signatures.size()});
         }
         /**
          * The payload is rejected if the digital signature cannot be validated.
@@ -231,22 +232,21 @@ public class JOSE {
      * T. Decrypts message and validates the keyed message authetication token
      * using the shared secret.
      *
-     * @param json                   JSON string which is valid JWE flattened
-     *                               JSON
-     * @param type                   class of object contained.
-     * @param base64UrlEncodedSecret base64URL-encoded bytes of the shared
-     *                               secret
-     * @param <T>                    class of the object contained in the
-     *                               message
+     * @param json      JSON string which is valid JWE flattened
+     *                  JSON
+     * @param type      class of object contained.
+     * @param secretKey a valid AES secret key
+     * @param <T>       class of the object contained in the
+     *                  message
      * @return decrypted object. null is returned in the case of invalid
-     *         signature, failure to decrypt or deserialise JSON.
+     * signature, failure to decrypt or deserialise JSON.
      */
-    public static <T> T read(String json, Class<T> type, String base64UrlEncodedSecret) {
+    public static <T> T read(String json, Class<T> type, SecretKey secretKey) {
       try {
         JsonWebEncryption jwe = JsonWebEncryption.fromJson(json);
         String payload = JweDecryptor.createFor(jwe)
-          .decrypt(base64UrlEncodedSecret)
-          .getAsString();
+            .decrypt(secretKey)
+            .getAsString();
 
         /**
          * The payload is rejected if the digital signature cannot be validated.
@@ -258,9 +258,9 @@ public class JOSE {
         }
         if (signatures.size() > 1) {
           LOG.log(Level.WARNING, "JWS {0} signatures instead of the expected 1. Validating only the first signature"
-                  + ".", new Object[]{signatures.size()});
+              + ".", new Object[]{signatures.size()});
         }
-        boolean signatureValid = SignatureValidator.isValid(signatures.get(0), base64UrlEncodedSecret);
+        boolean signatureValid = SignatureValidator.isValid(signatures.get(0), secretKey);
         if (!signatureValid) {
           return null;
         }
@@ -285,21 +285,21 @@ public class JOSE {
      *                         protected header. Can be null if an unset 'kid'
      *                         protected header value is sufficient.
      * @return a valid JSON string if the operation is successful; null in case
-     *         of failure
+     * of failure
      */
     public static String write(Object object, PrivateKey senderPrivateKey, PublicKey publicKey, String signatureKeyId) {
       try {
         String jsonPayload = JsonMarshaller.toJson(object);
 
         JsonWebSignature jws = JwsBuilder.getInstance()
-          .withStringPayload(jsonPayload)
-          .sign(senderPrivateKey, JwsAlgorithmType.RS256, signatureKeyId)
-          .buildJsonWebSignature();
+            .withStringPayload(jsonPayload)
+            .sign(senderPrivateKey, JwsAlgorithmType.RS256, signatureKeyId)
+            .buildJsonWebSignature();
 
         return JweBuilder.getInstance()
-          .withStringPayload(jws.toJson())
-          .buildJweJsonFlattened(publicKey)
-          .toJson();
+            .withStringPayload(jws.toJson())
+            .buildJweJsonFlattened(publicKey)
+            .toJson();
       } catch (IOException | GeneralSecurityException e) {
         LOG.log(Level.SEVERE, null, e);
       }
@@ -309,35 +309,32 @@ public class JOSE {
     /**
      * Write object as a signed and encrypted JSON string.
      *
-     * @param object                 the object to be signed and encrypted
-     * @param base64UrlEncodedSecret base64URL-encoded bytes of the shared
-     *                               secret; it is used to generate a keyed
-     *                               message authentication code (HMAC) and to
-     *                               encrypt the message.
-     * @param senderId               an identifier of the sender to be written
-     *                               as the 'kid' (key ID) field of the JOSE
-     *                               protected header. Can be null if an unset
-     *                               'kid' protected header value is sufficient.
+     * @param object    the object to be signed and encrypted
+     * @param secretKey valid AES secret key
+     * @param senderId  an identifier of the sender to be written
+     *                  as the 'kid' (key ID) field of the JOSE
+     *                  protected header. Can be null if an unset
+     *                  'kid' protected header value is sufficient.
      * @return a valid JSON string if the operation is successful; null in case
-     *         of failure
+     * of failure
      */
-    public static String write(Object object, String base64UrlEncodedSecret, String senderId) {
+    public static String write(Object object, SecretKey secretKey, String senderId) {
       try {
         String jsonPayload = JsonMarshaller.toJson(object);
 
         JsonWebSignature jws = JwsBuilder.getInstance()
-          .withStringPayload(jsonPayload)
-          .sign(base64UrlEncodedSecret, JwsAlgorithmType.HS256, senderId)
-          .buildJsonWebSignature();
+            .withStringPayload(jsonPayload)
+            .sign(secretKey, JwsAlgorithmType.HS256, senderId)
+            .buildJsonWebSignature();
 
         JweHeader jweHeader = new JweHeader();
         jweHeader.setKid(senderId);
 
         return JweBuilder.getInstance()
-          .withStringPayload(jws.toJson())
-          .withProtectedHeader(jweHeader)
-          .buildJweJsonFlattened(base64UrlEncodedSecret)
-          .toJson();
+            .withStringPayload(jws.toJson())
+            .withProtectedHeader(jweHeader)
+            .buildJweJsonFlattened(secretKey)
+            .toJson();
       } catch (IOException | GeneralSecurityException e) {
         LOG.log(Level.SEVERE, null, e);
       }

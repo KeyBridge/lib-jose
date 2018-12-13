@@ -1,15 +1,16 @@
 package org.ietf.jose.jwe;
 
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.PrivateKey;
-import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwe.encryption.Encrypter;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.KeyUtility;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.security.PrivateKey;
 
 /**
  * A JWE decryption utility. Accepts a JweJsonFlattened instance, decrypts the
@@ -51,19 +52,6 @@ public class JweDecryptor {
    */
   public DecryptionResult decrypt(byte[] secret) throws GeneralSecurityException {
     SecretKey key = KeyUtility.convertSecretToKey("AES", secret);
-    return decryptGeneric(key);
-  }
-
-  /**
-   * Decrypt using base64URL-encoded bytes of the shared secret.
-   *
-   * @param base64UrlEncodedSecret base64URL-encoded bytes of the shared secret
-   * @return DecryptionResult containing the decrypted plaintext
-   * @throws GeneralSecurityException in case of failure to unwrap the key or
-   *                                  decrypt
-   */
-  public DecryptionResult decrypt(String base64UrlEncodedSecret) throws GeneralSecurityException {
-    SecretKey key = KeyUtility.convertBase64UrlSecretToKey("AES", base64UrlEncodedSecret);
     return decryptGeneric(key);
   }
 

@@ -1,20 +1,21 @@
 package org.ietf.jose.demo;
 
 import ch.keybridge.lib.jose.JOSE;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwe.SecretKeyBuilder;
+import org.ietf.jose.jws.JsonWebSignature;
+import org.ietf.jose.jws.JwsBuilder;
+import org.ietf.jose.jws.SignatureValidator;
+import org.junit.Assert;
+import org.junit.Test;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.UUID;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jws.JsonWebSignature;
-import org.ietf.jose.jws.JwsBuilder;
-import org.ietf.jose.jws.SignatureValidator;
-import org.ietf.jose.util.Base64Utility;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * @author Andrius Druzinis-Vitkus
@@ -62,16 +63,14 @@ public class DemoTest {
     System.out.println();
 
     KeyGenerator generator = KeyGenerator.getInstance("HmacSHA256");
-    SecretKey key = generator.generateKey();
+    SecretKey key = SecretKeyBuilder.fromBytes(generator.generateKey().getEncoded());
 
-    String base64UrlEncodedSecret = Base64Utility.toBase64Url(key.getEncoded());
-
-    String json = JOSE.SignAndEncrypt.write(sampleText, base64UrlEncodedSecret, "myKeyId");
+    String json = JOSE.SignAndEncrypt.write(sampleText, key, "myKeyId");
     System.out.println("Signed and encrypted JSON:");
     System.out.println(json);
     System.out.println();
 
-    String decrypted = JOSE.SignAndEncrypt.read(json, String.class, base64UrlEncodedSecret);
+    String decrypted = JOSE.SignAndEncrypt.read(json, String.class, key);
 
     Assert.assertEquals(sampleText, decrypted);
 
@@ -91,11 +90,9 @@ public class DemoTest {
     KeyGenerator generator = KeyGenerator.getInstance(algorithm.getJavaAlgorithmName());
     SecretKey key = generator.generateKey();
 
-    String base64UrlEncodedSecret = Base64Utility.toBase64Url(key.getEncoded());
-
     String json = JwsBuilder.getInstance()
       .withStringPayload(sampleText)
-      .sign(base64UrlEncodedSecret, algorithm, UUID.randomUUID().toString())
+        .sign(key, algorithm, UUID.randomUUID().toString())
       .buildJsonWebSignature()
       .toJson();
 
@@ -106,7 +103,7 @@ public class DemoTest {
      * Signature validation
      */
     JsonWebSignature jws = JsonWebSignature.fromJson(json);
-    Assert.assertTrue(SignatureValidator.isValid(jws.getSignatures().get(0), base64UrlEncodedSecret));
+    Assert.assertTrue(SignatureValidator.isValid(jws.getSignatures().get(0), key));
   }
 
   @Test

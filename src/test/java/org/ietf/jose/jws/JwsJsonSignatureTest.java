@@ -2,12 +2,13 @@ package org.ietf.jose.jws;
 
 import org.ietf.jose.jwa.JwkType;
 import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwe.SecretKeyBuilder;
 import org.ietf.jose.jwk.JsonWebKey;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
-import org.ietf.jose.util.Base64Utility;
 import org.junit.Test;
 
 import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -56,19 +57,20 @@ public class JwsJsonSignatureTest {
 
   private static void testSingAndVerifySymmetric(byte[] payload, String secret, JwsAlgorithmType alg) {
     try {
+      final SecretKey key = SecretKeyBuilder.fromBase64UrlEncodedString(secret);
       JwsHeader header = new JwsHeader();
       header.setAlg(alg.getJoseAlgorithmName());
       JsonWebSignature jws = JwsBuilder.getInstance()
           .withBinaryPayload(payload)
-          .sign(secret, alg, UUID.randomUUID().toString())
+          .sign(key, alg, UUID.randomUUID().toString())
           .buildJsonWebSignature();
       assertEquals(1, jws.getSignatures().size());
       Signature signature = jws.getSignatures().get(0);
-      assertTrue(SignatureValidator.isValid(signature, secret));
+      assertTrue(SignatureValidator.isValid(signature, key));
 
       for (int i = 0; i < 100; i++) {
-        String base64UrlEncodedWrongKey = toBase64Url(getAlteredBytes(fromBase64Url(secret)));
-        assertFalse(SignatureValidator.isValid(signature, base64UrlEncodedWrongKey));
+        byte[] wrongKey = getAlteredBytes(fromBase64Url(secret));
+        assertFalse(SignatureValidator.isValid(signature, wrongKey));
       }
 
     } catch (Exception e) {
@@ -144,7 +146,8 @@ public class JwsJsonSignatureTest {
   @Test
   public void testSignatureFromBuilder() throws Exception {
     final String payload = "payload";
-    final String secret = Base64Utility.toBase64Url(KeyGenerator.getInstance("HmacSHA256").generateKey().getEncoded());
+    final SecretKey secret =
+        SecretKeyBuilder.fromBytes(KeyGenerator.getInstance("HmacSHA256").generateKey().getEncoded());
 
     JsonWebSignature jws = JwsBuilder.getInstance()
       .withStringPayload(payload)
