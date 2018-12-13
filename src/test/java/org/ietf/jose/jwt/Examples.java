@@ -166,7 +166,7 @@ public class Examples {
       .withStringPayload(joseClaimsJson)
       .buildJweJsonFlattened(Base64Utility.toBase64Url(secret));
     String jwt = jwe.toCompactForm();
-    System.out.println("JWT:");
+    System.out.println("JsonWebEncryption JWT:");
     System.out.println(jwt);
     System.out.println();
 
