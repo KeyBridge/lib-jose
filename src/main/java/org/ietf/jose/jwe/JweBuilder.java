@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * RFC 7516
@@ -111,7 +111,7 @@ public class JweBuilder {
    * @return this builder
    */
   public JweBuilder withStringPayload(String payload) {
-    this.payload = payload.getBytes(US_ASCII);
+    this.payload = payload.getBytes(UTF_8);
     return this;
   }
 
