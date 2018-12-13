@@ -177,7 +177,7 @@ public class JweBuilder {
   /**
    * Encrypt the payload with the shared SecretKey
    *
-   * @param key secret key
+   * @param key secret key; use SecretKeyBuilder if necessary.
    * @return a JweJsonFlattened instance
    * @throws IOException              in case of failure to serialise the
    *                                  protected header to JSON

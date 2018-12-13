@@ -1,13 +1,12 @@
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JsonWebKey;
-import org.ietf.jose.util.CryptographyUtility;
-
-import javax.crypto.SecretKey;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.PublicKey;
+import javax.crypto.SecretKey;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.util.CryptographyUtility;
 
 import static org.ietf.jose.util.KeyUtility.convertSecretToKey;
 
@@ -80,7 +79,7 @@ public class SignatureValidator {
    * Validate signature using a Key instance
    *
    * @param signature a valid signature instance
-   * @param key       a Key instance
+   * @param key       a Key instance; use SecretKeyBuilder if necessary.
    * @return true if signature is valid
    */
   public static boolean isValid(Signature signature, SecretKey key) {

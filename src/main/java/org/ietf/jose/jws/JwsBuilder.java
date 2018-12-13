@@ -15,15 +15,14 @@
  */
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JsonWebKey;
-import org.ietf.jose.util.Base64Utility;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.util.Base64Utility;
 
 /**
  * A builder for JSON Web Signature objects.
@@ -143,7 +142,8 @@ public class JwsBuilder {
     /**
      * Sign using a Key instance and specific algorithm
      *
-     * @param key       Key instance (either a PrivateKey or a SecretKey)
+     * @param key       Key instance (either a PrivateKey or a SecretKey); use
+     *                  SecretKeyBuilder if necessary.
      * @param algorithm a signature algorithm suitable for the provided key
      * @param keyId     a key ID which is put in the protected header's 'kid'
      *                  field

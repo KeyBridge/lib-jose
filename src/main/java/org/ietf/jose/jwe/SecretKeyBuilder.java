@@ -1,21 +1,22 @@
 package org.ietf.jose.jwe;
 
-import org.ietf.jose.util.KeyUtility;
-
-import javax.crypto.SecretKey;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import javax.crypto.SecretKey;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import org.ietf.jose.util.KeyUtility;
 
 /**
- * A utility for building AES SecretKeys from various strings. Supports arbitrary, base64URL, and
- * hexBinary strings. Caveat: the user must know what string they are passing: this builder does not
- * automatically recognize whether a string is base64Url, hexBinary, or just an arbitrary string.
+ * A utility for building AES SecretKeys from various strings. Supports
+ * arbitrary, base64URL, and hexBinary strings. Caveat: the user must know what
+ * string they are passing: this builder does not automatically recognize
+ * whether a string is base64Url, hexBinary, or just an arbitrary string.
  *
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 2018-12-13
  */
 public class SecretKeyBuilder {
+
   /**
    * The only secret key algorithm currently supported.
    */
@@ -44,15 +45,23 @@ public class SecretKeyBuilder {
   }
 
   /**
-   * Create an AES secret key from an arbitrary string. A SHA-256 hash is calculated from the supplied string
-   * in order to obtain a good number of bytes (AES keys can be 16, 24, or 32 bytes in length) for the AES key.
+   * Create an AES secret key from an arbitrary string. A SHA-256 hash is
+   * calculated from the supplied string in order to obtain a good number of
+   * bytes (AES keys can be 16, 24, or 32 bytes in length) for the AES key.
    *
    * @param someString any string
    * @return an EAS secret key
+   * @throws java.security.NoSuchAlgorithmException if no Provider supports a
+   *                                                MessageDigestSpi
+   *                                                implementation for the
+   *                                                specified algorithm. Note:
+   *                                                this should NEVER be thrown
+   *                                                as all JRE implementations
+   *                                                MUST support SHA-256.
    */
   public static SecretKey fromArbitraryString(String someString) throws NoSuchAlgorithmException {
     byte[] secret = java.security.MessageDigest.getInstance("SHA-256")
-        .digest(someString.getBytes(StandardCharsets.UTF_8));
+      .digest(someString.getBytes(StandardCharsets.UTF_8));
     return KeyUtility.convertSecretToKey(ALGORITHM, secret);
   }
 
