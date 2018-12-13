@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlEnumValue;
  * The table below is the set of "alg" (algorithm) Header Parameter values that
  * are defined by this specification for use with JWE. These algorithms are used
  * to encrypt the CEK, producing the JWE Encrypted Key, or to use key agreement
- * to agree upon the CEK
+ * to agree upon the CEK.
  * <p>
  * Developer note: This is a partial implementation of the full RFC-7518 table
  * of possible algorithms. This enumerated set is limited to instances known to
@@ -100,7 +100,6 @@ public enum JweKeyAlgorithmType {
    * <pre>
    * +-----------------+-------------------------------------------------+
    * | "alg" Param     | Key Management Algorithm                        |
-   * | Value           |                                                 |
    * +-----------------+-------------------------------------------------+
    * | A128KW          | AES Key Wrap with default initial value using   |
    * |                 | 128-bit key                                     |
@@ -113,13 +112,13 @@ public enum JweKeyAlgorithmType {
    */
   A128KW("A128KW", "AESWrap"),
   /**
-   * AES Key Wrap with default initial value using 192-bit key
+   * AES Key Wrap with default initial value using 192-bit key.
    *
    * @see A128KW
    */
   A192KW("A192KW", "AESWrap"),
   /**
-   * AES Key Wrap with default initial value using 256-bit key
+   * AES Key Wrap with default initial value using 256-bit key.
    *
    * @see A128KW
    */
