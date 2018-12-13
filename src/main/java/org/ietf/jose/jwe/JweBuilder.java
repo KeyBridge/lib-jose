@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,13 @@
  */
 package org.ietf.jose.jwe;
 
-import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
-import org.ietf.jose.jwa.JweKeyAlgorithmType;
-import org.ietf.jose.util.KeyUtility;
-
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
+import javax.crypto.SecretKey;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
+import org.ietf.jose.util.KeyUtility;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
@@ -77,7 +76,7 @@ public class JweBuilder {
    * 32). This only applies for symmetric encryption (wrapping) of encryption
    * keys.
    *
-   * @param key non-nul SecretKey instance
+   * @param key non-null SecretKey instance
    * @return JweKeyAlgorithmType
    */
   private static JweKeyAlgorithmType resolveKeyManagementAlgorithm(SecretKey key) {
@@ -173,7 +172,7 @@ public class JweBuilder {
       keyMgmtAlgo = KEY_MGMT_ALGO_ASYM;
     }
     return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
-                                        protectedHeader, unprotectedHeader);
+                                         protectedHeader, unprotectedHeader);
   }
 
   /**
@@ -188,7 +187,7 @@ public class JweBuilder {
   public JsonWebEncryption buildJweJsonFlattened(SecretKey key) throws IOException, GeneralSecurityException {
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
-                                        protectedHeader, unprotectedHeader);
+                                         protectedHeader, unprotectedHeader);
   }
 
   /**
@@ -201,7 +200,7 @@ public class JweBuilder {
    * @throws GeneralSecurityException in case of failure to encrypt
    */
   public JsonWebEncryption buildJweJsonFlattened(String base64UrlEncodedSecret) throws IOException,
-      GeneralSecurityException {
+    GeneralSecurityException {
     SecretKey key = KeyUtility.convertBase64UrlSecretToKey("AES", base64UrlEncodedSecret);
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key, protectedHeader, unprotectedHeader);
