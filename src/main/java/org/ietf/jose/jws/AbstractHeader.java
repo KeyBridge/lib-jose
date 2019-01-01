@@ -16,8 +16,11 @@
 package org.ietf.jose.jws;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.IOException;
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -26,6 +29,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.ietf.jose.adapter.XmlAdapterX509Certificate;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.util.JsonMarshaller;
 
 /**
  * An abstract JOSE object.
@@ -298,6 +302,40 @@ public abstract class AbstractHeader {
    */
   protected boolean canEqual(Object other) {
     return this.getClass().isInstance(other);
+  }
+
+  /**
+   * Export a JSON formatted string representation of this header. For
+   * development ONLY. This method is provided as a convenience to help
+   * pretty-print header content only. It is is not used in the processing of
+   * JOSE content.
+   *
+   * @return a JSON formatted string representation of the header contents
+   * @throws IOException on error
+   */
+  public String toJson() throws IOException {
+    Map<String, Object> jsonObject = new LinkedHashMap<>();
+
+    if (alg != null) {
+      jsonObject.put("alg", alg);
+    }
+    if (kid != null) {
+      jsonObject.put("kid", kid);
+    }
+    if (x5u != null) {
+      jsonObject.put("x5u", x5u);
+    }
+    if (x5c != null) {
+      jsonObject.put("x5c", x5c);
+    }
+    if (x5t != null) {
+      jsonObject.put("x5t", x5t);
+    }
+    if (x5tS256 != null) {
+      jsonObject.put("x5tS256", x5tS256);
+    }
+
+    return JsonMarshaller.toJson(jsonObject);
   }
 
   @Override
