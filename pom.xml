@@ -68,6 +68,7 @@
       <groupId>com.fasterxml.jackson.module</groupId>
       <artifactId>jackson-module-jaxb-annotations</artifactId>
       <version>${jackson.version}</version>
+      <!--<scope>provided</scope>-->
     </dependency>
     <dependency>
       <!--required for xml (json) annotation-->
@@ -97,7 +98,6 @@
       <version>3.3.0</version>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>keybridge.lib</groupId>
       <artifactId>cryptography</artifactId>
