@@ -45,12 +45,17 @@ public class SecretKeyBuilder {
   }
 
   /**
-   * Create an AES secret key from an arbitrary string. A SHA-256 hash is
-   * calculated from the supplied string in order to obtain a good number of
-   * bytes (AES keys can be 16, 24, or 32 bytes in length) for the AES key.
+   * Create an AES secret key from an arbitrary string value. This method is
+   * typically used for shared secret authentication, where the shared secret
+   * format is determined by content and may not conform with JOSE length
+   * requirements.
+   * <p>
+   * A SHA-256 hash is calculated from the supplied string in order to obtain a
+   * good number of bytes (AES keys can be 16, 24, or 32 bytes in length) for
+   * the AES key.
    *
-   * @param someString any string
-   * @return an EAS secret key
+   * @param sharedSecret a (shared) secret string value
+   * @return an AES secret key
    * @throws java.security.NoSuchAlgorithmException if no Provider supports a
    *                                                MessageDigestSpi
    *                                                implementation for the
@@ -59,9 +64,9 @@ public class SecretKeyBuilder {
    *                                                as all JRE implementations
    *                                                MUST support SHA-256.
    */
-  public static SecretKey fromArbitraryString(String someString) throws NoSuchAlgorithmException {
+  public static SecretKey fromSharedSecret(String sharedSecret) throws NoSuchAlgorithmException {
     byte[] secret = java.security.MessageDigest.getInstance("SHA-256")
-      .digest(someString.getBytes(StandardCharsets.UTF_8));
+      .digest(sharedSecret.getBytes(StandardCharsets.UTF_8));
     return KeyUtility.convertSecretToKey(ALGORITHM, secret);
   }
 
