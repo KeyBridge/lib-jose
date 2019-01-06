@@ -211,12 +211,12 @@ public class InteropTest {
     RsaPrivateJwk rsaPrivateJwk = (RsaPrivateJwk) key;
 
     JwtClaims claims = new JwtClaims()
-      .setAudience("Quality assurance")
-      .setIssuer("tester")
-      .setIssuedAt(ZonedDateTime.now(ZoneId.of("UTC")))
-      .setExpirationTime(ZonedDateTime.now().plus(5, ChronoUnit.MINUTES))
-      .setJwtId(UUID.randomUUID().toString())
-      .setSubject("Test")
+      .withAudience("Quality assurance")
+      .withIssuer("tester")
+      .withIssuedAt(ZonedDateTime.now(ZoneId.of("UTC")))
+      .withExpirationTime(ZonedDateTime.now().plus(5, ChronoUnit.MINUTES))
+      .withJwtId(UUID.randomUUID().toString())
+      .withSubject("Test")
       .addClaim("email", "foo@bar.com");
 
     String claimJson = claims.toJson();

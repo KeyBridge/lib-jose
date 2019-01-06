@@ -61,6 +61,8 @@ import org.ietf.jose.util.JsonMarshaller;
  * Applications using JWTs should define which specific claims they use and when
  * they are required or optional. All the names are short because a core goal of
  * JWTs is for the representation to be compact.
+ *
+ * @since v0.9.2 add fluent setters
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JwtClaims extends JsonSerializable {
@@ -172,16 +174,24 @@ public class JwtClaims extends JsonSerializable {
     return this.issuer;
   }
 
-  public JwtClaims setIssuer(String issuer) {
+  public JwtClaims withIssuer(String issuer) {
     this.issuer = issuer;
     return this;
+  }
+
+  public void setIssuer(String issuer) {
+    this.issuer = issuer;
   }
 
   public String getSubject() {
     return this.subject;
   }
 
-  public JwtClaims setSubject(String subject) {
+  public void setSubject(String subject) {
+    this.subject = subject;
+  }
+
+  public JwtClaims withSubject(String subject) {
     this.subject = subject;
     return this;
   }
@@ -190,7 +200,11 @@ public class JwtClaims extends JsonSerializable {
     return this.audience;
   }
 
-  public JwtClaims setAudience(String audience) {
+  public void setAudience(String audience) {
+    this.audience = audience;
+  }
+
+  public JwtClaims withAudience(String audience) {
     this.audience = audience;
     return this;
   }
@@ -199,7 +213,11 @@ public class JwtClaims extends JsonSerializable {
     return expirationTime;
   }
 
-  public JwtClaims setExpirationTime(ZonedDateTime expirationTime) {
+  public void setExpirationTime(ZonedDateTime expirationTime) {
+    this.expirationTime = expirationTime;
+  }
+
+  public JwtClaims withExpirationTime(ZonedDateTime expirationTime) {
     /**
      * Developer note: Must truncate the ZonedDateTime to seconds or EQUALS will
      * fail to match due to nanosecond time component.
@@ -212,7 +230,11 @@ public class JwtClaims extends JsonSerializable {
     return notBefore;
   }
 
-  public JwtClaims setNotBefore(ZonedDateTime notBefore) {
+  public void setNotBefore(ZonedDateTime notBefore) {
+    this.notBefore = notBefore;
+  }
+
+  public JwtClaims withNotBefore(ZonedDateTime notBefore) {
     this.notBefore = notBefore == null ? null : notBefore.truncatedTo(ChronoUnit.SECONDS);
     return this;
   }
@@ -221,13 +243,21 @@ public class JwtClaims extends JsonSerializable {
     return issuedAt;
   }
 
-  public JwtClaims setIssuedAt(ZonedDateTime issuedAt) {
+  public void setIssuedAt(ZonedDateTime issuedAt) {
+    this.issuedAt = issuedAt;
+  }
+
+  public JwtClaims withIssuedAt(ZonedDateTime issuedAt) {
     this.issuedAt = issuedAt == null ? null : issuedAt.truncatedTo(ChronoUnit.SECONDS);
     return this;
   }
 
   public String getJwtId() {
     return this.jwtId;
+  }
+
+  public void setJwtId(String jwtId) {
+    this.jwtId = jwtId;
   }
 
   /**
@@ -243,7 +273,7 @@ public class JwtClaims extends JsonSerializable {
    * @param jwtId a unique identifier for the JWT
    * @return this instance
    */
-  public JwtClaims setJwtId(String jwtId) {
+  public JwtClaims withJwtId(String jwtId) {
     this.jwtId = jwtId;
     return this;
   }
@@ -252,7 +282,11 @@ public class JwtClaims extends JsonSerializable {
     return this.claims;
   }
 
-  public JwtClaims setClaims(Map<String, Object> claims) {
+  public void setClaims(Map<String, Object> claims) {
+    this.claims = claims;
+  }
+
+  public JwtClaims withClaims(Map<String, Object> claims) {
     this.claims = claims;
     return this;
   }

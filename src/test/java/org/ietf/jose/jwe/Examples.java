@@ -1,11 +1,13 @@
 package org.ietf.jose.jwe;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.UUID;
+import javax.crypto.SecretKey;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.util.JsonMarshaller;
@@ -31,14 +33,15 @@ public class Examples {
   @Test
   public void printKeysAsJwk() throws IOException {
     RsaPrivateJwk jwkPrivateKey = RsaPrivateJwk.getInstance(keyPair, keyId);
-    System.out.println("Private key:");
-    System.out.println(JsonMarshaller.toJson(jwkPrivateKey));
+    System.out.println("  Private key:");
+    System.out.println("  " + JsonMarshaller.toJson(jwkPrivateKey));
     System.out.println();
 
     RsaPublicJwk jwkPublicKey = RsaPublicJwk.getInstance((RSAPublicKey) keyPair.getPublic());
-    System.out.println("Public key:");
-    System.out.println(JsonMarshaller.toJson(jwkPublicKey));
+    System.out.println("  Public key:");
+    System.out.println("  " + JsonMarshaller.toJson(jwkPublicKey));
     System.out.println();
+    System.out.println("printKeysAsJwk OK");
   }
 
   @Test
@@ -53,9 +56,9 @@ public class Examples {
       .buildJweJsonFlattened(keyPair.getPublic());
     String jweCompact = jwe.toCompactForm();
 
-    System.out.println("JWE JSON flattened:\n" + JsonMarshaller.toJsonPrettyFormatted(jwe));
+    System.out.println("  JWE JSON flattened:\n" + JsonMarshaller.toJsonPrettyFormatted(jwe));
     System.out.println();
-    System.out.println("JWE compact form:\n" + jweCompact);
+    System.out.println("  JWE compact form:\n" + jweCompact);
     System.out.println();
 
     /**
@@ -72,8 +75,9 @@ public class Examples {
     String decryptedPlaintext = JweDecryptor.createFor(fromJson)
       .decrypt(keyPair.getPrivate())
       .getAsString();
-    System.out.println("plaintext: " + decryptedPlaintext);
+    System.out.println("  plaintext: " + decryptedPlaintext);
 
+    System.out.println("createConsumeAndValidateExample OK");
     /**
      * Validate the JWT
      * <p>
@@ -81,5 +85,38 @@ public class Examples {
      * decryption means that either an incorrect decryption key has been used or
      * that the encrypted message has been tampered with and is invalid.
      */
+  }
+
+  @Test
+  public void testUsingSharedSecret() throws NoSuchAlgorithmException, IOException, GeneralSecurityException {
+    String sharedSecret = "shared-secret";
+
+    String messageContent = UUID.randomUUID().toString();
+
+    SecretKey secretKey = SecretKeyBuilder.fromSharedSecret(sharedSecret);
+    /**
+     * Encrypt
+     */
+    JsonWebEncryption jweEncrypt = JweBuilder.getInstance()
+      .withStringPayload(messageContent)
+      .buildJweJsonFlattened(secretKey);
+
+    String encryptedMessageContent = jweEncrypt.toCompactForm();
+
+    System.out.println("  Message content: " + messageContent);
+    System.out.println("  Encrypted      : " + encryptedMessageContent);
+
+    JsonWebEncryption jweDecrypt = JsonWebEncryption.fromCompactForm(encryptedMessageContent);
+
+    JweDecryptor jweDecryptor = JweDecryptor.createFor(jweDecrypt);
+    JweDecryptor.DecryptionResult decryptionResult = jweDecryptor.decrypt(secretKey);
+    String recoveredMessageContent = decryptionResult.getAsString();
+
+    System.out.println("  Recovered      : " + recoveredMessageContent);
+
+    assertEquals(messageContent, recoveredMessageContent);
+
+    System.out.println("testUsingSharedSecret OK");
+
   }
 }

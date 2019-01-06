@@ -1,5 +1,12 @@
 package org.ietf.jose.jwt;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
@@ -10,14 +17,6 @@ import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.SignatureValidator;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -45,8 +44,8 @@ public class Examples {
      * Note the use of chained setters.
      */
     JwtClaims joseClaims = new JwtClaims()
-      .setIssuer("Issuer")
-      .setAudience("Audience");
+      .withIssuer("Issuer")
+      .withAudience("Audience");
     // Set the expiration time of this JWT to be two hours from now
     joseClaims.setExpirationTime(ZonedDateTime.now().plus(2, ChronoUnit.HOURS));
     // A JWT must be processed on or after the Not Before values. Let's set this to one minute from now
@@ -57,8 +56,8 @@ public class Examples {
      * to use a random UUID
      */
     joseClaims
-      .setJwtId(UUID.randomUUID().toString())
-      .setSubject("Subject");
+      .withJwtId(UUID.randomUUID().toString())
+      .withSubject("Subject");
 
     /**
      * Custom claims are also supported.
@@ -134,13 +133,13 @@ public class Examples {
      * Note the use of chained setters.
      */
     JwtClaims joseClaims = new JwtClaims()
-      .setIssuer("Issuer")
-      .setAudience("Audience")
-      .setExpirationTime(ZonedDateTime.now().plus(2, ChronoUnit.HOURS))
-      .setNotBefore(ZonedDateTime.now().minus(1, ChronoUnit.MINUTES))
-      .setIssuedAt(ZonedDateTime.now())
-      .setJwtId(UUID.randomUUID().toString())
-      .setSubject("Subject")
+      .withIssuer("Issuer")
+      .withAudience("Audience")
+      .withExpirationTime(ZonedDateTime.now().plus(2, ChronoUnit.HOURS))
+      .withNotBefore(ZonedDateTime.now().minus(1, ChronoUnit.MINUTES))
+      .withIssuedAt(ZonedDateTime.now())
+      .withJwtId(UUID.randomUUID().toString())
+      .withSubject("Subject")
       .addClaim("domain", "somedomain.com")
       .addClaim("email", "someone@somedomain.com");
 
@@ -165,7 +164,7 @@ public class Examples {
      */
     JsonWebEncryption jwe = JweBuilder.getInstance()
       .withStringPayload(joseClaimsJson)
-        .buildJweJsonFlattened(SecretKeyBuilder.fromBytes(secret));
+      .buildJweJsonFlattened(SecretKeyBuilder.fromBytes(secret));
     String jwt = jwe.toCompactForm();
     System.out.println("JsonWebEncryption JWT:");
     System.out.println(jwt);
