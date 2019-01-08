@@ -188,8 +188,7 @@ public class JsonWebEncryption extends JsonSerializable {
   public static JsonWebEncryption fromCompactForm(String text) throws IOException {
     StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
     if (tokenizer.countTokens() != 5) {
-      throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string "
-        + "has " + tokenizer.countTokens() + ".");
+      throw new IllegalArgumentException("JWE compact form must have 5 elements separated by dots. Supplied string has " + tokenizer.countTokens() + ".");
     }
     JsonWebEncryption jwe = new JsonWebEncryption();
     String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
@@ -286,8 +285,13 @@ public class JsonWebEncryption extends JsonSerializable {
 
   @Override
   public String toString() {
-    return "JsonWebEncryption(protectedHeader=" + this.getProtectedHeader() + ", unprotected=" + this.getUnprotected() + ", encryptedKey=" + java.util.Arrays.toString(this.getEncryptedKey()) + ", initializationVector=" + java.util.Arrays.toString(this.getInitializationVector()) + ", ciphertext=" + java.util.Arrays.toString(this
-      .getCiphertext()) + ", authenticationTag=" + java.util.Arrays.toString(this.getAuthenticationTag()) + ", "
-      + "additionalAuthenticationData=" + java.util.Arrays.toString(this.getAdditionalAuthenticationData()) + ")";
+    return "JsonWebEncryption(protectedHeader=" + this.getProtectedHeader()
+      + ", unprotected=" + this.getUnprotected()
+      + ", encryptedKey=" + java.util.Arrays.toString(this.getEncryptedKey())
+      + ", initializationVector=" + java.util.Arrays.toString(this.getInitializationVector())
+      + ", ciphertext=" + java.util.Arrays.toString(this.getCiphertext())
+      + ", authenticationTag=" + java.util.Arrays.toString(this.getAuthenticationTag())
+      + ", additionalAuthenticationData=" + java.util.Arrays.toString(this.getAdditionalAuthenticationData())
+      + ")";
   }
 }
