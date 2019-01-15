@@ -1,11 +1,13 @@
 package org.ietf.jose.demo;
 
-import ch.keybridge.lib.jose.JOSE;
+import ch.keybridge.lib.jose.JoseFactory;
 import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.SecretKeyBuilder;
 import org.ietf.jose.jws.JsonWebSignature;
 import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.SignatureValidator;
+import org.ietf.jose.jwt.JwtClaims;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,6 +17,8 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 /**
@@ -37,19 +41,106 @@ public class DemoTest {
     KeyPair senderKeyPair = generator.generateKeyPair();
     KeyPair recipientKeyPair = generator.generateKeyPair();
 
-    String json = JOSE.SignAndEncrypt.write(sampleText, senderKeyPair.getPrivate(), recipientKeyPair.getPublic(),
-                                            "myKeyId");
+    String json = JoseFactory.SignAndEncrypt.write(sampleText, senderKeyPair.getPrivate(), recipientKeyPair.getPublic(),
+        "myKeyId", "receiverPublicKey");
     System.out.println("Signed and encrypted JSON:");
     System.out.println(json);
     System.out.println();
 
-    String decryptedRequest = JOSE.SignAndEncrypt.read(json, String.class, recipientKeyPair
+    String decryptedRequest = JoseFactory.SignAndEncrypt.read(json, String.class, recipientKeyPair
                                                        .getPrivate(), senderKeyPair.getPublic());
     Assert.assertEquals(sampleText, decryptedRequest);
 
     System.out.println("Decrypted object:");
     System.out.println(sampleText);
     System.out.println();
+  }
+
+  @Test
+  public void WebTokenSignedWithSharedSecretTest() throws Exception {
+    final String sharedSecret = "sharedSecret";
+    final JwtClaims claims = new JwtClaims()
+        .withAudience("audience")
+        .withIssuer("tester")
+        .withJwtId(UUID.randomUUID().toString())
+        .withSubject("some subject")
+        .withExpirationTime(ZonedDateTime.now().plus(5, ChronoUnit.MINUTES));
+    System.out.println(claims);
+
+    String signedToken = JoseFactory.AuthorizationTokenFactory.createSignedToken(claims, sharedSecret,
+        "mySharedSecret");
+    System.out.println(signedToken);
+
+    JsonWebSignature jws = JoseFactory.JwsFactory.fromCompactForm(signedToken);
+    Assert.assertTrue(SignatureValidator.isValid(jws.getSignature(), sharedSecret));
+
+    JwtClaims decodedClaims = JwtClaims.fromJson(jws.getStringPayload());
+    Assert.assertEquals(claims, decodedClaims);
+  }
+
+  @Test
+  public void WebTokenSignedWithPrivateKeyTest() throws Exception {
+    final KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+    final JwtClaims claims = new JwtClaims()
+        .withAudience("audience")
+        .withIssuer("tester")
+        .withJwtId(UUID.randomUUID().toString())
+        .withSubject("some subject")
+        .withExpirationTime(ZonedDateTime.now().plus(5, ChronoUnit.MINUTES));
+    System.out.println(claims);
+
+    String signedToken = JoseFactory.AuthorizationTokenFactory.createSignedToken(claims, keyPair.getPrivate(), "myKey");
+    System.out.println(signedToken);
+
+    JsonWebSignature jws = JoseFactory.JwsFactory.fromCompactForm(signedToken);
+    Assert.assertTrue(SignatureValidator.isValid(jws.getSignature(), keyPair.getPublic()));
+
+    JwtClaims decodedClaims = JwtClaims.fromJson(jws.getStringPayload());
+    Assert.assertEquals(claims, decodedClaims);
+  }
+
+  @Test
+  public void WebTokenEncryptedWithSharedSecretTest() throws Exception {
+    final String sharedSecret = "sharedSecret";
+    final JwtClaims claims = new JwtClaims()
+        .withAudience("audience")
+        .withIssuer("tester")
+        .withJwtId(UUID.randomUUID().toString())
+        .withSubject("some subject")
+        .withExpirationTime(ZonedDateTime.now().plus(5, ChronoUnit.MINUTES));
+    System.out.println(claims);
+
+    String encryptedToken = JoseFactory.AuthorizationTokenFactory.createEncryptedToken(claims, sharedSecret,
+        "mySharedSecret");
+    System.out.println(encryptedToken);
+
+    JsonWebEncryption jwe = JoseFactory.Jwefactory.fromCompactForm(encryptedToken);
+    String decryptedText = JoseFactory.Jwefactory.decrypt(jwe).decrypt(sharedSecret).getAsString();
+
+    JwtClaims decodedClaims = JwtClaims.fromJson(decryptedText);
+    Assert.assertEquals(claims, decodedClaims);
+  }
+
+  @Test
+  public void WebTokenEncryptedWithPublicKeyTest() throws Exception {
+    final KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+    final JwtClaims claims = new JwtClaims()
+        .withAudience("audience")
+        .withIssuer("tester")
+        .withJwtId(UUID.randomUUID().toString())
+        .withSubject("some subject")
+        .withExpirationTime(ZonedDateTime.now().plus(5, ChronoUnit.MINUTES));
+    System.out.println(claims);
+
+    String encryptedToken = JoseFactory.AuthorizationTokenFactory.createEncryptedToken(claims, keyPair.getPublic(),
+        "mySharedSecret");
+    System.out.println(encryptedToken);
+
+    JsonWebEncryption jwe = JoseFactory.Jwefactory.fromCompactForm(encryptedToken);
+    String decryptedText = JoseFactory.Jwefactory.decrypt(jwe).decrypt(keyPair.getPrivate()).getAsString();
+
+    JwtClaims decodedClaims = JwtClaims.fromJson(decryptedText);
+    Assert.assertEquals(claims, decodedClaims);
   }
 
   @Test
@@ -65,12 +156,12 @@ public class DemoTest {
     KeyGenerator generator = KeyGenerator.getInstance("HmacSHA256");
     SecretKey key = SecretKeyBuilder.fromBytes(generator.generateKey().getEncoded());
 
-    String json = JOSE.SignAndEncrypt.write(sampleText, key, "myKeyId");
+    String json = JoseFactory.SignAndEncrypt.write(sampleText, key, "myKeyId");
     System.out.println("Signed and encrypted JSON:");
     System.out.println(json);
     System.out.println();
 
-    String decrypted = JOSE.SignAndEncrypt.read(json, String.class, key);
+    String decrypted = JoseFactory.SignAndEncrypt.read(json, String.class, key);
 
     Assert.assertEquals(sampleText, decrypted);
 
