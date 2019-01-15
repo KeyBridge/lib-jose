@@ -15,6 +15,15 @@
  */
 package org.ietf.jose.jwt;
 
+import org.ietf.jose.adapter.XmlAdapterEpochZonedDateTime;
+import org.ietf.jose.jws.JsonSerializable;
+import org.ietf.jose.util.JsonMarshaller;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -22,14 +31,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterEpochZonedDateTime;
-import org.ietf.jose.jws.JsonSerializable;
-import org.ietf.jose.util.JsonMarshaller;
 
 /**
  * RFC 7519 JSON Web Token (JWT)
@@ -401,6 +402,29 @@ public class JwtClaims extends JsonSerializable {
     return hash;
   }
 
+  /**
+   * Compare two timestamps using logical equality (i.e. noon UTC equals 1 pm (+01 hours)).
+   * This method is necessary because ZonedDateTime::equals returns false for two (logically) equals times
+   * but encoded in different time zones.
+   *
+   * @param one   one ZonedDateTime instance
+   * @param other another ZonedDateTime instance
+   * @return true if the times are logically equal
+   */
+  private static boolean equalZonedDateTime(ZonedDateTime one, ZonedDateTime other) {
+    /**
+     * Same object or both null
+     */
+    if (one == other) {
+      return true;
+    }
+    if (one == null) return false;
+    /**
+     * return the logical time equality.
+     */
+    return one.isEqual(other);
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -425,13 +449,13 @@ public class JwtClaims extends JsonSerializable {
     if (!Objects.equals(this.jwtId, other.jwtId)) {
       return false;
     }
-    if (!Objects.equals(this.expirationTime, other.expirationTime)) {
+    if (!equalZonedDateTime(this.expirationTime, other.expirationTime)) {
       return false;
     }
-    if (!Objects.equals(this.notBefore, other.notBefore)) {
+    if (!equalZonedDateTime(this.notBefore, other.notBefore)) {
       return false;
     }
-    if (!Objects.equals(this.issuedAt, other.issuedAt)) {
+    if (!equalZonedDateTime(this.issuedAt, other.issuedAt)) {
       return false;
     }
     return Objects.equals(this.claims, other.claims);
