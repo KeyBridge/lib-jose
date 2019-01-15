@@ -15,12 +15,13 @@
  */
 package org.ietf.jose.jwe;
 
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
+
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-import javax.crypto.SecretKey;
-import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
-import org.ietf.jose.jwa.JweKeyAlgorithmType;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -161,32 +162,38 @@ public class JweBuilder {
    * Encrypt the payload with the provided recipient's PublicKey
    *
    * @param key public key
+   * @param keyId an identifier for the encryption key. This value gets written as the 'kid' field in the protected
+   *              header.
+   *              Can be null.
    * @return a JweJsonFlattened instance
    * @throws IOException              in case of failure to serialise the
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
-  public JsonWebEncryption buildJweJsonFlattened(PublicKey key) throws IOException, GeneralSecurityException {
+  public JsonWebEncryption buildJweJsonFlattened(PublicKey key, String keyId) throws IOException, GeneralSecurityException {
     if (keyMgmtAlgo == null) {
       keyMgmtAlgo = KEY_MGMT_ALGO_ASYM;
     }
     return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
-                                         protectedHeader, unprotectedHeader);
+        protectedHeader, unprotectedHeader, keyId);
   }
 
   /**
    * Encrypt the payload with the shared SecretKey
    *
    * @param key secret key; use SecretKeyBuilder if necessary.
+   * @param keyId an identifier for the encryption key. This value gets written as the 'kid' field in the protected
+   *              header.
+   *              Can be null.
    * @return a JweJsonFlattened instance
    * @throws IOException              in case of failure to serialise the
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to encrypt
    */
-  public JsonWebEncryption buildJweJsonFlattened(SecretKey key) throws IOException, GeneralSecurityException {
+  public JsonWebEncryption buildJweJsonFlattened(SecretKey key, String keyId) throws IOException, GeneralSecurityException {
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
-                                         protectedHeader, unprotectedHeader);
+        protectedHeader, unprotectedHeader, keyId);
   }
 
 }
