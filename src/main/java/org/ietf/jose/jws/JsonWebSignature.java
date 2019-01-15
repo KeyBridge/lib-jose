@@ -15,18 +15,19 @@
  */
 package org.ietf.jose.jws;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import org.ietf.jose.adapter.XmlAdapterJwsHeader;
+import org.ietf.jose.util.Base64Utility;
+import org.ietf.jose.util.JsonMarshaller;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.adapter.XmlAdapterJwsHeader;
-import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonMarshaller;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static org.ietf.jose.util.Base64Utility.fromBase64Url;
 import static org.ietf.jose.util.Base64Utility.fromBase64UrlToString;
@@ -250,10 +251,18 @@ public class JsonWebSignature extends JsonSerializable {
    */
   public List<Signature> getSignatures() {
     if (protectedHeader != null) {
-      return Collections.singletonList(Signature.getInstance(jwsSigningInput, signature, protectedHeader,
-                                                             unprotectedHeader));
+      return Collections.singletonList(getSignature());
     }
     return new ArrayList<>(signatures);
+  }
+
+  /**
+   * Get the first signature. In most cases a JWS will have only one signature.
+   *
+   * @return first signature
+   */
+  public Signature getSignature() {
+    return Signature.getInstance(jwsSigningInput, signature, protectedHeader, unprotectedHeader);
   }
 
   /**
