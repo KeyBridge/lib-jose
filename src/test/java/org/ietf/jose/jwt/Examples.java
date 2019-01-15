@@ -1,12 +1,5 @@
 package org.ietf.jose.jwt;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
@@ -17,6 +10,14 @@ import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.SignatureValidator;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -164,7 +165,7 @@ public class Examples {
      */
     JsonWebEncryption jwe = JweBuilder.getInstance()
       .withStringPayload(joseClaimsJson)
-      .buildJweJsonFlattened(SecretKeyBuilder.fromBytes(secret));
+        .buildJweJsonFlattened(SecretKeyBuilder.fromBytes(secret), null);
     String jwt = jwe.toCompactForm();
     System.out.println("JsonWebEncryption JWT:");
     System.out.println(jwt);

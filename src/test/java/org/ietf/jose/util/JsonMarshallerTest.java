@@ -26,7 +26,7 @@ public class JsonMarshallerTest {
       KeyPair keyPair = generator.generateKeyPair();
       JsonWebEncryption original = JweBuilder.getInstance()
           .withBinaryPayload("somePayload".getBytes(StandardCharsets.UTF_8))
-          .buildJweJsonFlattened(keyPair.getPublic());
+          .buildJweJsonFlattened(keyPair.getPublic(), "someKeyId");
 
       JsonWebEncryption unmarshalled = fromJson(toJson(original), JsonWebEncryption.class);
       String jsonPretty = toJsonPrettyFormatted(original);

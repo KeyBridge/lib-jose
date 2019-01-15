@@ -1,17 +1,16 @@
 package org.ietf.jose.jwt;
 
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
+import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
 import org.ietf.jose.jwe.JweDecryptor;
-import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwk.JsonWebKey;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jws.JsonWebSignature;
 import org.ietf.jose.jws.SignatureValidator;
-import org.ietf.jose.util.Base64Utility;
 import org.ietf.jose.util.JsonMarshaller;
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.OAEPParameterSpec;
@@ -56,7 +55,7 @@ public class PythonInterop {
     JsonWebEncryption encryption = JweBuilder.getInstance()
         .withKeyManagementAlgorithm(JweKeyAlgorithmType.RSA_OAEP)
         .withStringPayload("hi")
-        .buildJweJsonFlattened(kp.getPublic());
+        .buildJweJsonFlattened(kp.getPublic(), "someKeyId");
 
     System.out.println(encryption.toJson());
 

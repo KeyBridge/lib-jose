@@ -35,7 +35,7 @@ public class EncryptionTests {
     JsonWebEncryption jwe = JweBuilder.getInstance()
         .withStringPayload(plaintext)
         // sign it with our private key and specify a random UUID as the key ID
-        .buildJweJsonFlattened(keyPair.getPublic());
+        .buildJweJsonFlattened(keyPair.getPublic(), "someKeyId");
     String jweCompact = jwe.toCompactForm();
 
     System.out.println("JWE JSON flattened:\n" + JsonMarshaller.toJsonPrettyFormatted(jwe));

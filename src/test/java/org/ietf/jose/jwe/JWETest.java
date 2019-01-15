@@ -59,7 +59,7 @@ public class JWETest {
 
     JsonWebEncryption jwe = JweBuilder.getInstance()
       .withBinaryPayload(payload)
-      .buildJweJsonFlattened(pair.getPublic());
+        .buildJweJsonFlattened(pair.getPublic(), null);
 
     String compactForm = jwe.toCompactForm();
 
@@ -85,7 +85,7 @@ public class JWETest {
 
     JsonWebEncryption jwe = JweBuilder.getInstance()
       .withBinaryPayload(payload)
-      .buildJweJsonFlattened(pair.getPublic());
+        .buildJweJsonFlattened(pair.getPublic(), null);
 
     byte[] decrypted = JweDecryptor.createFor(jwe)
         .decrypt(pair.getPrivate())
@@ -105,7 +105,7 @@ public class JWETest {
 
     JsonWebEncryption jwe = JweBuilder.getInstance()
         .withStringPayload(stringPayload)
-      .buildJweJsonFlattened(pair.getPublic());
+        .buildJweJsonFlattened(pair.getPublic(), null);
 
     String decrypted = JweDecryptor.createFor(jwe)
         .decrypt(pair.getPrivate())
@@ -115,7 +115,7 @@ public class JWETest {
 
     jwe = JweBuilder.getInstance()
         .withStringPayload(stringPayload)
-        .buildJweJsonFlattened(pair.getPublic());
+        .buildJweJsonFlattened(pair.getPublic(), null);
 
     byte[] decryptedBytes = JweDecryptor.createFor(jwe)
         .decrypt(pair.getPrivate())
