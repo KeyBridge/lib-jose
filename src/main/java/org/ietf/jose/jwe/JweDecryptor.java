@@ -80,6 +80,18 @@ public class JweDecryptor {
   }
 
   /**
+   * Decrypt using a private key
+   *
+   * @param sharedSecret a shared secret
+   * @return DecryptionResult containing the decrypted plaintext
+   * @throws GeneralSecurityException in case of failure to unwrap the key or
+   *                                  decrypt
+   */
+  public DecryptionResult decrypt(String sharedSecret) throws GeneralSecurityException {
+    return decryptGeneric(SecretKeyBuilder.fromSharedSecret(sharedSecret));
+  }
+
+  /**
    * Internal decryption method that accepts any Key instance but may fail with
    * keys that are actually invalid for the operation. The public 'decrypt'
    * methods restrict the set of keys that can be used.

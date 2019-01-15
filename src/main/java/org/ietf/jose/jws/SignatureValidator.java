@@ -1,12 +1,15 @@
 package org.ietf.jose.jws;
 
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.PublicKey;
-import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwe.SecretKeyBuilder;
 import org.ietf.jose.jwk.JsonWebKey;
 import org.ietf.jose.util.CryptographyUtility;
+
+import javax.crypto.SecretKey;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 
 import static org.ietf.jose.util.KeyUtility.convertSecretToKey;
 
@@ -38,9 +41,9 @@ public class SignatureValidator {
     }
     try {
       return CryptographyUtility.validateSignature(signature,
-                                                   signingInput,
-                                                   key,
-                                                   algorithm.getJavaAlgorithmName());
+          signingInput,
+          key,
+          algorithm.getJavaAlgorithmName());
     } catch (GeneralSecurityException e) {
       return false;
     }
@@ -56,9 +59,9 @@ public class SignatureValidator {
   public static boolean isValid(Signature signature, JsonWebKey key) {
     try {
       return CryptographyUtility.validateSignature(signature.getSignatureBytes(),
-                                                   signature.getSigningInput(),
-                                                   key,
-                                                   signature.getProtectedHeader().getJwsAlgorithmType().getJavaAlgorithmName());
+          signature.getSigningInput(),
+          key,
+          signature.getProtectedHeader().getJwsAlgorithmType().getJavaAlgorithmName());
     } catch (GeneralSecurityException e) {
       return false;
     }
@@ -97,5 +100,17 @@ public class SignatureValidator {
     String keyAlgorithm = signature.getProtectedHeader().getJwsAlgorithmType().getJavaAlgorithmName();
     SecretKey key = convertSecretToKey(keyAlgorithm, secret);
     return isValid(signature.getProtectedHeader(), signature.getSigningInput(), key, signature.getSignatureBytes());
+  }
+
+  /**
+   * Validate signature using shared secret
+   *
+   * @param signature    a valid signature instance
+   * @param sharedSecret a string shared secret. Can be any arbitrary string.
+   * @return true if signature is valid
+   */
+  public static boolean isValid(Signature signature, String sharedSecret) throws NoSuchAlgorithmException {
+    SecretKey key = SecretKeyBuilder.fromSharedSecret(sharedSecret);
+    return isValid(signature, key);
   }
 }
