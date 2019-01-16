@@ -15,6 +15,8 @@
  */
 package org.ietf.jose.jwe;
 
+import ch.keybridge.lib.jose.Profile;
+import ch.keybridge.lib.jose.Profile1;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 
@@ -41,14 +43,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author Key Bridge
  */
 public class JweBuilder {
-
   /**
    * Default algorithms
    */
-  private static final JweEncryptionAlgorithmType CONTENT_ENC_ALGO = JweEncryptionAlgorithmType.A128CBC_HS256;
-  private static final JweKeyAlgorithmType KEY_MGMT_ALGO_ASYM = JweKeyAlgorithmType.RSA1_5;
-
-  private JweEncryptionAlgorithmType encryptionAlgo = CONTENT_ENC_ALGO;
+  private static final Profile PROFILE = new Profile1();
+  private JweEncryptionAlgorithmType encryptionAlgo = PROFILE.getContentEncAlgo();
   /**
    * Cannot set a default Key Management algorithm at this point because we
    * don't know if a symmetric or asymmetric key will be used for payload
@@ -172,7 +171,7 @@ public class JweBuilder {
    */
   public JsonWebEncryption buildJweJsonFlattened(PublicKey key, String keyId) throws IOException, GeneralSecurityException {
     if (keyMgmtAlgo == null) {
-      keyMgmtAlgo = KEY_MGMT_ALGO_ASYM;
+      keyMgmtAlgo = PROFILE.getKeyMgmtAlgAsym();
     }
     return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
         protectedHeader, unprotectedHeader, keyId);

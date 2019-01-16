@@ -15,9 +15,6 @@
  */
 package ch.keybridge.lib.jose;
 
-import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
-import org.ietf.jose.jwa.JweKeyAlgorithmType;
-import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
 import org.ietf.jose.jwe.JweDecryptor;
@@ -57,6 +54,7 @@ import java.util.logging.Logger;
 public class JoseFactory {
 
   private final static Logger LOG = Logger.getLogger(JoseFactory.class.getCanonicalName());
+  private static final Profile PROFILE = new Profile1();
 
   /**
    * Build, verify and decode Javascript Web Encryption objects.
@@ -302,7 +300,7 @@ public class JoseFactory {
 
         JsonWebSignature jws = JwsBuilder.getInstance()
             .withStringPayload(jsonPayload)
-            .sign(senderPrivateKey, JwsAlgorithmType.RS256, signatureKeyId)
+            .sign(senderPrivateKey, PROFILE.getSignatureAlgAsymmetric(), signatureKeyId)
             .buildJsonWebSignature();
 
         return JweBuilder.getInstance()
@@ -333,7 +331,7 @@ public class JoseFactory {
 
         JsonWebSignature jws = JwsBuilder.getInstance()
             .withStringPayload(jsonPayload)
-            .sign(secretKey, JwsAlgorithmType.HS256, senderId)
+            .sign(secretKey, PROFILE.getSignatureAlgSymmetric(), senderId)
             .buildJsonWebSignature();
 
         return JweBuilder.getInstance()
@@ -355,7 +353,8 @@ public class JoseFactory {
     /**
      * Create a JSON Web Token signed with a keyed hash (HMAC).
      *
-     * @param claims       claims to be asserted by this authorization token
+     * @param claims       claims to be asserted by this authorization token. The only mandatory field in claims is
+     *                     'jti'.
      * @param sharedSecret an arbitrary shared secret
      * @param keyId        an identifier for the encryption key. This value gets written as the 'kid' field in the
      *                     protected header.
@@ -369,14 +368,14 @@ public class JoseFactory {
       final Key key = SecretKeyBuilder.fromSharedSecret(sharedSecret);
       return JwsBuilder.getInstance()
           .withStringPayload(claims.toJson())
-          .sign(key, JwsAlgorithmType.HS256, keyId)
+          .sign(key, PROFILE.getSignatureAlgSymmetric(), keyId)
           .buildCompact();
     }
 
     /**
      * Create a JSON Web Token signed with a private key (digital signature).
      *
-     * @param claims     claims to be asserted by this authorization token
+     * @param claims     claims to be asserted by this authorization token. The only mandatory field in claims is 'jti'.
      * @param privateKey a private key used for the digital signature
      * @param keyId      an identifier for the encryption key. This value gets written as the 'kid' field in the
      *                   protected header.
@@ -389,7 +388,7 @@ public class JoseFactory {
         GeneralSecurityException {
       return JwsBuilder.getInstance()
           .withStringPayload(claims.toJson())
-          .sign(privateKey, JwsAlgorithmType.RS256, keyId)
+          .sign(privateKey, PROFILE.getSignatureAlgAsymmetric(), keyId)
           .buildCompact();
     }
 
@@ -410,8 +409,6 @@ public class JoseFactory {
       final SecretKey key = SecretKeyBuilder.fromSharedSecret(sharedSecret);
       return JweBuilder.getInstance()
           .withStringPayload(claims.toJson())
-          .withKeyManagementAlgorithm(JweKeyAlgorithmType.A256KW)
-          .withEncryptionAlgorithm(JweEncryptionAlgorithmType.A128CBC_HS256)
           .buildJweJsonFlattened(key, keyId)
           .toCompactForm();
     }
@@ -432,8 +429,6 @@ public class JoseFactory {
         GeneralSecurityException {
       return JweBuilder.getInstance()
           .withStringPayload(claims.toJson())
-          .withKeyManagementAlgorithm(JweKeyAlgorithmType.RSA1_5)
-          .withEncryptionAlgorithm(JweEncryptionAlgorithmType.A128CBC_HS256)
           .buildJweJsonFlattened(publicKey, keyId)
           .toCompactForm();
     }

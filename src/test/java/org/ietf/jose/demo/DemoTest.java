@@ -72,6 +72,7 @@ public class DemoTest {
     System.out.println(signedToken);
 
     JsonWebSignature jws = JoseFactory.JwsFactory.fromCompactForm(signedToken);
+    System.out.println("key ID: " + jws.getSignature().getProtectedHeader().getKid());
     Assert.assertTrue(SignatureValidator.isValid(jws.getSignature(), sharedSecret));
 
     JwtClaims decodedClaims = JwtClaims.fromJson(jws.getStringPayload());
