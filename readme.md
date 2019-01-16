@@ -48,10 +48,8 @@ PublicKey recipientPublicKey = ...
 String keyId = ... 
 
 // SignAndEncrypt.write produces a a valid JSON string; null on error
-String json = JOSE.SignAndEncrypt.write(sampleText, 
-                                        senderPrivateKey, 
-                                        recipientPublicKey, 
-                                        keyId);
+String json = JoseFactory.SignAndEncrypt.write(
+    sampleText, senderPrivateKey, recipientPublicKey, keyId);
 ```
 
 The signed and encrypted JSON output looks like (formatted for readability):
@@ -78,10 +76,8 @@ senderPublicKey = ... // sender's PublicKey (for signature validation)
 
 // SignAndEncrypt.read produces a decrypted object of the specified class type
 // Returns null if the signature fails to validate or the payload fails to decrypt. 
-String recoveredSampleText = JOSE.SignAndEncrypt.read(json, 
-                                                      String.class, 
-                                                      recipientPrivateKey, 
-                                                      senderPublicKey);
+String recoveredSampleText = JoseFactory.SignAndEncrypt.read(
+    json, String.class, recipientPrivateKey, senderPublicKey);
 ```
 
 ## More examples
@@ -91,7 +87,7 @@ See the following examples for useful sample code:
 * [JSON Web Token examples](src/main/java/org/ietf/jose/jwt/examples.md)
 * [JSON Web Signature examples](src/main/java/org/ietf/jose/jws/examples.md)
 * [JSON Web Encryption examples](src/main/java/org/ietf/jose/jwe/examples.md)
-* [JOSE utility class examples](docs/examples.md)
+* [JoseFactory utility class examples](docs/examples.md)
 
 All code used in these examples is available under `src/test/java/org/ietf/jose/jw*/examples.md` and `src/test/java/org/ietf/jose/demo`. 
 

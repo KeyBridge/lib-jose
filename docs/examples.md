@@ -16,7 +16,7 @@ The sender's private key is used to generate a digital signature of they payload
 ```java
 senderPrivateKey = ... // sender's PrivateKey (for digital signing)
 recipientPublicKey = ... // recipient's PublicKey (for encryption)
-String json = JOSE.SignAndEncrypt.write(sampleText, senderPrivateKey, recipientPublicKey, "myKeyId");
+String json = JoseFactory.SignAndEncrypt.write(sampleText, senderPrivateKey, recipientPublicKey, "myKeyId");
 ```
 
 **Output**
@@ -31,12 +31,12 @@ Similarly, to decrypt the payload, we need the recipient's private key, and the 
 recipientPrivateKey = ... // recipient's PrivateKey (for decryption)
 senderPublicKey = ... // sender's PublicKey (for signature validation)
 
-JOSE.SignAndEncrypt.read(json, String.class, recipientPrivateKey, senderPublicKey);
+JoseFactory.SignAndEncrypt.read(json, String.class, recipientPrivateKey, senderPublicKey);
 ```
 
 Decrypted result: `sample text to sign and encrypt`
 
-Note that the digital signature or HMAC are validated automatically by the JOSE::read method. 
+Note that the digital signature or HMAC are validated automatically by the JoseFactory::read method. 
 
 ### Sign and encrypt using a shared key
 
@@ -48,7 +48,7 @@ String sampleText = "sample text to sign and encrypt";
 
 ```java
 SecretKey key = SecretKeyBuilder.fromBase64UrlEncodedString(base64UrlEncodedSecret);
-String json = JOSE.SignAndEncrypt.write(sampleText, key, "myKeyId");```
+String json = JoseFactory.SignAndEncrypt.write(sampleText, key, "myKeyId");```
 ```
 
 The **output** is a signed and encrypted JSON:
@@ -61,7 +61,7 @@ This JSON string can be decrypted using the same shared secret.
 
 ```java
 SecretKey key = SecretKeyBuilder.fromBase64UrlEncodedString(base64UrlEncodedSecret);
-String decrypted = JOSE.SignAndEncrypt.read(json, String.class, key);
+String decrypted = JoseFactory.SignAndEncrypt.read(json, String.class, key);
 ```
 
 ## Digital signatures and HMAC codes
