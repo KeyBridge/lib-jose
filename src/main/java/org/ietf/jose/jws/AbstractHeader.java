@@ -187,6 +187,13 @@ public abstract class AbstractHeader {
   }
 
   //<editor-fold defaultstate="collapsed" desc="Typed getters and setters for JWS and JWE algorithms">
+  /**
+   * Get the "alg" (Algorithm) Header Parameter. The parameter is typed per RFC
+   * 7518 JSON Web Algorithms (JWA), (Algorithm) Header Parameter Values for
+   * JWS.
+   *
+   * @return the "alg" (Algorithm) Header Parameter
+   */
   public JwsAlgorithmType getJwsAlgorithmType() {
     return JwsAlgorithmType.resolveAlgorithm(alg);
   }
@@ -195,6 +202,13 @@ public abstract class AbstractHeader {
     this.alg = alg.getJoseAlgorithmName();
   }
 
+  /**
+   * Get the "alg" (Algorithm) Header Parameter. The parameter is typed per RFC
+   * 7518 JSON Web Algorithms (JWA), (Algorithm) Header Parameter Values for
+   * JWE.
+   *
+   * @return the "alg" (Algorithm) Header Parameter
+   */
   public JweKeyAlgorithmType getJweKeyAlgorithmType() {
     return JweKeyAlgorithmType.resolveAlgorithm(alg);
   }
@@ -203,6 +217,13 @@ public abstract class AbstractHeader {
     this.alg = alg.getJoseAlgorithmName();
   }
 
+  /**
+   * Get the "alg" (Algorithm) Header Parameter. Use {@code getJwsAlgorithmType}
+   * and {@code getJweKeyAlgorithmType} to get enumerated type instances of the
+   * header.
+   *
+   * @return the "alg" (Algorithm) Header Parameter
+   */
   public String getAlg() {
     return this.alg;
   }
