@@ -15,6 +15,15 @@
  */
 package ch.keybridge.lib.jose;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.SecretKey;
 import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
 import org.ietf.jose.jwe.JweDecryptor;
@@ -25,16 +34,6 @@ import org.ietf.jose.jws.Signature;
 import org.ietf.jose.jws.SignatureValidator;
 import org.ietf.jose.jwt.JwtClaims;
 import org.ietf.jose.util.JsonMarshaller;
-
-import javax.crypto.SecretKey;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * lib-jose – Javascript Object Signing and Encryption.
@@ -195,14 +194,14 @@ public class JoseFactory {
      *                    digital signature
      * @param <T>         class of the object contained in the message
      * @return decrypted object. null is returned in the case of invalid
-     * signature, failure to decrypt or deserialise JSON.
+     *         signature, failure to decrypt or deserialise JSON.
      */
     public static <T> T read(String json, Class<T> type, PrivateKey receiverKey, PublicKey senderKey) {
       try {
         JsonWebEncryption jwe = JsonWebEncryption.fromJson(json);
         String payload = JweDecryptor.createFor(jwe)
-            .decrypt(receiverKey)
-            .getAsString();
+          .decrypt(receiverKey)
+          .getAsString();
 
         JsonWebSignature jws = JsonWebSignature.fromJson(payload);
         List<Signature> signatures = jws.getSignatures();
@@ -211,7 +210,7 @@ public class JoseFactory {
         }
         if (signatures.size() > 1) {
           LOG.log(Level.WARNING, "JWS {1} signatures instead of the expected 1. Validating only the first signature"
-              + ".", new Object[]{signatures.size()});
+                  + ".", new Object[]{signatures.size()});
         }
         /**
          * The payload is rejected if the digital signature cannot be validated.
@@ -234,21 +233,19 @@ public class JoseFactory {
      * T. Decrypts message and validates the keyed message authetication token
      * using the shared secret.
      *
-     * @param json      JSON string which is valid JWE flattened
-     *                  JSON
+     * @param json      JSON string which is valid JWE flattened JSON
      * @param type      class of object contained.
      * @param secretKey a valid AES secret key
-     * @param <T>       class of the object contained in the
-     *                  message
+     * @param <T>       class of the object contained in the message
      * @return decrypted object. null is returned in the case of invalid
-     * signature, failure to decrypt or deserialise JSON.
+     *         signature, failure to decrypt or deserialise JSON.
      */
     public static <T> T read(String json, Class<T> type, SecretKey secretKey) {
       try {
         JsonWebEncryption jwe = JsonWebEncryption.fromJson(json);
         String payload = JweDecryptor.createFor(jwe)
-            .decrypt(secretKey)
-            .getAsString();
+          .decrypt(secretKey)
+          .getAsString();
 
         /**
          * The payload is rejected if the digital signature cannot be validated.
@@ -260,7 +257,7 @@ public class JoseFactory {
         }
         if (signatures.size() > 1) {
           LOG.log(Level.WARNING, "JWS {0} signatures instead of the expected 1. Validating only the first signature"
-              + ".", new Object[]{signatures.size()});
+                  + ".", new Object[]{signatures.size()});
         }
         boolean signatureValid = SignatureValidator.isValid(signatures.get(0), secretKey);
         if (!signatureValid) {
@@ -286,27 +283,26 @@ public class JoseFactory {
      *                         written as the 'kid' (key ID) field of the JWS
      *                         protected header. Can be null if an unset 'kid'
      *                         protected header value is sufficient.
-     * @param encryptionKeyId  an identifier of the encryption key to be
-     *                         written as the 'kid' (key ID) field of the JWE
-     *                         protected header. Can be null if an unset 'kid'
-     *                         protected header value is sufficient.
+     * @param encryptionKeyId  an identifier of the encryption key to be written
+     *                         as the 'kid' (key ID) field of the JWE protected
+     *                         header. Can be null if an unset 'kid' protected
+     *                         header value is sufficient.
      * @return a valid JSON string if the operation is successful; null in case
-     * of failure
+     *         of failure
      */
-    public static String write(Object object, PrivateKey senderPrivateKey, PublicKey publicKey, String signatureKeyId
-        , String encryptionKeyId) {
+    public static String write(Object object, PrivateKey senderPrivateKey, PublicKey publicKey, String signatureKeyId, String encryptionKeyId) {
       try {
         String jsonPayload = JsonMarshaller.toJson(object);
 
         JsonWebSignature jws = JwsBuilder.getInstance()
-            .withStringPayload(jsonPayload)
-            .sign(senderPrivateKey, PROFILE.getSignatureAlgAsymmetric(), signatureKeyId)
-            .buildJsonWebSignature();
+          .withStringPayload(jsonPayload)
+          .sign(senderPrivateKey, PROFILE.getSignatureAlgAsymmetric(), signatureKeyId)
+          .buildJsonWebSignature();
 
         return JweBuilder.getInstance()
-            .withStringPayload(jws.toJson())
-            .buildJweJsonFlattened(publicKey, encryptionKeyId)
-            .toJson();
+          .withStringPayload(jws.toJson())
+          .buildJweJsonFlattened(publicKey, encryptionKeyId)
+          .toJson();
       } catch (IOException | GeneralSecurityException e) {
         LOG.log(Level.SEVERE, null, e);
       }
@@ -318,26 +314,25 @@ public class JoseFactory {
      *
      * @param object    the object to be signed and encrypted
      * @param secretKey valid AES secret key
-     * @param senderId  an identifier of the sender to be written
-     *                  as the 'kid' (key ID) field of the JOSE
-     *                  protected header. Can be null if an unset
-     *                  'kid' protected header value is sufficient.
+     * @param senderId  an identifier of the sender to be written as the 'kid'
+     *                  (key ID) field of the JOSE protected header. Can be null
+     *                  if an unset 'kid' protected header value is sufficient.
      * @return a valid JSON string if the operation is successful; null in case
-     * of failure
+     *         of failure
      */
     public static String write(Object object, SecretKey secretKey, String senderId) {
       try {
         String jsonPayload = JsonMarshaller.toJson(object);
 
         JsonWebSignature jws = JwsBuilder.getInstance()
-            .withStringPayload(jsonPayload)
-            .sign(secretKey, PROFILE.getSignatureAlgSymmetric(), senderId)
-            .buildJsonWebSignature();
+          .withStringPayload(jsonPayload)
+          .sign(secretKey, PROFILE.getSignatureAlgSymmetric(), senderId)
+          .buildJsonWebSignature();
 
         return JweBuilder.getInstance()
-            .withStringPayload(jws.toJson())
-            .buildJweJsonFlattened(secretKey, senderId)
-            .toJson();
+          .withStringPayload(jws.toJson())
+          .buildJweJsonFlattened(secretKey, senderId)
+          .toJson();
       } catch (IOException | GeneralSecurityException e) {
         LOG.log(Level.SEVERE, null, e);
       }
@@ -346,50 +341,54 @@ public class JoseFactory {
   }
 
   /**
-   * A JWT authorization token factory that provides utility methods for easy token
-   * creation.
+   * A JWT authorization token factory that provides utility methods for easy
+   * token creation.
    */
   public static class AuthorizationTokenFactory {
+
     /**
      * Create a JSON Web Token signed with a keyed hash (HMAC).
      *
-     * @param claims       claims to be asserted by this authorization token. The only mandatory field in claims is
-     *                     'jti'.
+     * @param claims       claims to be asserted by this authorization token.
+     *                     The only mandatory field in claims is 'jti'.
      * @param sharedSecret an arbitrary shared secret
-     * @param keyId        an identifier for the encryption key. This value gets written as the 'kid' field in the
-     *                     protected header.
+     * @param keyId        an identifier for the encryption key. This value gets
+     *                     written as the 'kid' field in the protected header.
      *                     Can be null.
      * @return an encoded token that is ready to use as a Bearer token.
-     * @throws IOException              in case of failure to serialize the claims to JSON
+     * @throws IOException              in case of failure to serialize the
+     *                                  claims to JSON
      * @throws GeneralSecurityException in case of failure to sign
      */
     public static String createSignedToken(JwtClaims claims, String sharedSecret, String keyId) throws IOException,
-        GeneralSecurityException {
+      GeneralSecurityException {
       final Key key = SecretKeyBuilder.fromSharedSecret(sharedSecret);
       return JwsBuilder.getInstance()
-          .withStringPayload(claims.toJson())
-          .sign(key, PROFILE.getSignatureAlgSymmetric(), keyId)
-          .buildCompact();
+        .withStringPayload(claims.toJson())
+        .sign(key, PROFILE.getSignatureAlgSymmetric(), keyId)
+        .buildCompact();
     }
 
     /**
      * Create a JSON Web Token signed with a private key (digital signature).
      *
-     * @param claims     claims to be asserted by this authorization token. The only mandatory field in claims is 'jti'.
+     * @param claims     claims to be asserted by this authorization token. The
+     *                   only mandatory field in claims is 'jti'.
      * @param privateKey a private key used for the digital signature
-     * @param keyId      an identifier for the encryption key. This value gets written as the 'kid' field in the
-     *                   protected header.
-     *                   Can be null.
+     * @param keyId      an identifier for the encryption key. This value gets
+     *                   written as the 'kid' field in the protected header. Can
+     *                   be null.
      * @return an encoded token that is ready to use as a Bearer token.
-     * @throws IOException              in case of failure to serialize the claims to JSON
+     * @throws IOException              in case of failure to serialize the
+     *                                  claims to JSON
      * @throws GeneralSecurityException in case of failure to sign
      */
     public static String createSignedToken(JwtClaims claims, PrivateKey privateKey, String keyId) throws IOException,
-        GeneralSecurityException {
+      GeneralSecurityException {
       return JwsBuilder.getInstance()
-          .withStringPayload(claims.toJson())
-          .sign(privateKey, PROFILE.getSignatureAlgAsymmetric(), keyId)
-          .buildCompact();
+        .withStringPayload(claims.toJson())
+        .sign(privateKey, PROFILE.getSignatureAlgAsymmetric(), keyId)
+        .buildCompact();
     }
 
     /**
@@ -397,20 +396,21 @@ public class JoseFactory {
      *
      * @param claims       claims to be asserted by this authorization token
      * @param sharedSecret an arbitrary shared secret
-     * @param keyId        an identifier for the encryption key. This value gets written as the 'kid' field in the
-     *                     protected header.
+     * @param keyId        an identifier for the encryption key. This value gets
+     *                     written as the 'kid' field in the protected header.
      *                     Can be null.
      * @return an encoded token that is ready to use as a Bearer token.
-     * @throws IOException              in case of failure to serialize the claims to JSON
+     * @throws IOException              in case of failure to serialize the
+     *                                  claims to JSON
      * @throws GeneralSecurityException in case of failure to sign
      */
     public static String createEncryptedToken(JwtClaims claims, String sharedSecret, String keyId) throws IOException,
-        GeneralSecurityException {
+      GeneralSecurityException {
       final SecretKey key = SecretKeyBuilder.fromSharedSecret(sharedSecret);
       return JweBuilder.getInstance()
-          .withStringPayload(claims.toJson())
-          .buildJweJsonFlattened(key, keyId)
-          .toCompactForm();
+        .withStringPayload(claims.toJson())
+        .buildJweJsonFlattened(key, keyId)
+        .toCompactForm();
     }
 
     /**
@@ -418,19 +418,20 @@ public class JoseFactory {
      *
      * @param claims    claims to be asserted by this authorization token
      * @param publicKey public key of the recipient of this token
-     * @param keyId     an identifier for the encryption key. This value gets written as the 'kid' field in the
-     *                  protected header.
-     *                  Can be null.
+     * @param keyId     an identifier for the encryption key. This value gets
+     *                  written as the 'kid' field in the protected header. Can
+     *                  be null.
      * @return an encoded token that is ready to use as a Bearer token.
-     * @throws IOException              in case of failure to serialize the claims to JSON
+     * @throws IOException              in case of failure to serialize the
+     *                                  claims to JSON
      * @throws GeneralSecurityException in case of failure to sign
      */
     public static String createEncryptedToken(JwtClaims claims, PublicKey publicKey, String keyId) throws IOException,
-        GeneralSecurityException {
+      GeneralSecurityException {
       return JweBuilder.getInstance()
-          .withStringPayload(claims.toJson())
-          .buildJweJsonFlattened(publicKey, keyId)
-          .toCompactForm();
+        .withStringPayload(claims.toJson())
+        .buildJweJsonFlattened(publicKey, keyId)
+        .toCompactForm();
     }
   }
 }
