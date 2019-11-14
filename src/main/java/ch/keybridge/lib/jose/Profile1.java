@@ -11,8 +11,9 @@ import org.ietf.jose.jwa.JwsAlgorithmType;
  * @since 0.0.1 created 2019-01-15
  */
 public class Profile1 implements Profile {
+
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   @Override
   public JweEncryptionAlgorithmType getContentEncAlgo() {
@@ -20,7 +21,7 @@ public class Profile1 implements Profile {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   @Override
   public JweKeyAlgorithmType getKeyMgmtAlgAsym() {
@@ -28,7 +29,7 @@ public class Profile1 implements Profile {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   @Override
   public JweKeyAlgorithmType getKeyMgmtAlgSymmetric() {
@@ -36,7 +37,7 @@ public class Profile1 implements Profile {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   @Override
   public JwsAlgorithmType getSignatureAlgAsymmetric() {
@@ -44,7 +45,7 @@ public class Profile1 implements Profile {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   @Override
   public JwsAlgorithmType getSignatureAlgSymmetric() {
