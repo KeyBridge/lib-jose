@@ -102,7 +102,7 @@
     <dependency>
       <groupId>keybridge.lib</groupId>
       <artifactId>cryptography</artifactId>
-      <version>4.1.0</version>
+      <version>4.2.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
