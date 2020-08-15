@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,10 @@
  */
 package org.ietf.jose.jwa;
 
+import javax.xml.bind.annotation.XmlEnumValue;
 import org.ietf.jose.jwe.encryption.AesGcmEncrypter;
 import org.ietf.jose.jwe.encryption.DefaultEncrypter;
 import org.ietf.jose.jwe.encryption.Encrypter;
-
-import javax.xml.bind.annotation.XmlEnumValue;
 
 import static org.ietf.jose.jwe.encryption.DefaultEncrypter.AesConfigurationType.*;
 
@@ -72,6 +71,7 @@ import static org.ietf.jose.jwe.encryption.DefaultEncrypter.AesConfigurationType
  * </pre>
  */
 public enum JweEncryptionAlgorithmType {
+
   /**
    * AES_128_CBC_HMAC_SHA_256 authenticated encryption algorithm, as defined in
    * RFC 7518 Section 5.2.3

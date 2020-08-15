@@ -37,6 +37,12 @@ package org.ietf.jose.jws;
  */
 public class X5CHeaderParameter {
 
+  /**
+   * The certificate or certificate chain is represented as a JSON array of
+   * certificate value strings. Each string in the array is a base64-encoded
+   * (Section 4 of [RFC4648] -- not base64url-encoded) DER [ITU.X690.2008] PKIX
+   * certificate value.
+   */
   private byte[] data;
 
   public X5CHeaderParameter() {

@@ -15,22 +15,22 @@
  */
 package org.ietf.jose.jwt;
 
-import org.ietf.jose.adapter.XmlAdapterEpochZonedDateTime;
-import org.ietf.jose.jws.JsonSerializable;
-import org.ietf.jose.util.JsonMarshaller;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.ietf.jose.adapter.XmlAdapterEpochZonedDateTime;
+import org.ietf.jose.jws.JsonSerializable;
+import org.ietf.jose.util.JsonMarshaller;
 
 /**
  * RFC 7519 JSON Web Token (JWT)
@@ -167,44 +167,103 @@ public class JwtClaims extends JsonSerializable {
   @XmlTransient
   private Map<String, Object> claims;
 
+  /**
+   * Default no-arg constructor. Initialized the `issuedAt` field to the current
+   * system time.
+   */
   public JwtClaims() {
+    this.jwtId = UUID.randomUUID().toString();
+    this.issuedAt = ZonedDateTime.now();
+    this.claims = new HashMap<>();
   }
 
   //<editor-fold defaultstate="collapsed" desc="Getter and Setter">
+  /**
+   * Get the principal that issued the JWT
+   *
+   * @return the principal that issued the JWT
+   */
   public String getIssuer() {
     return this.issuer;
   }
 
+  /**
+   * Identifies the principal that issued the JWT
+   *
+   * @param issuer the principal that issued the JWT
+   * @return the current claims instance
+   */
   public JwtClaims withIssuer(String issuer) {
     this.issuer = issuer;
     return this;
   }
 
+  /**
+   * Set the principal that issued the JWT
+   *
+   * @param issuer the principal that issued the JWT
+   */
   public void setIssuer(String issuer) {
     this.issuer = issuer;
   }
 
+  /**
+   * The "sub" (subject) claim identifies the principal that is the subject of
+   * the JWT.
+   *
+   * @return the subject of the JWT
+   */
   public String getSubject() {
     return this.subject;
   }
 
+  /**
+   * Set the principal that is the subject of the JWT.
+   *
+   * @param subject the subject of the JWT.
+   */
   public void setSubject(String subject) {
     this.subject = subject;
   }
 
+  /**
+   * Set the principal that is the subject of the JWT.
+   *
+   * @param subject the subject of the JWT.
+   * @return the current claims instance
+   */
   public JwtClaims withSubject(String subject) {
     this.subject = subject;
     return this;
   }
 
+  /**
+   * The "aud" (audience) claim identifies the recipients that the JWT is
+   * intended for.
+   *
+   * @return the recipients that the JWT is intended for.
+   */
   public String getAudience() {
     return this.audience;
   }
 
+  /**
+   * The "aud" (audience) claim identifies the recipients that the JWT is
+   * intended for.
+   *
+   * @param audience the recipients that the JWT is intended for.
+   */
   public void setAudience(String audience) {
     this.audience = audience;
   }
 
+  /**
+   * The "aud" (audience) claim identifies the recipients that the JWT is
+   * intended for.
+   *
+   * @param audience that the JWT is intended for.
+   * @return the current claims instance
+   */
   public JwtClaims withAudience(String audience) {
     this.audience = audience;
     return this;
@@ -227,6 +286,17 @@ public class JwtClaims extends JsonSerializable {
     return this;
   }
 
+  /**
+   * Convenience helper method to set the expiration time.
+   *
+   * @param duration the JWT duration. Typically this should be 3600 seconds.
+   * @return the current claims instance.
+   */
+  public JwtClaims withDuration(Duration duration) {
+    this.expirationTime = issuedAt.plus(duration);
+    return this;
+  }
+
   public ZonedDateTime getNotBefore() {
     return notBefore;
   }
@@ -240,36 +310,67 @@ public class JwtClaims extends JsonSerializable {
     return this;
   }
 
+  /**
+   * Identifies the time at which the JWT was issued.
+   *
+   * @return timestamp when the JWT was issued.
+   */
   public ZonedDateTime getIssuedAt() {
     return issuedAt;
   }
 
+  /**
+   * Identifies the time at which the JWT was issued.
+   * <p>
+   * Developer note: `issuedAt` is set to the current system time in the
+   * constructor.
+   *
+   * @param issuedAt timestamp when the JWT was issued.
+   */
   public void setIssuedAt(ZonedDateTime issuedAt) {
     this.issuedAt = issuedAt;
   }
 
+  /**
+   * Identifies the time at which the JWT was issued.
+   * <p>
+   * Developer note: `issuedAt` is set to the current system time in the
+   * constructor.
+   *
+   * @param issuedAt timestamp when the JWT was issued.
+   * @return the current claims instance
+   */
   public JwtClaims withIssuedAt(ZonedDateTime issuedAt) {
     this.issuedAt = issuedAt == null ? null : issuedAt.truncatedTo(ChronoUnit.SECONDS);
     return this;
   }
 
+  /**
+   * A unique identifier for the JWT.
+   *
+   * @return the JWT idenfifier
+   */
   public String getJwtId() {
     return this.jwtId;
   }
 
+  /**
+   * A unique identifier for the JWT.
+   * <p>
+   * Developer note: the JWT id is initialized to a random UUID in the
+   * constructor. Use this method to replace the default value.
+   *
+   * @param jwtId the JWT idenfifier
+   */
   public void setJwtId(String jwtId) {
     this.jwtId = jwtId;
   }
 
   /**
-   * 4.1.7. "jti" (JWT ID) Claim The "jti" (JWT ID) claim provides a unique
-   * identifier for the JWT. The identifier value MUST be assigned in a manner
-   * that ensures that there is a negligible probability that the same value
-   * will be accidentally assigned to a different data object; if the
-   * application uses multiple issuers, collisions MUST be prevented among
-   * values produced by different issuers as well. The "jti" claim can be used
-   * to prevent the JWT from being replayed. The "jti" value is a case-
-   * sensitive string. Use of this claim is OPTIONAL.
+   * A unique identifier for the JWT.
+   * <p>
+   * Developer note: the JWT id is initialized to a random UUID in the
+   * constructor. Use this method to replace the default value.
    *
    * @param jwtId a unique identifier for the JWT
    * @return this instance
@@ -291,7 +392,10 @@ public class JwtClaims extends JsonSerializable {
     this.claims = claims;
     return this;
   }
-
+  /**
+   * Internal set of reserved claim names. This prevents the user from adding a
+   * claim for which they should use a setter method.
+   */
   @XmlTransient
   private static final Set<String> RESERVED_CLAIM_NAMES = Arrays.stream(JwtClaims.class.getDeclaredFields())
     .filter(field -> field.isAnnotationPresent(XmlElement.class))
@@ -307,13 +411,11 @@ public class JwtClaims extends JsonSerializable {
    * @param claimValue claim value
    * @return this JwtClaims instance
    */
-  public JwtClaims addClaim(String claimName, Object claimValue) {
+  public JwtClaims withClaim(String claimName, Object claimValue) {
     if (RESERVED_CLAIM_NAMES.contains(claimName)) {
       throw new IllegalArgumentException("Cannot use reserved claim name " + claimName);
     }
-    if (claims == null) {
-      claims = new HashMap<>();
-    }
+//    if (claims == null) {      claims = new HashMap<>();    }
     claims.put(claimName, claimValue);
     return this;
   }//</editor-fold>
@@ -327,7 +429,7 @@ public class JwtClaims extends JsonSerializable {
    * @throws Exception   if the date times fail to unmarshal
    */
   public static JwtClaims fromJson(final String json) throws IOException, Exception {
-    Class<?> unmarshallingClass = (new HashMap<String, Object>()).getClass();
+    Class<?> unmarshallingClass = (new HashMap<>()).getClass();
     Map<String, Object> valueMap = (Map<String, Object>) JsonMarshaller.fromJson(json, unmarshallingClass);
     JwtClaims claims = new JwtClaims();
     claims.issuer = (String) valueMap.remove("iss");
@@ -337,7 +439,7 @@ public class JwtClaims extends JsonSerializable {
     claims.expirationTime = unmarshalZonedDateTime(valueMap.remove("exp"));
     claims.notBefore = unmarshalZonedDateTime(valueMap.remove("nbf"));
     claims.issuedAt = unmarshalZonedDateTime(valueMap.remove("iat"));
-    claims.claims = valueMap.isEmpty() ? null : valueMap;
+    claims.claims = valueMap.isEmpty() ? Collections.EMPTY_MAP : valueMap;
     return claims;
   }
 
@@ -382,7 +484,7 @@ public class JwtClaims extends JsonSerializable {
     if (issuedAt != null) {
       jsonObject.put("iat", issuedAt.toEpochSecond());
     }
-    if (claims != null) {
+    if (claims != null && !claims.isEmpty()) {
       jsonObject.putAll(claims);
     }
     return JsonMarshaller.toJson(jsonObject);
@@ -403,9 +505,10 @@ public class JwtClaims extends JsonSerializable {
   }
 
   /**
-   * Compare two timestamps using logical equality (i.e. noon UTC equals 1 pm (+01 hours)).
-   * This method is necessary because ZonedDateTime::equals returns false for two (logically) equals times
-   * but encoded in different time zones.
+   * Compare two timestamps using logical equality (i.e. noon UTC equals 1 pm
+   * (+01 hours)). This method is necessary because ZonedDateTime::equals
+   * returns false for two (logically) equals times but encoded in different
+   * time zones.
    *
    * @param one   one ZonedDateTime instance
    * @param other another ZonedDateTime instance
@@ -418,7 +521,9 @@ public class JwtClaims extends JsonSerializable {
     if (one == other) {
       return true;
     }
-    if (one == null) return false;
+    if (one == null) {
+      return false;
+    }
     /**
      * return the logical time equality.
      */

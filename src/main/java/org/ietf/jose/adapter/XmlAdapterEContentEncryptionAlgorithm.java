@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,8 @@
  */
 package org.ietf.jose.adapter;
 
-import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
-
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 
 /**
  * Converts EContentEncyptionAlgorithm enum values into Base64URL-encoded
@@ -35,3 +34,4 @@ public class XmlAdapterEContentEncryptionAlgorithm extends XmlAdapter<String, Jw
     return JweEncryptionAlgorithmType.resolve(v);
   }
 }
+//

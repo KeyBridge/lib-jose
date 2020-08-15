@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,22 +15,27 @@
  */
 package org.ietf.jose.adapter;
 
-import org.ietf.jose.jws.X5CHeaderParameter;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.Base64;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import org.ietf.jose.jws.X5CHeaderParameter;
 
 /**
  * Converts X5CHeaderParameter instances into Base64URL-encoded strings and vice
- versa
+ * versa.
  */
 public class XmlAdapterX509Certificate extends XmlAdapter<String, X5CHeaderParameter> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String marshal(X5CHeaderParameter v) {
     return v.toString();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public X5CHeaderParameter unmarshal(String v) {
     X5CHeaderParameter certificate = new X5CHeaderParameter();

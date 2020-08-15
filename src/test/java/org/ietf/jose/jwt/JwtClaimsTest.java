@@ -61,8 +61,8 @@ public class JwtClaimsTest {
   @Test
   public void testCustomClaims() throws IOException, Exception {
     JwtClaims claims = new JwtClaims();
-    claims.addClaim("email", "foo@bar.com");
-    claims.addClaim("friends", Arrays.asList("John", "Jack", "Jeremy"));
+    claims.withClaim("email", "foo@bar.com");
+    claims.withClaim("friends", Arrays.asList("John", "Jack", "Jeremy"));
 
     String json = claims.toJson();
     System.out.println("  toJson   " + json);

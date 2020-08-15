@@ -217,7 +217,7 @@ public class InteropTest {
       .withExpirationTime(ZonedDateTime.now().plus(5, ChronoUnit.MINUTES))
       .withJwtId(UUID.randomUUID().toString())
       .withSubject("Test")
-      .addClaim("email", "foo@bar.com");
+      .withClaim("email", "foo@bar.com");
 
     String claimJson = claims.toJson();
 

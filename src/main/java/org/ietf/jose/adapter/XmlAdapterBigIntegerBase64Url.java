@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +15,14 @@
  */
 package org.ietf.jose.adapter;
 
+import java.math.BigInteger;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.ietf.jose.util.Base64Utility;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import java.math.BigInteger;
-
 /**
- * Converts BigInteger instances into Base64URL-encoded strings and vice versa
+ * Converts BigInteger instances into Base64URL-encoded strings and vice versa.
+ * Provides Base64 encoding and decoding as defined by
+ * <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>.
  */
 public class XmlAdapterBigIntegerBase64Url extends XmlAdapter<String, BigInteger> {
 
@@ -63,11 +64,17 @@ public class XmlAdapterBigIntegerBase64Url extends XmlAdapter<String, BigInteger
     return resizedBytes;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String marshal(BigInteger v) {
     return Base64Utility.toBase64Url(toBytesUnsigned(v));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public BigInteger unmarshal(String v) {
     return new BigInteger(1, Base64Utility.fromBase64Url(v));

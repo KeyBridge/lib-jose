@@ -17,13 +17,12 @@ package org.ietf.jose.jwe;
 
 import ch.keybridge.lib.jose.Profile;
 import ch.keybridge.lib.jose.Profile1;
-import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
-import org.ietf.jose.jwa.JweKeyAlgorithmType;
-
-import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
+import javax.crypto.SecretKey;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
+import org.ietf.jose.jwa.JweKeyAlgorithmType;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -43,6 +42,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author Key Bridge
  */
 public class JweBuilder {
+
   /**
    * Default algorithms
    */
@@ -160,10 +160,9 @@ public class JweBuilder {
   /**
    * Encrypt the payload with the provided recipient's PublicKey
    *
-   * @param key public key
-   * @param keyId an identifier for the encryption key. This value gets written as the 'kid' field in the protected
-   *              header.
-   *              Can be null.
+   * @param key   public key
+   * @param keyId an identifier for the encryption key. This value gets written
+   *              as the 'kid' field in the protected header. Can be null.
    * @return a JweJsonFlattened instance
    * @throws IOException              in case of failure to serialise the
    *                                  protected header to JSON
@@ -174,16 +173,15 @@ public class JweBuilder {
       keyMgmtAlgo = PROFILE.getKeyMgmtAlgAsym();
     }
     return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
-        protectedHeader, unprotectedHeader, keyId);
+                                         protectedHeader, unprotectedHeader, keyId);
   }
 
   /**
    * Encrypt the payload with the shared SecretKey
    *
-   * @param key secret key; use SecretKeyBuilder if necessary.
-   * @param keyId an identifier for the encryption key. This value gets written as the 'kid' field in the protected
-   *              header.
-   *              Can be null.
+   * @param key   secret key; use SecretKeyBuilder if necessary.
+   * @param keyId an identifier for the encryption key. This value gets written
+   *              as the 'kid' field in the protected header. Can be null.
    * @return a JweJsonFlattened instance
    * @throws IOException              in case of failure to serialise the
    *                                  protected header to JSON
@@ -192,7 +190,7 @@ public class JweBuilder {
   public JsonWebEncryption buildJweJsonFlattened(SecretKey key, String keyId) throws IOException, GeneralSecurityException {
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
-        protectedHeader, unprotectedHeader, keyId);
+                                         protectedHeader, unprotectedHeader, keyId);
   }
 
 }

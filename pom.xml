@@ -64,15 +64,41 @@
 
 
   <dependencies>
+    <!-- JSON-P -->
     <dependency>
-      <!--required for json marshal and unmarshal-->
+      <groupId>org.glassfish</groupId>
+      <artifactId>jakarta.json</artifactId>
+      <version>1.1.5</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- JSON-B API -->
+    <dependency>
+      <groupId>jakarta.json.bind</groupId>
+      <artifactId>jakarta.json.bind-api</artifactId>
+      <version>1.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Yasson (JSON-B implementation) -->
+    <dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>yasson</artifactId>
+      <version>1.0.3</version>
+      <scope>provided</scope>
+    </dependency>
+
+
+    <!--        <dependency>
+      required for json marshal and unmarshal
       <groupId>com.fasterxml.jackson.module</groupId>
       <artifactId>jackson-module-jaxb-annotations</artifactId>
       <version>${jackson.version}</version>
-      <!--<scope>provided</scope>-->
-    </dependency>
+      <scope>provided</scope>
+    </dependency>-->
+
+    <!--required for xml (json) annotation-->
     <dependency>
-      <!--required for xml (json) annotation-->
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
       <version>2.3.0</version>

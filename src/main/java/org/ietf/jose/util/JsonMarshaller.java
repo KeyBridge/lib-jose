@@ -23,8 +23,8 @@ import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import java.io.IOException;
 
 /**
- * A JSON serialization utility. Uses Jackson JSON serializer with reasonable
- * configuration, see the "static" code block for details.
+ * A JSON serialization utility. Uses the Jackson JSON serializer with a
+ * reasonable default configuration. See the "static" code block for details.
  */
 public class JsonMarshaller {
 

@@ -83,8 +83,13 @@ public class EllipticCurveJwk extends JsonWebKey {
   @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger y;
   /**
-   * "d" (ECC Private Key) Parameter. MUST be present to represent Elliptic
-   * Curve private keys
+   * 6.2.2.1. "d" (ECC Private Key) Parameter
+   * <p>
+   * The "d" (ECC private key) parameter contains the Elliptic Curve private key
+   * value. It is represented as the base64url encoding of the octet string
+   * representation of the private key value, as defined in Section 2.3.7 of
+   * SEC1 [SEC1]. The length of this octet string MUST be
+   * ceiling(log-base-2(n)/8) octets (where n is the order of the curve).
    */
   @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger d;

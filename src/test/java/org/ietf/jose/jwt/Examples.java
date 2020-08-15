@@ -64,8 +64,8 @@ public class Examples {
      * Custom claims are also supported.
      */
     joseClaims
-      .addClaim("domain", "somedomain.com")
-      .addClaim("email", "someone@somedomain.com");
+      .withClaim("domain", "somedomain.com")
+      .withClaim("email", "someone@somedomain.com");
 
     /**
      * Convert the JWT Claims objects to JSON
@@ -141,8 +141,8 @@ public class Examples {
       .withIssuedAt(ZonedDateTime.now())
       .withJwtId(UUID.randomUUID().toString())
       .withSubject("Subject")
-      .addClaim("domain", "somedomain.com")
-      .addClaim("email", "someone@somedomain.com");
+      .withClaim("domain", "somedomain.com")
+      .withClaim("email", "someone@somedomain.com");
 
     /**
      * Convert the JWT Claims objects to JSON

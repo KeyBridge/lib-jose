@@ -18,8 +18,6 @@ package org.ietf.jose.jwe;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterEContentEncryptionAlgorithm;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jws.AbstractHeader;
 
@@ -85,7 +83,7 @@ public class JweHeader extends AbstractHeader {
    * initial contents of this registry are the values defined in Section 5.1 of
    * [JWA].
    */
-  @XmlJavaTypeAdapter(type = JweEncryptionAlgorithmType.class, value = XmlAdapterEContentEncryptionAlgorithm.class)
+//  @XmlJavaTypeAdapter(type = JweEncryptionAlgorithmType.class, value = XmlAdapterEContentEncryptionAlgorithm.class)
   private JweEncryptionAlgorithmType enc;
 
   /**
