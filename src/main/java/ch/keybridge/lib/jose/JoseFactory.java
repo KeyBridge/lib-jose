@@ -33,7 +33,7 @@ import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.Signature;
 import org.ietf.jose.jws.SignatureValidator;
 import org.ietf.jose.jwt.JwtClaims;
-import org.ietf.jose.util.JsonMarshaller;
+import org.ietf.jose.util.JsonbUtility;
 
 /**
  * lib-jose – Javascript Object Signing and Encryption.
@@ -220,7 +220,7 @@ public class JoseFactory {
           return null;
         }
         String mainPayload = jws.getStringPayload();
-        return JsonMarshaller.fromJson(mainPayload, type);
+        return new JsonbUtility().unmarshal(mainPayload, type);
       } catch (IOException | GeneralSecurityException e) {
         LOG.log(Level.SEVERE, null, e);
       }
@@ -264,7 +264,7 @@ public class JoseFactory {
           return null;
         }
         String mainPayload = jws.getStringPayload();
-        return JsonMarshaller.fromJson(mainPayload, type);
+        return new JsonbUtility().unmarshal(mainPayload, type);
       } catch (IOException | GeneralSecurityException e) {
         LOG.log(Level.SEVERE, null, e);
       }
@@ -292,7 +292,7 @@ public class JoseFactory {
      */
     public static String write(Object object, PrivateKey senderPrivateKey, PublicKey publicKey, String signatureKeyId, String encryptionKeyId) {
       try {
-        String jsonPayload = JsonMarshaller.toJson(object);
+        String jsonPayload = new JsonbUtility().marshal(object);
 
         JsonWebSignature jws = JwsBuilder.getInstance()
           .withStringPayload(jsonPayload)
@@ -322,7 +322,7 @@ public class JoseFactory {
      */
     public static String write(Object object, SecretKey secretKey, String senderId) {
       try {
-        String jsonPayload = JsonMarshaller.toJson(object);
+        String jsonPayload = new JsonbUtility().marshal(object);
 
         JsonWebSignature jws = JwsBuilder.getInstance()
           .withStringPayload(jsonPayload)

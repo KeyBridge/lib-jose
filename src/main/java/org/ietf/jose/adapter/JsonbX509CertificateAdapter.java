@@ -16,30 +16,30 @@
 package org.ietf.jose.adapter;
 
 import java.util.Base64;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.json.bind.adapter.JsonbAdapter;
 import org.ietf.jose.jws.X5CHeaderParameter;
 
 /**
  * Converts X5CHeaderParameter instances into Base64URL-encoded strings and vice
  * versa.
  */
-public class XmlAdapterX509Certificate extends XmlAdapter<String, X5CHeaderParameter> {
+public class JsonbX509CertificateAdapter implements JsonbAdapter<X5CHeaderParameter, String> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public String marshal(X5CHeaderParameter v) {
-    return v.toString();
+  public String adaptToJson(X5CHeaderParameter obj) throws Exception {
+    return obj == null ? null : obj.toString();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public X5CHeaderParameter unmarshal(String v) {
+  public X5CHeaderParameter adaptFromJson(String obj) throws Exception {
     X5CHeaderParameter certificate = new X5CHeaderParameter();
-    certificate.setData(Base64.getDecoder().decode(v));
+    certificate.setData(Base64.getDecoder().decode(obj));
     return certificate;
   }
 }

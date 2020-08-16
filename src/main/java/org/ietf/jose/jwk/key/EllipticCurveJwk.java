@@ -16,10 +16,6 @@
 package org.ietf.jose.jwk.key;
 
 import java.math.BigInteger;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
 import org.ietf.jose.jwk.JsonWebKey;
 
 /**
@@ -46,7 +42,6 @@ import org.ietf.jose.jwk.JsonWebKey;
  *
  * @author Key Bridge
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class EllipticCurveJwk extends JsonWebKey {
 
   /**
@@ -68,7 +63,6 @@ public class EllipticCurveJwk extends JsonWebKey {
    * coordinate for the curve specified in the "crv" parameter. For example, if
    * the value of "crv" is "P-521", the octet string must be 66 octets long.
    */
-  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger x;
   /**
    * 6.2.1.3. "y" (Y Coordinate) Parameter
@@ -80,8 +74,8 @@ public class EllipticCurveJwk extends JsonWebKey {
    * coordinate for the curve specified in the "crv" parameter. For example, if
    * the value of "crv" is "P-521", the octet string must be 66 octets long.
    */
-  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger y;
+
   /**
    * 6.2.2.1. "d" (ECC Private Key) Parameter
    * <p>
@@ -91,7 +85,6 @@ public class EllipticCurveJwk extends JsonWebKey {
    * SEC1 [SEC1]. The length of this octet string MUST be
    * ceiling(log-base-2(n)/8) octets (where n is the order of the curve).
    */
-  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger d;
 
   public EllipticCurveJwk() {

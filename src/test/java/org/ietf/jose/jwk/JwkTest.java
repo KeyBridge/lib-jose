@@ -1,15 +1,14 @@
 package org.ietf.jose.jwk;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import org.ietf.TestFileReader;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonMarshaller;
+import org.ietf.jose.util.JsonbUtility;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.math.BigInteger;
 
 import static org.junit.Assert.*;
 
@@ -18,7 +17,7 @@ public class JwkTest {
   @Test
   public void ecPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-public-key.json");
-    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
+    JsonWebKey key = new JsonbUtility().unmarshal(json, JsonWebKey.class);
     assertTrue(key instanceof EllipticCurveJwk);
     EllipticCurveJwk ecKey = (EllipticCurveJwk) key;
     assertEquals("P-521", ecKey.getCrv());
@@ -28,15 +27,14 @@ public class JwkTest {
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1")), ecKey.getY());
     assertNull(ecKey.getD());
 
-    EllipticCurveJwk keyReconverted = (EllipticCurveJwk) JsonMarshaller.fromJson(JsonMarshaller.toJson(ecKey),
-        JsonWebKey.class);
+    EllipticCurveJwk keyReconverted = (EllipticCurveJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(ecKey), JsonWebKey.class);
     assertEquals(ecKey, keyReconverted);
   }
 
   @Test
   public void ecPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-private-key.json");
-    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
+    JsonWebKey key = new JsonbUtility().unmarshal(json, JsonWebKey.class);
     assertTrue(key instanceof EllipticCurveJwk);
     EllipticCurveJwk ecKey = (EllipticCurveJwk) key;
     assertEquals("P-521", ecKey.getCrv());
@@ -46,14 +44,14 @@ public class JwkTest {
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1")), ecKey.getY());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zbKipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt")), ecKey.getD());
 
-    EllipticCurveJwk keyReconverted = (EllipticCurveJwk) JsonMarshaller.fromJson(JsonMarshaller.toJson(ecKey), JsonWebKey.class);
+    EllipticCurveJwk keyReconverted = (EllipticCurveJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(ecKey), JsonWebKey.class);
     assertEquals(ecKey, keyReconverted);
   }
 
   @Test
   public void rsaPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-public-key.json");
-    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
+    JsonWebKey key = new JsonbUtility().unmarshal(json, JsonWebKey.class);
     assertTrue(key instanceof RsaPublicJwk);
     RsaPublicJwk rsaKey = (RsaPublicJwk) key;
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O"
@@ -66,14 +64,14 @@ public class JwkTest {
     assertEquals(PublicKeyUseType.sig, rsaKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", rsaKey.getKid());
 
-    RsaPublicJwk keyReconverted = (RsaPublicJwk) JsonMarshaller.fromJson(JsonMarshaller.toJson(rsaKey), JsonWebKey.class);
+    RsaPublicJwk keyReconverted = (RsaPublicJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(rsaKey), JsonWebKey.class);
     assertEquals(rsaKey, keyReconverted);
   }
 
   @Test
   public void rsaPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
+    JsonWebKey key = new JsonbUtility().unmarshal(json, JsonWebKey.class);
     assertTrue(key instanceof RsaPrivateJwk);
     RsaPrivateJwk rsaKey = (RsaPrivateJwk) key;
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O"
@@ -91,14 +89,14 @@ public class JwkTest {
     assertEquals(PublicKeyUseType.sig, rsaKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", rsaKey.getKid());
 
-    RsaPrivateJwk keyReconverted = (RsaPrivateJwk) JsonMarshaller.fromJson(JsonMarshaller.toJson(rsaKey), JsonWebKey.class);
+    RsaPrivateJwk keyReconverted = (RsaPrivateJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(rsaKey), JsonWebKey.class);
     assertEquals(rsaKey, keyReconverted);
   }
 
   @Test
   public void jwkPublicKeySetTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7517/appendix-a/public-keys.json");
-    JwkSet deserialized = JsonMarshaller.fromJson(json, JwkSet.class);
+    JwkSet deserialized = new JsonbUtility().unmarshal(json, JwkSet.class);
     assertEquals(2, deserialized.getKeys().size());
     assertTrue(deserialized.getKeys().get(0) instanceof EllipticCurveJwk);
     EllipticCurveJwk ecKey = (EllipticCurveJwk) deserialized.getKeys().get(0);
@@ -117,14 +115,14 @@ public class JwkTest {
     assertEquals("RS256", rsaKey.getAlg());
     assertEquals("2011-04-29", rsaKey.getKid());
 
-    JwkSet reconverted = JsonMarshaller.fromJson(JsonMarshaller.toJson(deserialized), JwkSet.class);
+    JwkSet reconverted = new JsonbUtility().unmarshal(new JsonbUtility().marshal(deserialized), JwkSet.class);
     assertEquals(deserialized, reconverted);
   }
 
   @Test
   public void jwkPrivateKeySetTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7517/appendix-a/private-keys.json");
-    JwkSet deserialized = JsonMarshaller.fromJson(json, JwkSet.class);
+    JwkSet deserialized = new JsonbUtility().unmarshal(json, JwkSet.class);
     assertEquals(2, deserialized.getKeys().size());
     assertTrue(deserialized.getKeys().get(0) instanceof EllipticCurveJwk);
     EllipticCurveJwk ecKey = (EllipticCurveJwk) deserialized.getKeys().get(0);
@@ -155,7 +153,7 @@ public class JwkTest {
     assertEquals("RS256", rsaKey.getAlg());
     assertEquals("2011-04-29", rsaKey.getKid());
 
-    JwkSet reconverted = JsonMarshaller.fromJson(JsonMarshaller.toJson(deserialized), JwkSet.class);
+    JwkSet reconverted = new JsonbUtility().unmarshal(new JsonbUtility().marshal(deserialized), JwkSet.class);
     assertEquals(deserialized, reconverted);
   }
 }

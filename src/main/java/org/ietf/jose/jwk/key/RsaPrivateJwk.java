@@ -26,11 +26,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
+import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -45,7 +41,6 @@ import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
  * present, with the exception of "oth", which MUST only be present when more
  * than two prime factors were used.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class RsaPrivateJwk extends RsaPublicJwk {
 
   /**
@@ -55,8 +50,7 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    * for the RSA private key. It is represented as a Base64urlUInt- encoded
    * value.
    */
-  @XmlElement(name = "d")
-  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
+  @JsonbProperty("d")
   private BigInteger privateExponent;
 
   /**
@@ -65,7 +59,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    * The "p" (first prime factor) parameter contains the first prime factor. It
    * is represented as a Base64urlUInt-encoded value.
    */
-  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger p;
 
   /**
@@ -74,7 +67,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    * The "q" (second prime factor) parameter contains the second prime factor.
    * It is represented as a Base64urlUInt-encoded value.
    */
-  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger q;
 
   /**
@@ -84,7 +76,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    * Remainder Theorem (CRT) exponent of the first factor. It is represented as
    * a Base64urlUInt-encoded value.
    */
-  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger dp;
 
   /**
@@ -93,7 +84,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    * The "dq" (second factor CRT exponent) parameter contains the CRT exponent
    * of the second factor. It is represented as a Base64urlUInt- encoded value.
    */
-  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger dq;
 
   /**
@@ -102,7 +92,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    * The "qi" (first CRT coefficient) parameter contains the CRT coefficient of
    * the second factor. It is represented as a Base64urlUInt-encoded value.
    */
-  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
   private BigInteger qi;
 
   public RsaPrivateJwk() {

@@ -22,11 +22,7 @@ import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterBigIntegerBase64Url;
+import javax.json.bind.annotation.JsonbProperty;
 import org.ietf.jose.jwk.JsonWebKey;
 
 /**
@@ -36,7 +32,6 @@ import org.ietf.jose.jwk.JsonWebKey;
  * <p>
  * The following members MUST be present for RSA public keys.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class RsaPublicJwk extends JsonWebKey {
 
   /**
@@ -51,8 +46,7 @@ public class RsaPublicJwk extends JsonWebKey {
    * Implementations using such libraries will need to take care to omit the
    * extra octet from the base64url-encoded representation.
    */
-  @XmlElement(name = "n")
-  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
+  @JsonbProperty("n")
   protected BigInteger modulus;
 
   /**
@@ -65,8 +59,7 @@ public class RsaPublicJwk extends JsonWebKey {
    * base64url-encoded MUST consist of the three octets [1, 0, 1]; the resulting
    * representation for this value is "AQAB".
    */
-  @XmlElement(name = "e")
-  @XmlJavaTypeAdapter(type = BigInteger.class, value = XmlAdapterBigIntegerBase64Url.class)
+  @JsonbProperty("e")
   protected BigInteger publicExponent;
 
   public RsaPublicJwk() {

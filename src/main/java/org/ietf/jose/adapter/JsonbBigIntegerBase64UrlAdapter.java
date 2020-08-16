@@ -16,7 +16,7 @@
 package org.ietf.jose.adapter;
 
 import java.math.BigInteger;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.json.bind.adapter.JsonbAdapter;
 import org.ietf.jose.util.Base64Utility;
 
 /**
@@ -24,7 +24,7 @@ import org.ietf.jose.util.Base64Utility;
  * Provides Base64 encoding and decoding as defined by
  * <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>.
  */
-public class XmlAdapterBigIntegerBase64Url extends XmlAdapter<String, BigInteger> {
+public class JsonbBigIntegerBase64UrlAdapter implements JsonbAdapter<BigInteger, String> {
 
   /**
    * Returns a byte array representation of the specified big integer without
@@ -68,15 +68,16 @@ public class XmlAdapterBigIntegerBase64Url extends XmlAdapter<String, BigInteger
    * {@inheritDoc}
    */
   @Override
-  public String marshal(BigInteger v) {
-    return Base64Utility.toBase64Url(toBytesUnsigned(v));
+  public String adaptToJson(BigInteger obj) throws Exception {
+    return Base64Utility.toBase64Url(toBytesUnsigned(obj));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public BigInteger unmarshal(String v) {
-    return new BigInteger(1, Base64Utility.fromBase64Url(v));
+  public BigInteger adaptFromJson(String obj) throws Exception {
+    return new BigInteger(1, Base64Utility.fromBase64Url(obj));
   }
+
 }

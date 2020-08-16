@@ -15,21 +15,16 @@
  */
 package org.ietf.jose.jws;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.IOException;
 import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterX509Certificate;
+import javax.json.bind.annotation.JsonbProperty;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.util.JsonMarshaller;
+import org.ietf.jose.util.JsonbWriter;
 
 /**
  * An abstract JOSE object.
@@ -79,16 +74,6 @@ import org.ietf.jose.util.JsonMarshaller;
  * In addition to the common parameters, each JWK will have members that are key
  * type specific. These members represent the parameters of the key.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-/**
- * Developer note: JsonIgnoreProperties annotation ensures that when
- * deserialising from JSON, unknown fields are ignored without throwing
- * exceptions.
- *
- * @see
- * <a href="https://fasterxml.github.io/jackson-annotations/javadoc/2.6/com/fasterxml/jackson/annotation/JsonIgnoreProperties.html#ignoreUnknown()">ignoreUnknown</a>
- */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AbstractHeader {
 
   /**
@@ -159,7 +144,6 @@ public abstract class AbstractHeader {
    * certificate or certificate chain to be invalid if any validation failure
    * occurs. Use of this Header Parameter is OPTIONAL.
    */
-  @XmlJavaTypeAdapter(type = X5CHeaderParameter.class, value = XmlAdapterX509Certificate.class)
   protected List<X5CHeaderParameter> x5c;
   /**
    * 4.1.7. "x5t" (X.509 Certificate SHA-1 Thumbprint) Header Parameter
@@ -180,7 +164,7 @@ public abstract class AbstractHeader {
    * sometimes known as certificate fingerprints. Use of this Header Parameter
    * is OPTIONAL.
    */
-  @XmlElement(name = "x5t#S256")
+  @JsonbProperty("x5t#S256")
   protected String x5tS256;
 
   public AbstractHeader() {
@@ -356,7 +340,7 @@ public abstract class AbstractHeader {
       jsonObject.put("x5tS256", x5tS256);
     }
 
-    return JsonMarshaller.toJson(jsonObject);
+    return new JsonbWriter().marshal(jsonObject);
   }
 
   @Override

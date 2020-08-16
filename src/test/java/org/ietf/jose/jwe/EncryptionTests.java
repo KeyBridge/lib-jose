@@ -1,14 +1,13 @@
 package org.ietf.jose.jwe;
 
-import org.ietf.jose.util.JsonMarshaller;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
+import org.ietf.jose.util.JsonbUtility;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,16 +28,17 @@ public class EncryptionTests {
   @Test
   public void internationalStringTest() throws Exception {
     /**
-     * Take a valid but non-English string, encrypt and decrypt it, and check it's identical
+     * Take a valid but non-English string, encrypt and decrypt it, and check
+     * it's identical
      */
     String plaintext = "ąęč„ė“čūį“įęūš“-";
     JsonWebEncryption jwe = JweBuilder.getInstance()
-        .withStringPayload(plaintext)
-        // sign it with our private key and specify a random UUID as the key ID
-        .buildJweJsonFlattened(keyPair.getPublic(), "someKeyId");
+      .withStringPayload(plaintext)
+      // sign it with our private key and specify a random UUID as the key ID
+      .buildJweJsonFlattened(keyPair.getPublic(), "someKeyId");
     String jweCompact = jwe.toCompactForm();
 
-    System.out.println("JWE JSON flattened:\n" + JsonMarshaller.toJsonPrettyFormatted(jwe));
+    System.out.println("JWE JSON flattened:\n" + new JsonbUtility().withFormatting(true).marshal(jwe));
     System.out.println();
     System.out.println("JWE compact form:\n" + jweCompact);
     System.out.println();
@@ -55,8 +55,8 @@ public class EncryptionTests {
     assertEquals(jwe, fromJson);
 
     String decryptedPlaintext = JweDecryptor.createFor(fromJson)
-        .decrypt(keyPair.getPrivate())
-        .getAsString();
+      .decrypt(keyPair.getPrivate())
+      .getAsString();
     System.out.println("plaintext: " + decryptedPlaintext);
     Assert.assertEquals(plaintext, decryptedPlaintext);
   }

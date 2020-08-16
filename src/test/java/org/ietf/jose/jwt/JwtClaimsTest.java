@@ -5,7 +5,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import org.ietf.jose.util.JsonMarshaller;
+import org.ietf.jose.util.JsonbUtility;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -27,7 +27,7 @@ public class JwtClaimsTest {
     claim.setExpirationTime(now.plusHours(2));
 //    claim.addClaim("privateName", "privateValue");
 
-    String json = JsonMarshaller.toJson(claim);
+    String json = new JsonbUtility().marshal(claim);
     String jsonDirect = claim.toJson();
 
     System.out.println("  JsonMarshaller.toJson: " + json);
@@ -35,7 +35,7 @@ public class JwtClaimsTest {
     // test json text
     assertEquals(json, jsonDirect);
     // test object vs reconstituted object
-//    JwtClaims reconstituted = JsonMarshaller.fromJson(json, JwtClaims.class);
+//    JwtClaims reconstituted = new JsonbUtility().unmarshal(json, JwtClaims.class);
 //    System.out.println("original      " + claim.toJson());
 //    System.out.println("  with array " + reconstituted.getClaims() == null);
 //    System.out.println("reconstituted " + reconstituted.toJson());
@@ -46,7 +46,7 @@ public class JwtClaimsTest {
      * <p>
      * TODO: Add an XML adapter for the claims field.
      */
-    assertEquals(claim, JsonMarshaller.fromJson(json, JwtClaims.class));
+    assertEquals(claim, new JsonbUtility().unmarshal(json, JwtClaims.class));
 //    java.lang.AssertionError:
 //    expected: org.ietf.jose.jwt.JwtClaims<{"aud":"someAudience","exp":1527964352,"nbf":1527960752,"iat":1527957152}>
 //    but was : org.ietf.jose.jwt.JwtClaims<{"aud":"someAudience","exp":1527964352,"nbf":1527960752,"iat":1527957152}>

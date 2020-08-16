@@ -15,10 +15,6 @@
  */
 package org.ietf.jose.jwk.key;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
 import org.ietf.jose.jwk.JsonWebKey;
 
 /**
@@ -33,7 +29,6 @@ import org.ietf.jose.jwk.JsonWebKey;
  * the application uses another means or convention to determine the algorithm
  * used.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class SymmetricJwk extends JsonWebKey {
 
   /**
@@ -43,7 +38,6 @@ public class SymmetricJwk extends JsonWebKey {
    * single-valued) key. It is represented as the base64url encoding of the
    * octet sequence containing the key value.
    */
-  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] k;
 
   public SymmetricJwk() {

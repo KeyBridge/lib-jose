@@ -16,8 +16,6 @@
 package org.ietf.jose.jwe;
 
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jws.AbstractHeader;
 
@@ -60,7 +58,6 @@ import org.ietf.jose.jws.AbstractHeader;
  *
  * @author Key Bridge
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class JweHeader extends AbstractHeader {
 
   /**
@@ -83,7 +80,6 @@ public class JweHeader extends AbstractHeader {
    * initial contents of this registry are the values defined in Section 5.1 of
    * [JWA].
    */
-//  @XmlJavaTypeAdapter(type = JweEncryptionAlgorithmType.class, value = XmlAdapterEContentEncryptionAlgorithm.class)
   private JweEncryptionAlgorithmType enc;
 
   /**
@@ -125,11 +121,6 @@ public class JweHeader extends AbstractHeader {
   }
 
   @Override
-  public String toString() {
-    return "JweHeader(enc=" + this.getEnc() + ", zip=" + this.getZip() + ")";
-  }
-
-  @Override
   public int hashCode() {
     int hash = 7;
     hash = 71 * hash + Objects.hashCode(this.enc);
@@ -159,4 +150,10 @@ public class JweHeader extends AbstractHeader {
   protected boolean canEqual(Object other) {
     return other instanceof JweHeader;
   }
+
+  @Override
+  public String toString() {
+    return "JweHeader{" + "enc=" + enc + ", zip=" + zip + '}';
+  }
+
 }

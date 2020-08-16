@@ -15,7 +15,7 @@
  */
 package org.ietf.jose.jwa;
 
-import javax.xml.bind.annotation.XmlEnumValue;
+import javax.json.bind.annotation.JsonbProperty;
 import org.ietf.jose.jwe.encryption.AesGcmEncrypter;
 import org.ietf.jose.jwe.encryption.DefaultEncrypter;
 import org.ietf.jose.jwe.encryption.Encrypter;
@@ -76,19 +76,19 @@ public enum JweEncryptionAlgorithmType {
    * AES_128_CBC_HMAC_SHA_256 authenticated encryption algorithm, as defined in
    * RFC 7518 Section 5.2.3
    */
-  @XmlEnumValue("A128CBC-HS256")
+  @JsonbProperty("A128CBC-HS256")
   A128CBC_HS256("A128CBC-HS256", new DefaultEncrypter(AES_128_CBC_HMAC_SHA_256)),
   /**
    * AES_192_CBC_HMAC_SHA_384 authenticated encryption algorithm, as defined in
    * RFC 7518 Section 5.2.4
    */
-  @XmlEnumValue("A192CBC-HS384")
+  @JsonbProperty("A192CBC-HS384")
   A192CBC_HS384("A192CBC-HS384", new DefaultEncrypter(AES_192_CBC_HMAC_SHA_384)),
   /**
    * AES_256_CBC_HMAC_SHA_512 authenticated encryption algorithm, as defined in
    * RFC 7518 Section 5.2.5
    */
-  @XmlEnumValue("A256CBC-HS512")
+  @JsonbProperty("A256CBC-HS512")
   A256CBC_HS512("A256CBC-HS512", new DefaultEncrypter(AES_256_CBC_HMAC_SHA_512)),
   /**
    * RFC7518 § 5.3. Content Encryption with AES GCM This section defines the
@@ -173,4 +173,10 @@ public enum JweEncryptionAlgorithmType {
   public Encrypter getEncrypter() {
     return encrypter;
   }
+
+  @Override
+  public String toString() {
+    return joseAlgorithmName;
+  }
+
 }

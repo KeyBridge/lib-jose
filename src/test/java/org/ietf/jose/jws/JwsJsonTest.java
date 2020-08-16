@@ -1,17 +1,16 @@
 package org.ietf.jose.jws;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import org.ietf.TestUtil;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.key.SymmetricJwk;
 import org.ietf.jose.util.CryptographyUtility;
+import org.ietf.jose.util.JsonbUtility;
 import org.junit.Test;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.ietf.jose.util.Base64Utility.toBase64Url;
-import static org.ietf.jose.util.JsonMarshaller.fromJson;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -135,9 +134,9 @@ public class JwsJsonTest {
      * "k":"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75
      * aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow" }
      */
-    SymmetricJwk key = fromJson("{\"kty\":\"oct\",\n"
+    SymmetricJwk key = new JsonbUtility().unmarshal("{\"kty\":\"oct\",\n"
       + "\"k\":\"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow\"}",
-                                SymmetricJwk.class);
+                                                    SymmetricJwk.class);
 
     Mac mac = Mac.getInstance("HmacSHA256");
     SecretKeySpec secretKeySpec = new SecretKeySpec(key.getK(), "HmacSHA256");

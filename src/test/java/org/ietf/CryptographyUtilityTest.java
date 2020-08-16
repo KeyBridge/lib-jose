@@ -1,21 +1,21 @@
 package org.ietf;
 
+import java.nio.charset.StandardCharsets;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.util.CryptographyUtility;
-import org.ietf.jose.util.JsonMarshaller;
+import org.ietf.jose.util.JsonbUtility;
 import org.junit.Test;
-
-import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertArrayEquals;
 
 public class CryptographyUtilityTest {
+
   @Test
   public void encryptAndDecrypt() throws Exception {
     final String jwkJson = TestFileReader.getTestCase("/rfc7516/appendix-a/rsa-private-key.json");
 
-    RsaPrivateJwk key = JsonMarshaller.fromJson(jwkJson, RsaPrivateJwk.class);
+    RsaPrivateJwk key = new JsonbUtility().unmarshal(jwkJson, RsaPrivateJwk.class);
 
     String algorithm = JweKeyAlgorithmType.RSA_OAEP.getJavaAlgorithm();
 

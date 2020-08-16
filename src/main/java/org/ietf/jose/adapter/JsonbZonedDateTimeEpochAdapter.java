@@ -21,7 +21,7 @@ package org.ietf.jose.adapter;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.json.bind.adapter.JsonbAdapter;
 
 /**
  * XML adapter to transform a (UTC) ZonedDateTime and epoch seconds.
@@ -42,22 +42,22 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  * @author Key Bridge
  * @since v0.8.0 added 06/02/18 replacing XmlAdapterInstantLong
  */
-public class XmlAdapterEpochZonedDateTime extends XmlAdapter<Long, ZonedDateTime> {
+public class JsonbZonedDateTimeEpochAdapter implements JsonbAdapter<ZonedDateTime, Long> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public ZonedDateTime unmarshal(Long v) throws Exception {
-    return ZonedDateTime.ofInstant(Instant.ofEpochSecond(v), ZoneId.of("UTC"));
+  public Long adaptToJson(ZonedDateTime obj) throws Exception {
+    return obj == null ? null : obj.toEpochSecond();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Long marshal(ZonedDateTime v) throws Exception {
-    return v.toEpochSecond();
+  public ZonedDateTime adaptFromJson(Long obj) throws Exception {
+    return ZonedDateTime.ofInstant(Instant.ofEpochSecond(obj), ZoneId.of("UTC"));
   }
 
 }

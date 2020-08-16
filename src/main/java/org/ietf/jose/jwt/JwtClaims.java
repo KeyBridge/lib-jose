@@ -23,14 +23,13 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.json.bind.annotation.JsonbProperty;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterEpochZonedDateTime;
+import org.ietf.jose.adapter.JsonbZonedDateTimeEpochAdapter;
 import org.ietf.jose.jws.JsonSerializable;
-import org.ietf.jose.util.JsonMarshaller;
+import org.ietf.jose.util.JsonbReader;
+import org.ietf.jose.util.JsonbWriter;
 
 /**
  * RFC 7519 JSON Web Token (JWT)
@@ -65,7 +64,6 @@ import org.ietf.jose.util.JsonMarshaller;
  *
  * @since v0.9.2 add fluent setters
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class JwtClaims extends JsonSerializable {
 
   /**
@@ -74,7 +72,7 @@ public class JwtClaims extends JsonSerializable {
    * application specific. The "iss" value is a case-sensitive string containing
    * a StringOrURI value. Use of this claim is OPTIONAL.
    */
-  @XmlElement(name = "iss")
+  @JsonbProperty("iss")
   private String issuer;
   /**
    * 4.1.2. "sub" (Subject) Claim The "sub" (subject) claim identifies the
@@ -85,7 +83,7 @@ public class JwtClaims extends JsonSerializable {
    * is a case-sensitive string containing a StringOrURI value. Use of this
    * claim is OPTIONAL.
    */
-  @XmlElement(name = "sub")
+  @JsonbProperty("sub")
   private String subject;
   /**
    * 4.1.3. "aud" (Audience) Claim The "aud" (audience) claim identifies the
@@ -99,7 +97,7 @@ public class JwtClaims extends JsonSerializable {
    * containing a StringOrURI value. The interpretation of audience values is
    * generally application specific. Use of this claim is OPTIONAL.
    */
-  @XmlElement(name = "aud")
+  @JsonbProperty("aud")
   private String audience;
   /**
    * 4.1.4. "exp" (Expiration Time) Claim The "exp" (expiration time) claim
@@ -110,8 +108,7 @@ public class JwtClaims extends JsonSerializable {
    * more than a few minutes, to account for clock skew. Its value MUST be a
    * number containing a NumericDate value. Use of this claim is OPTIONAL.
    */
-  @XmlElement(name = "exp")
-  @XmlJavaTypeAdapter(XmlAdapterEpochZonedDateTime.class)
+  @JsonbProperty("exp")
   private ZonedDateTime expirationTime;
   /**
    * 4.1.5. "nbf" (Not Before) Claim The "nbf" (not before) claim identifies the
@@ -122,8 +119,7 @@ public class JwtClaims extends JsonSerializable {
    * minutes, to account for clock skew. Its value MUST be a number containing a
    * NumericDate value. Use of this claim is OPTIONAL.
    */
-  @XmlElement(name = "nbf")
-  @XmlJavaTypeAdapter(XmlAdapterEpochZonedDateTime.class)
+  @JsonbProperty("nbf")
   private ZonedDateTime notBefore;
   /**
    * 4.1.6. "iat" (Issued At) Claim The "iat" (issued at) claim identifies the
@@ -131,8 +127,7 @@ public class JwtClaims extends JsonSerializable {
    * age of the JWT. Its value MUST be a number containing a NumericDate value.
    * Use of this claim is OPTIONAL.
    */
-  @XmlElement(name = "iat")
-  @XmlJavaTypeAdapter(XmlAdapterEpochZonedDateTime.class)
+  @JsonbProperty("iat")
   private ZonedDateTime issuedAt;
   /**
    * 4.1.7. "jti" (JWT ID) Claim The "jti" (JWT ID) claim provides a unique
@@ -144,7 +139,7 @@ public class JwtClaims extends JsonSerializable {
    * to prevent the JWT from being replayed. The "jti" value is a case-
    * sensitive string. Use of this claim is OPTIONAL.
    */
-  @XmlElement(name = "jti")
+  @JsonbProperty("jti")
   private String jwtId;
 
   /**
@@ -430,7 +425,7 @@ public class JwtClaims extends JsonSerializable {
    */
   public static JwtClaims fromJson(final String json) throws IOException, Exception {
     Class<?> unmarshallingClass = (new HashMap<>()).getClass();
-    Map<String, Object> valueMap = (Map<String, Object>) JsonMarshaller.fromJson(json, unmarshallingClass);
+    Map<String, Object> valueMap = (Map<String, Object>) new JsonbReader().unmarshal(json, unmarshallingClass);
     JwtClaims claims = new JwtClaims();
     claims.issuer = (String) valueMap.remove("iss");
     claims.subject = (String) valueMap.remove("sub");
@@ -487,7 +482,7 @@ public class JwtClaims extends JsonSerializable {
     if (claims != null && !claims.isEmpty()) {
       jsonObject.putAll(claims);
     }
-    return JsonMarshaller.toJson(jsonObject);
+    return new JsonbWriter().withAdapters(new JsonbZonedDateTimeEpochAdapter()).marshal(jsonObject);
   }
 
   @Override

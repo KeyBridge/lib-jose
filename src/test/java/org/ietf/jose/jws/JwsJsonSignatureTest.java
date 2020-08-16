@@ -1,14 +1,5 @@
 package org.ietf.jose.jws;
 
-import org.ietf.jose.jwa.JwkType;
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwe.SecretKeyBuilder;
-import org.ietf.jose.jwk.JsonWebKey;
-import org.ietf.jose.jwk.key.RsaPrivateJwk;
-import org.junit.Test;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -17,6 +8,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import org.ietf.jose.jwa.JwkType;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwe.SecretKeyBuilder;
+import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
+import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import static org.ietf.TestUtil.createRandomString;
@@ -35,9 +34,9 @@ public class JwsJsonSignatureTest {
       JwsHeader header = new JwsHeader();
       header.setAlg(alg.getJoseAlgorithmName());
       JsonWebSignature jws = JwsBuilder.getInstance()
-          .withBinaryPayload(payload)
-          .sign(privateKey, alg, UUID.randomUUID().toString())
-          .buildJsonWebSignature();
+        .withBinaryPayload(payload)
+        .sign(privateKey, alg, UUID.randomUUID().toString())
+        .buildJsonWebSignature();
       assertEquals(1, jws.getSignatures().size());
       Signature signature = jws.getSignatures().get(0);
       assertTrue(SignatureValidator.isValid(signature, publicKey));
@@ -61,9 +60,9 @@ public class JwsJsonSignatureTest {
       JwsHeader header = new JwsHeader();
       header.setAlg(alg.getJoseAlgorithmName());
       JsonWebSignature jws = JwsBuilder.getInstance()
-          .withBinaryPayload(payload)
-          .sign(key, alg, UUID.randomUUID().toString())
-          .buildJsonWebSignature();
+        .withBinaryPayload(payload)
+        .sign(key, alg, UUID.randomUUID().toString())
+        .buildJsonWebSignature();
       assertEquals(1, jws.getSignatures().size());
       Signature signature = jws.getSignatures().get(0);
       assertTrue(SignatureValidator.isValid(signature, key));
@@ -146,13 +145,13 @@ public class JwsJsonSignatureTest {
   @Test
   public void testSignatureFromBuilder() throws Exception {
     final String payload = "payload";
-    final SecretKey secret =
-        SecretKeyBuilder.fromBytes(KeyGenerator.getInstance("HmacSHA256").generateKey().getEncoded());
+    final SecretKey secret
+                    = SecretKeyBuilder.fromBytes(KeyGenerator.getInstance("HmacSHA256").generateKey().getEncoded());
 
     JsonWebSignature jws = JwsBuilder.getInstance()
       .withStringPayload(payload)
-        .sign(secret, JwsAlgorithmType.HS256, UUID.randomUUID().toString())
-        .buildJsonWebSignature();
+      .sign(secret, JwsAlgorithmType.HS256, UUID.randomUUID().toString())
+      .buildJsonWebSignature();
 
     assertTrue(SignatureValidator.isValid(jws.getSignatures().get(0), secret));
   }

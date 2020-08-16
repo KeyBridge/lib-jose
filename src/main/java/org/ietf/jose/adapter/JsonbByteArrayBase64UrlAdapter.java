@@ -15,27 +15,27 @@
  */
 package org.ietf.jose.adapter;
 
-import org.ietf.jose.jwe.JweHeader;
+import javax.json.bind.adapter.JsonbAdapter;
 import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonMarshaller;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import java.io.IOException;
 
 /**
  * Converts byte arrays into Base64URL-encoded strings and vice versa
  */
-public class XmlAdapterJweHeader extends XmlAdapter<String, JweHeader> {
+public class JsonbByteArrayBase64UrlAdapter implements JsonbAdapter< byte[], String> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public String marshal(JweHeader v) throws IOException {
-    String protectedHeaderJson = JsonMarshaller.toJson(v);
-    return Base64Utility.toBase64Url(protectedHeaderJson);
+  public String adaptToJson(byte[] obj) throws Exception {
+    return Base64Utility.toBase64Url(obj);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public JweHeader unmarshal(String v) throws IOException {
-    String json = Base64Utility.fromBase64UrlToString(v);
-    return JsonMarshaller.fromJson(json, JweHeader.class);
+  public byte[] adaptFromJson(String obj) throws Exception {
+    return Base64Utility.fromBase64Url(obj);
   }
 }

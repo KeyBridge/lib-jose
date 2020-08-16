@@ -19,16 +19,12 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.Arrays;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbTransient;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.JsonWebKey;
 import org.ietf.jose.util.CryptographyUtility;
-import org.ietf.jose.util.JsonMarshaller;
+import org.ietf.jose.util.JsonbWriter;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.ietf.jose.util.Base64Utility.toBase64Url;
@@ -65,7 +61,6 @@ import static org.ietf.jose.util.Base64Utility.toBase64Url;
  *  "signature":"_signature contents_"
  * }</pre>
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Signature {
 
   /**
@@ -74,7 +69,7 @@ public class Signature {
    * is non-empty; otherwise, it MUST be absent. These Header Parameter values
    * are integrity protected.
    */
-  @XmlElement(name = "protected")
+  @JsonbProperty("protected")
   private JwsHeader protectedHeader;
   /**
    * The "header" member MUST be present and contain the value JWS Unprotected
@@ -83,13 +78,12 @@ public class Signature {
    * rather than as a string. These Header Parameter values are not integrity
    * protected.
    */
-  @XmlElement(name = "header")
+  @JsonbProperty("header")
   private JwsHeader header;
   /**
    * The "signature" member MUST be present and contain the value BASE64URL(JWS
    * Signature).
    */
-  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   private byte[] signature;
 
   /**
@@ -99,8 +93,8 @@ public class Signature {
    *        BASE64URL(JWS Payload))
    * </pre>
    */
-  @XmlTransient
-  byte[] jwsSigningInput;
+  @JsonbTransient
+  private byte[] jwsSigningInput;
 
   /**
    * Create signature for the provided payload and JSON Web Key
@@ -139,7 +133,7 @@ public class Signature {
    * </pre>
    */
   private static byte[] createJwsSigningInput(JwsHeader protectedHeader, byte[] jwsPayload) throws IOException {
-    String protectedHeaderJson = JsonMarshaller.toJson(protectedHeader);
+    String protectedHeaderJson = new JsonbWriter().marshal(protectedHeader);
     String fullPayload = toBase64Url(protectedHeaderJson) + '.' + toBase64Url(jwsPayload);
     return fullPayload.getBytes(US_ASCII);
   }
@@ -258,6 +252,10 @@ public class Signature {
       throw new IllegalStateException("JWS Signing Input not available");
     }
     return jwsSigningInput;
+  }
+
+  public void setJwsSigningInput(byte[] jwsSigningInput) {
+    this.jwsSigningInput = jwsSigningInput;
   }
 
   @Override

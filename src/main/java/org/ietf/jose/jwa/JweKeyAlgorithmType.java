@@ -16,7 +16,6 @@
 package org.ietf.jose.jwa;
 
 import java.security.spec.AlgorithmParameterSpec;
-import javax.xml.bind.annotation.XmlEnumValue;
 
 /**
  * RFC-7518
@@ -85,7 +84,6 @@ public enum JweKeyAlgorithmType {
    * An example using RSAES OAEP with the default parameters is shown in
    * Appendix A.1 of [JWE].
    */
-  @XmlEnumValue("RSA-OAEP")
   RSA_OAEP("RSA-OAEP", "RSA/ECB/OAEPWithSHA-1AndMGF1Padding"),
   /**
    * 4.4. Key Wrapping with AES Key Wrap

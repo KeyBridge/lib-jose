@@ -13,7 +13,7 @@ import java.util.UUID;
 import javax.crypto.SecretKey;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.ietf.TestFileReader;
-import org.ietf.jose.adapter.XmlAdapterEpochZonedDateTime;
+import org.ietf.jose.adapter.JsonbZonedDateTimeEpochAdapter;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JsonWebEncryption;
@@ -25,7 +25,7 @@ import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.jws.JsonWebSignature;
 import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.SignatureValidator;
-import org.ietf.jose.util.JsonMarshaller;
+import org.ietf.jose.util.JsonbUtility;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
@@ -124,14 +124,11 @@ public class InteropTest {
     assertEquals(claims.getSubject(), claimsDecoded.getSubject());
     assertEquals(claims.getAudience().get(0), claimsDecoded.getAudience());
 
-    XmlAdapterEpochZonedDateTime epochAdapter = new XmlAdapterEpochZonedDateTime();
+    JsonbZonedDateTimeEpochAdapter epochAdapter = new JsonbZonedDateTimeEpochAdapter();
 
-    assertEquals(epochAdapter.unmarshal(claims.getExpirationTime().getValue()),
-                 claimsDecoded.getExpirationTime());
-    assertEquals(epochAdapter.unmarshal(claims.getNotBefore().getValue()),
-                 claimsDecoded.getNotBefore());
-    assertEquals(epochAdapter.unmarshal(claims.getIssuedAt().getValue()),
-                 claimsDecoded.getIssuedAt());
+    assertEquals(epochAdapter.adaptFromJson(claims.getExpirationTime().getValue()), claimsDecoded.getExpirationTime());
+    assertEquals(epochAdapter.adaptFromJson(claims.getNotBefore().getValue()), claimsDecoded.getNotBefore());
+    assertEquals(epochAdapter.adaptFromJson(claims.getIssuedAt().getValue()), claimsDecoded.getIssuedAt());
     assertEquals(claims.getJwtId(), claimsDecoded.getJwtId());
 
     JwtClaims joseClaims = new JwtClaims();
@@ -204,10 +201,10 @@ public class InteropTest {
   @Test
   public void jwtSignedWithRsaJwk() throws Exception {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-public-key.json");
-    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
+    JsonWebKey key = new JsonbUtility().unmarshal(json, JsonWebKey.class);
     RsaPublicJwk rsaPublicJwk = (RsaPublicJwk) key;
     json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    key = JsonMarshaller.fromJson(json, JsonWebKey.class);
+    key = new JsonbUtility().unmarshal(json, JsonWebKey.class);
     RsaPrivateJwk rsaPrivateJwk = (RsaPrivateJwk) key;
 
     JwtClaims claims = new JwtClaims()
@@ -272,7 +269,7 @@ public class InteropTest {
   @Test
   public void convertKeyToPem() throws Exception {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    JsonWebKey key = JsonMarshaller.fromJson(json, JsonWebKey.class);
+    JsonWebKey key = new JsonbUtility().unmarshal(json, JsonWebKey.class);
     RsaPrivateJwk rsaPrivateJwk = (RsaPrivateJwk) key;
 
     StringWriter sw = new StringWriter();

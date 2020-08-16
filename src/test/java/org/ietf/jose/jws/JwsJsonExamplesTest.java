@@ -1,16 +1,15 @@
 package org.ietf.jose.jws;
 
-import org.ietf.TestFileReader;
-import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.key.RsaPrivateJwk;
-import org.ietf.jose.util.CryptographyUtility;
-import org.ietf.jose.util.JsonMarshaller;
-import org.junit.Test;
-
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.spec.RSAPrivateKeySpec;
+import org.ietf.TestFileReader;
+import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwk.key.RsaPrivateJwk;
+import org.ietf.jose.util.CryptographyUtility;
+import org.ietf.jose.util.JsonbUtility;
+import org.junit.Test;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.ietf.jose.util.Base64Utility.toBase64Url;
@@ -30,7 +29,7 @@ public class JwsJsonExamplesTest {
     final String fullPayload = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZXhhbXBsZSJ9" + '.' + toBase64Url(payload);
 
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    RsaPrivateJwk key = JsonMarshaller.fromJson(json, RsaPrivateJwk.class);
+    RsaPrivateJwk key = new JsonbUtility().unmarshal(json, RsaPrivateJwk.class);
 
     KeyFactory kf = KeyFactory.getInstance("RSA");
     RSAPrivateKeySpec spec = new RSAPrivateKeySpec(key.getModulus(), key.getPrivateExponent());

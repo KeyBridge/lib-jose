@@ -1,7 +1,7 @@
 package org.ietf.jose.jws;
 
 import java.io.IOException;
-import org.ietf.jose.util.JsonMarshaller;
+import org.ietf.jose.util.JsonbUtility;
 
 /**
  * @author Andrius Druzinis-Vitkus
@@ -16,7 +16,7 @@ public abstract class JsonSerializable {
    * @throws java.io.IOException on serialization error
    */
   public String toJson() throws IOException {
-    return JsonMarshaller.toJson(this);
+    return new JsonbUtility().marshal(this);
   }
 
   /**
@@ -27,11 +27,7 @@ public abstract class JsonSerializable {
    */
   @Override
   public String toString() {
-    try {
-      return JsonMarshaller.toJsonPrettyFormatted(this);
-    } catch (IOException ex) {
-      return this.getClass().getSimpleName() + " serializer error " + ex.getMessage();
-    }
+    return new JsonbUtility().withFormatting(true).marshal(this);
   }
 
   /**

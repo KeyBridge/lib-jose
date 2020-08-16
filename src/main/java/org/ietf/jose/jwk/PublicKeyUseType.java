@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +49,7 @@ package org.ietf.jose.jwk;
  * @author Key Bridge
  */
 public enum PublicKeyUseType {
+
   /**
    * signature
    */

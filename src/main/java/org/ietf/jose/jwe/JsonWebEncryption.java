@@ -21,17 +21,15 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.StringTokenizer;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.ietf.jose.adapter.XmlAdapterJweHeader;
+import javax.json.bind.annotation.JsonbProperty;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwe.encryption.EncryptionResult;
 import org.ietf.jose.jws.JsonSerializable;
 import org.ietf.jose.util.CryptographyUtility;
-import org.ietf.jose.util.JsonMarshaller;
+import org.ietf.jose.util.JsonbReader;
+import org.ietf.jose.util.JsonbUtility;
+import org.ietf.jose.util.JsonbWriter;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.ietf.jose.util.Base64Utility.*;
@@ -49,34 +47,32 @@ import static org.ietf.jose.util.Base64Utility.*;
  * than this syntax difference, JWE JSON Serialization objects using the
  * flattened syntax are processed identically to those using the general syntax.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class JsonWebEncryption extends JsonSerializable {
 
   /**
    * Integrity-protected header contents
    */
-  @XmlElement(name = "protected", required = true)
-  @XmlJavaTypeAdapter(type = JweHeader.class, value = XmlAdapterJweHeader.class)
+  @JsonbProperty("protected")
   private JweHeader protectedHeader;
   /**
    * Non-integrity-protected header contents
    */
-  @XmlElement(name = "unprotected", required = true)
+  @JsonbProperty("unprotected")
   private JweHeader unprotected;
   /**
    * Encrypted key contents
    */
-  @XmlElement(name = "encrypted_key")
+  @JsonbProperty("encrypted_key")
   private byte[] encryptedKey;
   /**
    * Initialization vector contents
    */
-  @XmlElement(name = "iv")
+  @JsonbProperty("iv")
   private byte[] initializationVector;
   /**
    * Ciphertext contents are encrypted plaintext.
    */
-  @XmlElement(name = "ciphertext")
+  @JsonbProperty("ciphertext")
   private byte[] ciphertext;
   /**
    * Authentication tag contents the first half (128 bits) of the HMAC output M
@@ -85,12 +81,12 @@ public class JsonWebEncryption extends JsonSerializable {
    * See RFC 7516 JSON Web Encryption (JWE) at B.7. Truncate HMAC Value to
    * Create Authentication Tag
    */
-  @XmlElement(name = "tag")
+  @JsonbProperty("tag")
   private byte[] authenticationTag;
   /**
    * Additional authenticated data contents
    */
-  @XmlElement(name = "aad")
+  @JsonbProperty("aad")
   private byte[] additionalAuthenticationData;
 
   public JsonWebEncryption() {
@@ -144,7 +140,7 @@ public class JsonWebEncryption extends JsonSerializable {
     /**
      * The default Additional Authentication Data can be the protected header
      */
-    String headerJson = JsonMarshaller.toJson(protectedHeader); // throws IOException
+    String headerJson = new JsonbWriter().marshal(protectedHeader);// new JsonbUtility().marshal(protectedHeader); // throws IOException
     jwe.additionalAuthenticationData = toBase64Url(headerJson).getBytes(US_ASCII);
     EncryptionResult encryptionResult = contentEnc.getEncrypter().encrypt(payload, null,
                                                                           jwe.additionalAuthenticationData, contentEncryptionKey);
@@ -162,7 +158,7 @@ public class JsonWebEncryption extends JsonSerializable {
    * @throws IOException in case of failure to deserialise the JSON string
    */
   public static JsonWebEncryption fromJson(String json) throws IOException {
-    return JsonMarshaller.fromJson(json, JsonWebEncryption.class);
+    return new JsonbUtility().unmarshal(json, JsonWebEncryption.class);
   }
 
   /**
@@ -195,7 +191,8 @@ public class JsonWebEncryption extends JsonSerializable {
     }
     JsonWebEncryption jwe = new JsonWebEncryption();
     String protectedHeaderJson = fromBase64UrlToString(tokenizer.nextToken());
-    jwe.protectedHeader = JsonMarshaller.fromJson(protectedHeaderJson, JweHeader.class);
+//    jwe.protectedHeader =  new JsonbUtility().unmarshal(protectedHeaderJson, JweHeader.class);
+    jwe.protectedHeader = new JsonbReader().unmarshal(protectedHeaderJson, JweHeader.class);
     jwe.encryptedKey = fromBase64Url(tokenizer.nextToken());
     jwe.initializationVector = fromBase64Url(tokenizer.nextToken());
     jwe.ciphertext = fromBase64Url(tokenizer.nextToken());
@@ -224,7 +221,7 @@ public class JsonWebEncryption extends JsonSerializable {
    * @throws java.io.IOException on JSON marshal error
    */
   public String toCompactForm() throws IOException {
-    return toBase64Url(JsonMarshaller.toJson(protectedHeader)) + '.'
+    return toBase64Url(new JsonbWriter().marshal(protectedHeader)) + '.'
       + toBase64Url(encryptedKey) + '.'
       + toBase64Url(initializationVector) + '.'
       + toBase64Url(ciphertext) + '.'

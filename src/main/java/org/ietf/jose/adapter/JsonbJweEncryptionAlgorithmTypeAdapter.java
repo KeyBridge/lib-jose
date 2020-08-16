@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2018 Key Bridge.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,22 +15,29 @@
  */
 package org.ietf.jose.adapter;
 
-import org.ietf.jose.util.Base64Utility;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.json.bind.adapter.JsonbAdapter;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 
 /**
- * Converts byte arrays into Base64URL-encoded strings and vice versa
+ * Converts EContentEncyptionAlgorithm enum values into Base64URL-encoded
+ * strings and vice versa
  */
-public class XmlAdapterByteArrayBase64Url extends XmlAdapter<String, byte[]> {
+public class JsonbJweEncryptionAlgorithmTypeAdapter implements JsonbAdapter<JweEncryptionAlgorithmType, String> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public String marshal(byte[] v) {
-    return Base64Utility.toBase64Url(v);
+  public String adaptToJson(JweEncryptionAlgorithmType obj) throws Exception {
+    return obj == null ? null : obj.getJoseAlgorithmName();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public byte[] unmarshal(String v) {
-    return Base64Utility.fromBase64Url(v);
+  public JweEncryptionAlgorithmType adaptFromJson(String obj) throws Exception {
+    return JweEncryptionAlgorithmType.resolve(obj);
   }
 }
+//

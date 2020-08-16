@@ -15,19 +15,15 @@
  */
 package org.ietf.jose.jws;
 
-import org.ietf.jose.adapter.XmlAdapterByteArrayBase64Url;
-import org.ietf.jose.adapter.XmlAdapterJwsHeader;
-import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonMarshaller;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
+import org.ietf.jose.util.Base64Utility;
+import org.ietf.jose.util.JsonbUtility;
 
 import static org.ietf.jose.util.Base64Utility.fromBase64Url;
 import static org.ietf.jose.util.Base64Utility.fromBase64UrlToString;
@@ -85,14 +81,12 @@ import static org.ietf.jose.util.Base64Utility.fromBase64UrlToString;
  *   "signature":"[signature contents]"
  * }</pre>
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class JsonWebSignature extends JsonSerializable {
 
   /**
    * The "payload" member MUST be present and contain the value BASE64URL(JWS
    * Payload).
    */
-  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
   protected byte[] payload;
   /**
    * The "protected" member MUST be present and contain the value
@@ -100,8 +94,7 @@ public class JsonWebSignature extends JsonSerializable {
    * is non-empty; otherwise, it MUST be absent. These Header Parameter values
    * are integrity protected.
    */
-  @XmlElement(name = "protected")
-  @XmlJavaTypeAdapter(type = JwsHeader.class, value = XmlAdapterJwsHeader.class)
+  @JsonbProperty("protected")
   private JwsHeader protectedHeader;
   /**
    * The "header" member MUST be present and contain the value JWS Unprotected
@@ -110,14 +103,13 @@ public class JsonWebSignature extends JsonSerializable {
    * rather than as a string. These Header Parameter values are not integrity
    * protected.
    */
-  @XmlElement(name = "header")
+  @JsonbProperty("header")
   private JwsHeader unprotectedHeader;
   /**
    * The "signature" member MUST be present and contain the value BASE64URL(JWS
    * Signature).
    */
-  @XmlElement(name = "signature")
-  @XmlJavaTypeAdapter(type = byte[].class, value = XmlAdapterByteArrayBase64Url.class)
+  @JsonbProperty("signature")
   private byte[] signature;
 
   /**
@@ -135,7 +127,7 @@ public class JsonWebSignature extends JsonSerializable {
    * represents a signature or MAC over the GeneralJsonSignature Payload and the
    * GeneralJsonSignature Protected Header.
    */
-  @XmlElement(name = "signatures")
+  @JsonbProperty("signatures")
   private List<Signature> signatures;
 
   /**
@@ -167,13 +159,13 @@ public class JsonWebSignature extends JsonSerializable {
    * @throws IOException in case of failure to deserialize the JSON string
    */
   public static JsonWebSignature fromJson(String json) throws IOException {
-    JsonWebSignature jws = JsonMarshaller.fromJson(json, JsonWebSignature.class);
+    JsonWebSignature jws = new JsonbUtility().unmarshal(json, JsonWebSignature.class);
 
     /**
      * Read the JSON again but with retained protected header order. This is
      * necessary later when verifying the digital signature on HMAC.
      */
-    JwsFrame frame = JsonMarshaller.fromJson(json, JwsFrame.class);
+    JwsFrame frame = new JsonbUtility().unmarshal(json, JwsFrame.class);
 
     if (jws.protectedHeader != null) {
       // this is a single-signature JWS (flattened)
@@ -181,7 +173,7 @@ public class JsonWebSignature extends JsonSerializable {
     } else if (!jws.signatures.isEmpty()) {
       // this is a general JWS JSON object
       for (int i = 0; i < jws.signatures.size(); i++) {
-        jws.signatures.get(i).jwsSigningInput = createSignatureInput(frame.signatures.get(i));
+        jws.signatures.get(i).setJwsSigningInput(createSignatureInput(frame.signatures.get(i)));
       }
     } else {
       throw new IllegalArgumentException("Invalid JWS JSON input");
@@ -227,7 +219,7 @@ public class JsonWebSignature extends JsonSerializable {
     String signatureBase64Url = tokenizer.nextToken();
 
     String protectedHeaderJson = fromBase64UrlToString(protectedHeaderBase64Url);
-    jws.protectedHeader = JsonMarshaller.fromJson(protectedHeaderJson, JwsHeader.class);
+    jws.protectedHeader = new JsonbUtility().unmarshal(protectedHeaderJson, JwsHeader.class);
     jws.payload = fromBase64Url(payloadBase64Url);
     jws.signature = fromBase64Url(signatureBase64Url);
 
@@ -293,7 +285,7 @@ public class JsonWebSignature extends JsonSerializable {
     } else {
       throw new IllegalStateException("JWS is empty");
     }
-    return Base64Utility.toBase64Url(JsonMarshaller.toJson(compactProtectedHeader))
+    return Base64Utility.toBase64Url(new JsonbUtility().marshal(compactProtectedHeader))
       + '.' + Base64Utility.toBase64Url(payload)
       + '.' + Base64Utility.toBase64Url(compactSignature);
   }
@@ -307,7 +299,7 @@ public class JsonWebSignature extends JsonSerializable {
   private static final class JwsFrame {
 
     String payload;
-    @XmlElement(name = "protected")
+    @JsonbProperty("protected")
     String protectedHeaderJsonBase64Url;
     Map<String, String> header;
     String signature;

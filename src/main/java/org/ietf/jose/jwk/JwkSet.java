@@ -17,9 +17,6 @@ package org.ietf.jose.jwk;
 
 import java.util.List;
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 
 /**
  * RFC 7517 JSON Web Key (JWK)
@@ -44,7 +41,6 @@ import javax.xml.bind.annotation.XmlElement;
  * values that are not understood by them, that are missing required members, or
  * for which values are out of the supported ranges.
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class JwkSet {
 
   /**
@@ -55,7 +51,6 @@ public class JwkSet {
    * preference among them, although applications of JWK Sets can choose to
    * assign a meaning to the order for their purposes, if desired.
    */
-  @XmlElement(required = true)
   private List<? extends JsonWebKey> keys;
 
   public JwkSet() {

@@ -15,23 +15,23 @@
  */
 package org.ietf.jose.adapter;
 
-import java.io.IOException;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.json.bind.adapter.JsonbAdapter;
 import org.ietf.jose.jws.JwsHeader;
 import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonMarshaller;
+import org.ietf.jose.util.JsonbReader;
+import org.ietf.jose.util.JsonbWriter;
 
 /**
  * Converts byte arrays into Base64URL-encoded strings and vice versa
  */
-public class XmlAdapterJwsHeader extends XmlAdapter<String, JwsHeader> {
+public class JsonbJwsHeaderAdapter implements JsonbAdapter<JwsHeader, String> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public String marshal(JwsHeader v) throws IOException {
-    String protectedHeaderJson = JsonMarshaller.toJson(v);
+  public String adaptToJson(JwsHeader obj) throws Exception {
+    String protectedHeaderJson = new JsonbWriter().marshal(obj);
     return Base64Utility.toBase64Url(protectedHeaderJson);
   }
 
@@ -39,8 +39,8 @@ public class XmlAdapterJwsHeader extends XmlAdapter<String, JwsHeader> {
    * {@inheritDoc}
    */
   @Override
-  public JwsHeader unmarshal(String v) throws IOException {
-    String json = Base64Utility.fromBase64UrlToString(v);
-    return JsonMarshaller.fromJson(json, JwsHeader.class);
+  public JwsHeader adaptFromJson(String obj) throws Exception {
+    String json = Base64Utility.fromBase64UrlToString(obj);
+    return new JsonbReader().unmarshal(json, JwsHeader.class);
   }
 }
