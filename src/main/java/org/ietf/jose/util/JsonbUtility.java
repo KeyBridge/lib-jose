@@ -61,10 +61,11 @@ public class JsonbUtility {
       .withPropertyVisibilityStrategy(new JsonbPropertyVisibilityStrategy())
       .withAdapters(new JsonbBigIntegerBase64UrlAdapter())
       .withAdapters(new JsonbByteArrayBase64UrlAdapter())
+      .withAdapters(new JsonbZonedDateTimeEpochAdapter())
       .withAdapters(new JsonbJweHeaderAdapter())
       .withAdapters(new JsonbJwsHeaderAdapter())
-      .withAdapters(new JsonbX509CertificateAdapter())
-      .withAdapters(new JsonbZonedDateTimeEpochAdapter());
+      .withAdapters(new JsonbJwkAdapter())
+      .withAdapters(new JsonbX509CertificateAdapter());
     reader = new JsonbReader(jsonbConfig);
     writer = new JsonbWriter(jsonbConfig);
   }
