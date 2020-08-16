@@ -57,13 +57,6 @@ import org.ietf.jose.jwk.PublicKeyUseType;
  * Developer note: all sub-classes, which need to be the output of unmarshalling
  * a JWK JSON string, must be listed in JsonSubTypes.
  */
-//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "kty")
-//@JsonSubTypes({
-//  @JsonSubTypes.Type(value = EllipticCurveJwk.class, name = "EC")
-//  , @JsonSubTypes.Type(value = RsaPublicJwk.class, name = "RSA")
-//  , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
-//  , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
-//)
 public abstract class AbstractJwk extends AbstractHeader {
 
   /**
@@ -219,6 +212,11 @@ public abstract class AbstractJwk extends AbstractHeader {
       return false;
     }
     return super.equals(obj);
+  }
+
+  @Override
+  public String toString() {
+    return "AbstractJwk{" + "kty=" + kty + '}';
   }
 
 }
