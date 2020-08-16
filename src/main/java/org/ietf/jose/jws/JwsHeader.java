@@ -15,9 +15,11 @@
  */
 package org.ietf.jose.jws;
 
+import ch.keybridge.lib.jose.AbstractHeader;
 import java.net.URI;
 import java.util.List;
-import org.ietf.jose.jwk.JsonWebKey;
+import java.util.Objects;
+import org.ietf.jose.jwk.AbstractJsonWebKey;
 
 /**
  * RFC 7515 JSON Web Signature (JWS)
@@ -63,7 +65,7 @@ public class JwsHeader extends AbstractHeader {
    * represented as a JSON Web Key [JWK]. Use of this Header Parameter is
    * OPTIONAL.
    */
-  protected JsonWebKey jwk;
+  protected AbstractJsonWebKey jwk;
   /**
    * 4.1.9. "typ" (Type) Header Parameter
    * <p>
@@ -139,8 +141,8 @@ public class JwsHeader extends AbstractHeader {
    * invalid if the critical list contains any Header Parameter names defined by
    * this specification or [JWA] for use with JWS or if any other constraints on
    * its use are violated. When used, this Header Parameter MUST be integrity
-   * protected; therefore, it MUST occur only within the JWS Protected Header.
-   * Use of this Header Parameter is OPTIONAL. This Header Parameter MUST be
+   * private; therefore, it MUST occur only within the JWS Protected Header. Use
+   * of this Header Parameter is OPTIONAL. This Header Parameter MUST be
    * understood and processed by implementations.
    * <p>
    * An example use, along with a hypothetical "exp" (expiration time) field is:
@@ -165,11 +167,11 @@ public class JwsHeader extends AbstractHeader {
     this.jku = jku;
   }
 
-  public JsonWebKey getJwk() {
+  public AbstractJsonWebKey getJwk() {
     return this.jwk;
   }
 
-  public void setJwk(JsonWebKey jwk) {
+  public void setJwk(AbstractJsonWebKey jwk) {
     this.jwk = jwk;
   }
 
@@ -196,4 +198,46 @@ public class JwsHeader extends AbstractHeader {
   public void setCrit(List<String> crit) {
     this.crit = crit;
   }
+
+  @Override
+  public int hashCode() {
+    int hash = super.hashCode();
+    hash = 59 * hash + Objects.hashCode(this.jku);
+    hash = 59 * hash + Objects.hashCode(this.jwk);
+    hash = 59 * hash + Objects.hashCode(this.typ);
+    hash = 59 * hash + Objects.hashCode(this.cty);
+    hash = 59 * hash + Objects.hashCode(this.crit);
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final JwsHeader other = (JwsHeader) obj;
+    if (!Objects.equals(this.typ, other.typ)) {
+      return false;
+    }
+    if (!Objects.equals(this.cty, other.cty)) {
+      return false;
+    }
+    if (!Objects.equals(this.jku, other.jku)) {
+      return false;
+    }
+    if (!Objects.equals(this.jwk, other.jwk)) {
+      return false;
+    }
+    if (!Objects.equals(this.crit, other.crit)) {
+      return false;
+    }
+    return super.equals(obj);
+  }
+
 }

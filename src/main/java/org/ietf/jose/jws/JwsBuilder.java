@@ -21,7 +21,7 @@ import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.jwk.AbstractJsonWebKey;
 import org.ietf.jose.util.Base64Utility;
 
 /**
@@ -134,7 +134,7 @@ public class JwsBuilder {
      *                                  protected header to JSON
      * @throws GeneralSecurityException in case of failure to sign
      */
-    public Signable sign(JsonWebKey key, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
+    public Signable sign(AbstractJsonWebKey key, JwsAlgorithmType algorithm) throws IOException, GeneralSecurityException {
       this.signatures.add(Signature.getInstance(payload, key, algorithm));
       return this;
     }

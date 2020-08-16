@@ -23,7 +23,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import javax.json.bind.annotation.JsonbProperty;
-import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.jwk.AbstractJsonWebKey;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -32,7 +32,7 @@ import org.ietf.jose.jwk.JsonWebKey;
  * <p>
  * The following members MUST be present for RSA public keys.
  */
-public class RsaPublicJwk extends JsonWebKey {
+public class RsaPublicJwk extends AbstractJsonWebKey {
 
   /**
    * 6.3.1.1. "n" (Modulus) Parameter

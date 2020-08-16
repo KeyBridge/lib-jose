@@ -51,16 +51,16 @@ public class JwkSet {
    * preference among them, although applications of JWK Sets can choose to
    * assign a meaning to the order for their purposes, if desired.
    */
-  private List<? extends JsonWebKey> keys;
+  private List<? extends AbstractJsonWebKey> keys;
 
   public JwkSet() {
   }
 
-  public List<? extends JsonWebKey> getKeys() {
+  public List<? extends AbstractJsonWebKey> getKeys() {
     return this.keys;
   }
 
-  public void setKeys(List<? extends JsonWebKey> keys) {
+  public void setKeys(List<? extends AbstractJsonWebKey> keys) {
     this.keys = keys;
   }
 

@@ -17,7 +17,7 @@ package org.ietf.jose.jwe;
 
 import java.util.Objects;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
-import org.ietf.jose.jws.AbstractHeader;
+import org.ietf.jose.jws.JwsHeader;
 
 /**
  * RFC 7516 JSON Web Encryption (JWE)
@@ -58,7 +58,7 @@ import org.ietf.jose.jws.AbstractHeader;
  *
  * @author Key Bridge
  */
-public class JweHeader extends AbstractHeader {
+public class JweHeader extends JwsHeader {
 
   /**
    * 4.1.2. "enc" (Encryption Algorithm) Header Parameter
@@ -81,7 +81,6 @@ public class JweHeader extends AbstractHeader {
    * [JWA].
    */
   private JweEncryptionAlgorithmType enc;
-
   /**
    * 4.1.3. "zip" (Compression Algorithm) Header Parameter
    * <p>
@@ -122,9 +121,9 @@ public class JweHeader extends AbstractHeader {
 
   @Override
   public int hashCode() {
-    int hash = 7;
-    hash = 71 * hash + Objects.hashCode(this.enc);
-    hash = 71 * hash + Objects.hashCode(this.zip);
+    int hash = super.hashCode();
+    hash = 41 * hash + Objects.hashCode(this.enc);
+    hash = 41 * hash + Objects.hashCode(this.zip);
     return hash;
   }
 
@@ -143,17 +142,10 @@ public class JweHeader extends AbstractHeader {
     if (!Objects.equals(this.zip, other.zip)) {
       return false;
     }
-    return this.enc == other.enc;
-  }
-
-  @Override
-  protected boolean canEqual(Object other) {
-    return other instanceof JweHeader;
-  }
-
-  @Override
-  public String toString() {
-    return "JweHeader{" + "enc=" + enc + ", zip=" + zip + '}';
+    if (this.enc != other.enc) {
+      return false;
+    }
+    return super.equals(obj);
   }
 
 }

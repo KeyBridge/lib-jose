@@ -22,7 +22,7 @@ import java.util.Arrays;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
 import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.jwk.AbstractJsonWebKey;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonbWriter;
 
@@ -107,7 +107,7 @@ public class Signature {
    *                                  protected header to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public static Signature getInstance(byte[] payload, JsonWebKey key, JwsAlgorithmType algorithm) throws IOException,
+  public static Signature getInstance(byte[] payload, AbstractJsonWebKey key, JwsAlgorithmType algorithm) throws IOException,
     GeneralSecurityException {
     Signature signature = new Signature();
     JwsHeader ph = new JwsHeader();

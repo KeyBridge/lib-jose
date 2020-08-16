@@ -13,23 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ietf.jose.jws;
+package ch.keybridge.lib.jose;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import javax.json.bind.annotation.JsonbProperty;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.util.JsonbWriter;
+import org.ietf.jose.jws.X5CHeaderParameter;
 
 /**
- * An abstract JOSE object.
- * <p>
- * This is extended by JWS and JWK JOSE implementations.
+ * An abstract JOSE object. This is extended by JWS and JWK JOSE implementations
+ * and includes fields common to both the JWS (7515) and JWT (7517)
+ * implementations.
+ * <pre>
+ * 7515    7516     7517
+ *  JWS     JWE      JWK       Header
+ *  x        x        x        "alg" (Algorithm)
+ *  x        x                 "crit" (Critical)
+ *  x        x                 "cty" (Content Type)
+ *           x                 "enc" (Encryption Algorithm)
+ *  x        x                 "jku" (JWK Set URL)
+ *  x        x                 "jwk" (JSON Web Key)
+ *           x        x        "key_ops" (Key Operations)
+ *  x        x        x        "kid" (Key ID)
+ *                    x        "kty" (Key Type)
+ *  x        x                 "typ" (Type)
+ *                    x        "use" (Public Key Use)
+ *  x        x        x        "x5c" (X.509 Certificate Chain)
+ *  x        x        x        "x5t" (X.509 Certificate SHA-1 Thumbprint)
+ *  x        x        x        "x5t#S256" (X.509 Certificate SHA-256 Thumbprint)
+ *  x        x                 "x5u" (X.509 URL)
+ *           x                 "zip" (Compression Algorithm) </pre>
  * <p>
  * RFC 7515 JSON Web Signature (JWS)
  * <p>
@@ -74,6 +90,7 @@ import org.ietf.jose.util.JsonbWriter;
  * In addition to the common parameters, each JWK will have members that are key
  * type specific. These members represent the parameters of the key.
  */
+// SeeAlso: JwsHeader, JweHeader, JsonWebKey
 public abstract class AbstractHeader {
 
   /**
@@ -225,7 +242,7 @@ public abstract class AbstractHeader {
   }
 
   public URI getX5u() {
-    return this.x5u;
+    return x5u;
   }
 
   public void setX5u(URI x5u) {
@@ -256,15 +273,26 @@ public abstract class AbstractHeader {
     this.x5tS256 = x5tS256;
   }//</editor-fold>
 
+  /**
+   * Inspect the other class to determine if this and the other class are the
+   * same instance type.
+   *
+   * @param other the other class
+   * @return TRUE if {@code this} is an instance of {@code other}
+   */
+  protected boolean canEqual(Object other) {
+    return this.getClass().isInstance(other);
+  }
+
   @Override
   public int hashCode() {
-    int hash = 5;
-    hash = 41 * hash + Objects.hashCode(this.alg);
-    hash = 41 * hash + Objects.hashCode(this.kid);
-    hash = 41 * hash + Objects.hashCode(this.x5u);
-    hash = 41 * hash + Objects.hashCode(this.x5c);
-    hash = 41 * hash + Objects.hashCode(this.x5t);
-    hash = 41 * hash + Objects.hashCode(this.x5tS256);
+    int hash = 7;
+    hash = 11 * hash + Objects.hashCode(this.alg);
+    hash = 11 * hash + Objects.hashCode(this.kid);
+    hash = 11 * hash + Objects.hashCode(this.x5u);
+    hash = 11 * hash + Objects.hashCode(this.x5c);
+    hash = 11 * hash + Objects.hashCode(this.x5t);
+    hash = 11 * hash + Objects.hashCode(this.x5tS256);
     return hash;
   }
 
@@ -296,57 +324,6 @@ public abstract class AbstractHeader {
       return false;
     }
     return Objects.equals(this.x5c, other.x5c);
-  }
-
-  /**
-   * Inspect the other class to determine if this and the other class are the
-   * same instance type.
-   *
-   * @param other the other class
-   * @return TRUE if {@code this} is an instance of {@code other}
-   */
-  protected boolean canEqual(Object other) {
-    return this.getClass().isInstance(other);
-  }
-
-  /**
-   * Export a JSON formatted string representation of this header. For
-   * development ONLY. This method is provided as a convenience to help
-   * pretty-print header content only. It is is not used in the processing of
-   * JOSE content.
-   *
-   * @return a JSON formatted string representation of the header contents
-   * @throws IOException on error
-   */
-  public String toJson() throws IOException {
-    Map<String, Object> jsonObject = new LinkedHashMap<>();
-
-    if (alg != null) {
-      jsonObject.put("alg", alg);
-    }
-    if (kid != null) {
-      jsonObject.put("kid", kid);
-    }
-    if (x5u != null) {
-      jsonObject.put("x5u", x5u);
-    }
-    if (x5c != null) {
-      jsonObject.put("x5c", x5c);
-    }
-    if (x5t != null) {
-      jsonObject.put("x5t", x5t);
-    }
-    if (x5tS256 != null) {
-      jsonObject.put("x5tS256", x5tS256);
-    }
-
-    return new JsonbWriter().marshal(jsonObject);
-  }
-
-  @Override
-  public String toString() {
-    return "AbstractHeader(alg=" + this.getAlg() + ", kid=" + this.getKid() + ", x5u=" + this.getX5u() + ", x5c="
-      + this.getX5c() + ", x5t=" + this.getX5t() + ", x5tS256=" + this.getX5tS256() + ")";
   }
 
 }

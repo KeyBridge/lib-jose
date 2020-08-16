@@ -19,7 +19,7 @@ import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweDecryptor;
 import org.ietf.jose.jwe.encryption.Encrypter;
-import org.ietf.jose.jwk.JsonWebKey;
+import org.ietf.jose.jwk.AbstractJsonWebKey;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.jws.JsonWebSignature;
@@ -201,10 +201,10 @@ public class InteropTest {
   @Test
   public void jwtSignedWithRsaJwk() throws Exception {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-public-key.json");
-    JsonWebKey key = new JsonbUtility().unmarshal(json, JsonWebKey.class);
+    AbstractJsonWebKey key = new JsonbUtility().unmarshal(json, AbstractJsonWebKey.class);
     RsaPublicJwk rsaPublicJwk = (RsaPublicJwk) key;
     json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    key = new JsonbUtility().unmarshal(json, JsonWebKey.class);
+    key = new JsonbUtility().unmarshal(json, AbstractJsonWebKey.class);
     RsaPrivateJwk rsaPrivateJwk = (RsaPrivateJwk) key;
 
     JwtClaims claims = new JwtClaims()
@@ -269,7 +269,7 @@ public class InteropTest {
   @Test
   public void convertKeyToPem() throws Exception {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    JsonWebKey key = new JsonbUtility().unmarshal(json, JsonWebKey.class);
+    AbstractJsonWebKey key = new JsonbUtility().unmarshal(json, AbstractJsonWebKey.class);
     RsaPrivateJwk rsaPrivateJwk = (RsaPrivateJwk) key;
 
     StringWriter sw = new StringWriter();
