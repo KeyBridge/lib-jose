@@ -57,7 +57,7 @@ public class JsonbReader {
      * I-JSON (”Internet JSON”) is a restricted profile of JSON.
      */
     jsonbConfig = new JsonbConfig()
-      .withBinaryDataStrategy(BinaryDataStrategy.BASE_64)
+      .withBinaryDataStrategy(BinaryDataStrategy.BASE_64_URL)
       .withPropertyVisibilityStrategy(new JsonbPropertyVisibilityStrategy());
     this.jsonb = JsonbBuilder.create(jsonbConfig);
   }
