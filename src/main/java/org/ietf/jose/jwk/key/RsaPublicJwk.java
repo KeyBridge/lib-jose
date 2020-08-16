@@ -97,9 +97,4 @@ public class RsaPublicJwk extends AbstractJwk {
     this.publicExponent = publicExponent;
   }
 
-  @Override
-  public String toString() {
-    return "RsaPublicJwk{" + "modulus=" + modulus + ", publicExponent=" + publicExponent + '}';
-  }
-
 }
