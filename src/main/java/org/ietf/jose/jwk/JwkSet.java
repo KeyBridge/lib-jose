@@ -15,9 +15,10 @@
  */
 package org.ietf.jose.jwk;
 
-import org.ietf.jose.jwk.key.AbstractJwk;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.ietf.jose.jwk.key.AbstractJwk;
 
 /**
  * RFC 7517 JSON Web Key (JWK)
@@ -52,17 +53,22 @@ public class JwkSet {
    * preference among them, although applications of JWK Sets can choose to
    * assign a meaning to the order for their purposes, if desired.
    */
-  private List<? extends AbstractJwk> keys;
+  private List<AbstractJwk> keys;
 
   public JwkSet() {
+    this.keys = new ArrayList<>();
   }
 
-  public List<? extends AbstractJwk> getKeys() {
+  public List<AbstractJwk> getKeys() {
     return this.keys;
   }
 
-  public void setKeys(List<? extends AbstractJwk> keys) {
+  public void setKeys(List< AbstractJwk> keys) {
     this.keys = keys;
+  }
+
+  public void addKey(AbstractJwk key) {
+    this.keys.add(key);
   }
 
   @Override
