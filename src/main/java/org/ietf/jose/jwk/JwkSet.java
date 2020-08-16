@@ -15,6 +15,7 @@
  */
 package org.ietf.jose.jwk;
 
+import org.ietf.jose.jwk.key.AbstractJwk;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,16 +52,16 @@ public class JwkSet {
    * preference among them, although applications of JWK Sets can choose to
    * assign a meaning to the order for their purposes, if desired.
    */
-  private List<? extends AbstractJsonWebKey> keys;
+  private List<? extends AbstractJwk> keys;
 
   public JwkSet() {
   }
 
-  public List<? extends AbstractJsonWebKey> getKeys() {
+  public List<? extends AbstractJwk> getKeys() {
     return this.keys;
   }
 
-  public void setKeys(List<? extends AbstractJsonWebKey> keys) {
+  public void setKeys(List<? extends AbstractJwk> keys) {
     this.keys = keys;
   }
 

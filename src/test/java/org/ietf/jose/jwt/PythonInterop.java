@@ -14,7 +14,7 @@ import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
 import org.ietf.jose.jwe.JweDecryptor;
-import org.ietf.jose.jwk.AbstractJsonWebKey;
+import org.ietf.jose.jwk.key.AbstractJwk;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jws.JsonWebSignature;
 import org.ietf.jose.jws.SignatureValidator;
@@ -36,7 +36,7 @@ public class PythonInterop {
   @Test
   public void testHmacSignature() throws Exception {
     String keyJson = "{\"k\":\"kGpikVaixila7_ItL2TUntsXseU6nsiDB70rypC7Pnc\",\"kty\":\"oct\"}";
-    AbstractJsonWebKey jwk = new JsonbUtility().unmarshal(keyJson, AbstractJsonWebKey.class);
+    AbstractJwk jwk = new JsonbUtility().unmarshal(keyJson, AbstractJwk.class);
 
     String jwsJson = "{\"header\":{\"kid\":\"I02Tv_pkGNw_rYNYERVA7QV6SxvmJmuRg32POLdPt5c\"},"
       + "\"payload\":\"RGVtbyBJbnRlZ3JpdHkgcHJvdGVjdGVkIG1lc3NhZ2U\",\"protected\":\"eyJhbGciOiJIUzI1NiJ9\","
@@ -114,7 +114,7 @@ public class PythonInterop {
       + "-cTf6ERF4k4e_jy78GfPYUIaUyoSSJuBzp3Cubk3OCqs6grT8bR_cu0Dm1MZwWmtdqDyI95HrUeq3MP15vMMON8lHTeZu2lmKvwqW7anV5UzhM1iZ7z4yMkuUwFWoBvyY898EXvRD-hdqRxHlSqAZ192zB3pVFJ0s7pFc\",\n"
       + "\"qi\":\"3PiqvXQN0zwMeE-sBvZgi289XP9XCQF3VWqPzMKnIgQp7_Tugo6-NZBKCQsMf3HaEGBjTVJs_jcK8-TRXvaKe"
       + "-7ZMaQj8VfBdYkssbu0NKDDhjJ-GtiseaDVWt7dcH0cfwxgFUHpQh7FoCrjFJ6h6ZEpMF6xmujs4qMpPz8aaI4\"}\n";
-    AbstractJsonWebKey jwk = new JsonbUtility().unmarshal(privateKeyJson, AbstractJsonWebKey.class);
+    AbstractJwk jwk = new JsonbUtility().unmarshal(privateKeyJson, AbstractJwk.class);
 
     String jweJson = "{\"ciphertext\":\"1OW7iUv0idBJhue_Uz2rw1YJQaeaNb4ToruDvst5ZgQ\",\n"
       + "\"encrypted_key\":\"Mo4ddtxpVz4spV_yixhqS9tUQBZTcJ2mhgpuUOI38kArWZlpl3JYPEV-J2uv76hqWQ4j5x8"

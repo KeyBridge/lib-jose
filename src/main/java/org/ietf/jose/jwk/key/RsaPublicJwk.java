@@ -23,16 +23,18 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import javax.json.bind.annotation.JsonbProperty;
-import org.ietf.jose.jwk.AbstractJsonWebKey;
+import org.ietf.jose.jwk.KeyType;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
  * <p>
  * 6.3.1. Parameters for RSA Public Keys
  * <p>
- * The following members MUST be present for RSA public keys.
+ * The following members MUST be present for RSA public keys: <br>
+ * "n" (Modulus) Parameter  <br>
+ * "e" (Exponent) Parameter
  */
-public class RsaPublicJwk extends AbstractJsonWebKey {
+public class RsaPublicJwk extends AbstractJwk {
 
   /**
    * 6.3.1.1. "n" (Modulus) Parameter
@@ -63,6 +65,7 @@ public class RsaPublicJwk extends AbstractJsonWebKey {
   protected BigInteger publicExponent;
 
   public RsaPublicJwk() {
+    this.kty = KeyType.RSA;
   }
 
   public static RsaPublicJwk getInstance(RSAPublicKey publicKey) {
@@ -96,7 +99,7 @@ public class RsaPublicJwk extends AbstractJsonWebKey {
 
   @Override
   public String toString() {
-    return "RsaPublicJwk(modulus=" + this.getModulus() + ", publicExponent=" + this.getPublicExponent() + ")";
+    return "RsaPublicJwk{" + "modulus=" + modulus + ", publicExponent=" + publicExponent + '}';
   }
 
 }

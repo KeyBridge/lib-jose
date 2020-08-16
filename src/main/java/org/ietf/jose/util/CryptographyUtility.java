@@ -23,7 +23,7 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.ietf.jose.jwa.JwsAlgorithmType;
-import org.ietf.jose.jwk.AbstractJsonWebKey;
+import org.ietf.jose.jwk.key.AbstractJwk;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
@@ -242,7 +242,7 @@ public class CryptographyUtility {
    * @return bytes of the signature or HMAC
    * @throws GeneralSecurityException in case of failure
    */
-  public static byte[] sign(byte[] payloadBytes, AbstractJsonWebKey jwk, JwsAlgorithmType algorithm) throws
+  public static byte[] sign(byte[] payloadBytes, AbstractJwk jwk, JwsAlgorithmType algorithm) throws
     GeneralSecurityException {
     if (jwk instanceof SymmetricJwk) {
       SymmetricJwk symmetricKey = (SymmetricJwk) jwk;
@@ -288,7 +288,7 @@ public class CryptographyUtility {
    * @return TRUE if the signature is valid
    * @throws GeneralSecurityException in case of failure
    */
-  public static boolean validateSignature(byte[] signature, byte[] payload, AbstractJsonWebKey jwk, String algorithm) throws
+  public static boolean validateSignature(byte[] signature, byte[] payload, AbstractJwk jwk, String algorithm) throws
     GeneralSecurityException {
     if (jwk instanceof SymmetricJwk) {
       SymmetricJwk symmetricKey = (SymmetricJwk) jwk;

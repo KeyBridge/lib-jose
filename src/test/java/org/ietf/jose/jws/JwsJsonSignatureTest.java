@@ -13,7 +13,7 @@ import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JwkType;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.SecretKeyBuilder;
-import org.ietf.jose.jwk.AbstractJsonWebKey;
+import org.ietf.jose.jwk.key.AbstractJwk;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.junit.Test;
 
@@ -83,8 +83,8 @@ public class JwsJsonSignatureTest {
     KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
     generator.initialize(2048);
     KeyPair keyPair = generator.generateKeyPair();
-    AbstractJsonWebKey jwkOne = RsaPrivateJwk.getInstance(keyPair, UUID.randomUUID().toString());
-    AbstractJsonWebKey jwkTwo = RsaPrivateJwk.getInstance(keyPair, UUID.randomUUID().toString());
+    AbstractJwk jwkOne = RsaPrivateJwk.getInstance(keyPair, UUID.randomUUID().toString());
+    AbstractJwk jwkTwo = RsaPrivateJwk.getInstance(keyPair, UUID.randomUUID().toString());
 
     Signature signature = Signature.getInstance("sign this".getBytes(), jwkOne, RS256);
     Signature signature2 = Signature.getInstance("sign this".getBytes(), jwkTwo, RS512);

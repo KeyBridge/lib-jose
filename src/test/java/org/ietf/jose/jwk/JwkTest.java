@@ -1,5 +1,6 @@
 package org.ietf.jose.jwk;
 
+import org.ietf.jose.jwk.key.AbstractJwk;
 import java.io.IOException;
 import java.math.BigInteger;
 import org.ietf.TestFileReader;
@@ -17,7 +18,7 @@ public class JwkTest {
   @Test
   public void ecPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-public-key.json");
-    AbstractJsonWebKey key = new JsonbUtility().unmarshal(json, AbstractJsonWebKey.class);
+    AbstractJwk key = new JsonbUtility().unmarshal(json, AbstractJwk.class);
     assertTrue(key instanceof EllipticCurveJwk);
     EllipticCurveJwk ecKey = (EllipticCurveJwk) key;
     assertEquals("P-521", ecKey.getCrv());
@@ -27,14 +28,14 @@ public class JwkTest {
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1")), ecKey.getY());
     assertNull(ecKey.getD());
 
-    EllipticCurveJwk keyReconverted = (EllipticCurveJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(ecKey), AbstractJsonWebKey.class);
+    EllipticCurveJwk keyReconverted = (EllipticCurveJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(ecKey), AbstractJwk.class);
     assertEquals(ecKey, keyReconverted);
   }
 
   @Test
   public void ecPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-private-key.json");
-    AbstractJsonWebKey key = new JsonbUtility().unmarshal(json, AbstractJsonWebKey.class);
+    AbstractJwk key = new JsonbUtility().unmarshal(json, AbstractJwk.class);
     assertTrue(key instanceof EllipticCurveJwk);
     EllipticCurveJwk ecKey = (EllipticCurveJwk) key;
     assertEquals("P-521", ecKey.getCrv());
@@ -44,14 +45,14 @@ public class JwkTest {
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1")), ecKey.getY());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zbKipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt")), ecKey.getD());
 
-    EllipticCurveJwk keyReconverted = (EllipticCurveJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(ecKey), AbstractJsonWebKey.class);
+    EllipticCurveJwk keyReconverted = (EllipticCurveJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(ecKey), AbstractJwk.class);
     assertEquals(ecKey, keyReconverted);
   }
 
   @Test
   public void rsaPublicKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-public-key.json");
-    AbstractJsonWebKey key = new JsonbUtility().unmarshal(json, AbstractJsonWebKey.class);
+    AbstractJwk key = new JsonbUtility().unmarshal(json, AbstractJwk.class);
     assertTrue(key instanceof RsaPublicJwk);
     RsaPublicJwk rsaKey = (RsaPublicJwk) key;
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O"
@@ -64,14 +65,14 @@ public class JwkTest {
     assertEquals(PublicKeyUseType.sig, rsaKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", rsaKey.getKid());
 
-    RsaPublicJwk keyReconverted = (RsaPublicJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(rsaKey), AbstractJsonWebKey.class);
+    RsaPublicJwk keyReconverted = (RsaPublicJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(rsaKey), AbstractJwk.class);
     assertEquals(rsaKey, keyReconverted);
   }
 
   @Test
   public void rsaPrivateKeyTest() throws IOException {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/rsa-private-key.json");
-    AbstractJsonWebKey key = new JsonbUtility().unmarshal(json, AbstractJsonWebKey.class);
+    AbstractJwk key = new JsonbUtility().unmarshal(json, AbstractJwk.class);
     assertTrue(key instanceof RsaPrivateJwk);
     RsaPrivateJwk rsaKey = (RsaPrivateJwk) key;
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT-O"
@@ -89,7 +90,7 @@ public class JwkTest {
     assertEquals(PublicKeyUseType.sig, rsaKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", rsaKey.getKid());
 
-    RsaPrivateJwk keyReconverted = (RsaPrivateJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(rsaKey), AbstractJsonWebKey.class);
+    RsaPrivateJwk keyReconverted = (RsaPrivateJwk) new JsonbUtility().unmarshal(new JsonbUtility().marshal(rsaKey), AbstractJwk.class);
     assertEquals(rsaKey, keyReconverted);
   }
 

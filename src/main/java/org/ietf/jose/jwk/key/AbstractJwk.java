@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ietf.jose.jwk;
+package org.ietf.jose.jwk.key;
 
 import ch.keybridge.lib.jose.AbstractHeader;
 import java.util.List;
 import java.util.Objects;
+import org.ietf.jose.jwk.KeyOperationType;
+import org.ietf.jose.jwk.KeyType;
+import org.ietf.jose.jwk.PublicKeyUseType;
 
 /**
  * RFC-7517 JSON Web Key (JWK)
@@ -61,7 +64,7 @@ import java.util.Objects;
 //  , @JsonSubTypes.Type(value = RsaPrivateJwk.class, name = "RSA")
 //  , @JsonSubTypes.Type(value = SymmetricJwk.class, name = "oct")}
 //)
-public abstract class AbstractJsonWebKey extends AbstractHeader {
+public abstract class AbstractJwk extends AbstractHeader {
 
   /**
    * 4.1. "kty" (Key Type) Parameter
@@ -80,7 +83,7 @@ public abstract class AbstractJsonWebKey extends AbstractHeader {
    * for those key types. Members used with specific "kty" values can be found
    * in the IANA "JSON Web Key Parameters" registry established by Section 8.1.
    */
-  protected String kty;
+  protected KeyType kty;
   /**
    * 4.2. "use" (Public Key Use) Parameter
    * <p>
@@ -158,14 +161,14 @@ public abstract class AbstractJsonWebKey extends AbstractHeader {
    */
   protected List<KeyOperationType> key_ops;
 
-  public AbstractJsonWebKey() {
+  public AbstractJwk() {
   }
 
-  public String getKty() {
+  public KeyType getKty() {
     return kty;
   }
 
-  public void setKty(String kty) {
+  public void setKty(KeyType kty) {
     this.kty = kty;
   }
 
@@ -205,7 +208,7 @@ public abstract class AbstractJsonWebKey extends AbstractHeader {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    final AbstractJsonWebKey other = (AbstractJsonWebKey) obj;
+    final AbstractJwk other = (AbstractJwk) obj;
     if (!Objects.equals(this.kty, other.kty)) {
       return false;
     }

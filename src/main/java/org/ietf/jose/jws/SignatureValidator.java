@@ -8,7 +8,7 @@ import java.security.PublicKey;
 import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.SecretKeyBuilder;
-import org.ietf.jose.jwk.AbstractJsonWebKey;
+import org.ietf.jose.jwk.key.AbstractJwk;
 import org.ietf.jose.util.CryptographyUtility;
 
 import static org.ietf.jose.util.KeyUtility.convertSecretToKey;
@@ -56,7 +56,7 @@ public class SignatureValidator {
    * @param key       a JSON Web Key instance
    * @return true if signature is valid
    */
-  public static boolean isValid(Signature signature, AbstractJsonWebKey key) {
+  public static boolean isValid(Signature signature, AbstractJwk key) {
     try {
       return CryptographyUtility.validateSignature(signature.getSignatureBytes(),
                                                    signature.getSigningInput(),

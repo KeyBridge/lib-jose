@@ -15,7 +15,7 @@
  */
 package org.ietf.jose.jwk.key;
 
-import org.ietf.jose.jwk.AbstractJsonWebKey;
+import org.ietf.jose.jwk.KeyType;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -29,7 +29,7 @@ import org.ietf.jose.jwk.AbstractJsonWebKey;
  * the application uses another means or convention to determine the algorithm
  * used.
  */
-public class SymmetricJwk extends AbstractJsonWebKey {
+public class SymmetricJwk extends AbstractJwk {
 
   /**
    * 6.4.1. "k" (Key Value) Parameter
@@ -41,6 +41,7 @@ public class SymmetricJwk extends AbstractJsonWebKey {
   private byte[] k;
 
   public SymmetricJwk() {
+    this.kty = KeyType.oct;
   }
 
   public byte[] getK() {

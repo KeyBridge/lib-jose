@@ -19,7 +19,7 @@ import ch.keybridge.lib.jose.AbstractHeader;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-import org.ietf.jose.jwk.AbstractJsonWebKey;
+import org.ietf.jose.jwk.key.AbstractJwk;
 
 /**
  * RFC 7515 JSON Web Signature (JWS)
@@ -65,7 +65,7 @@ public class JwsHeader extends AbstractHeader {
    * represented as a JSON Web Key [JWK]. Use of this Header Parameter is
    * OPTIONAL.
    */
-  protected AbstractJsonWebKey jwk;
+  protected AbstractJwk jwk;
   /**
    * 4.1.9. "typ" (Type) Header Parameter
    * <p>
@@ -167,11 +167,11 @@ public class JwsHeader extends AbstractHeader {
     this.jku = jku;
   }
 
-  public AbstractJsonWebKey getJwk() {
+  public AbstractJwk getJwk() {
     return this.jwk;
   }
 
-  public void setJwk(AbstractJsonWebKey jwk) {
+  public void setJwk(AbstractJwk jwk) {
     this.jwk = jwk;
   }
 

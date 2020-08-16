@@ -16,7 +16,7 @@
 package org.ietf.jose.jwk.key;
 
 import java.math.BigInteger;
-import org.ietf.jose.jwk.AbstractJsonWebKey;
+import org.ietf.jose.jwk.KeyType;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -42,7 +42,7 @@ import org.ietf.jose.jwk.AbstractJsonWebKey;
  *
  * @author Key Bridge
  */
-public class EllipticCurveJwk extends AbstractJsonWebKey {
+public class EllipticCurveJwk extends AbstractJwk {
 
   /**
    * 6.2.1.1. "crv" (Curve) Parameter
@@ -88,6 +88,7 @@ public class EllipticCurveJwk extends AbstractJsonWebKey {
   private BigInteger d;
 
   public EllipticCurveJwk() {
+    this.kty = KeyType.EC;
   }
 
   public String getCrv() {

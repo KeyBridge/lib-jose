@@ -27,6 +27,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import javax.json.bind.annotation.JsonbProperty;
+import org.ietf.jose.jwk.KeyType;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -52,7 +53,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    */
   @JsonbProperty("d")
   private BigInteger privateExponent;
-
   /**
    * 6.3.2.2. "p" (First Prime Factor) Parameter
    * <p>
@@ -60,7 +60,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    * is represented as a Base64urlUInt-encoded value.
    */
   private BigInteger p;
-
   /**
    * 6.3.2.3. "q" (Second Prime Factor) Parameter
    * <p>
@@ -68,7 +67,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    * It is represented as a Base64urlUInt-encoded value.
    */
   private BigInteger q;
-
   /**
    * 6.3.2.4. "dp" (First Factor CRT Exponent) Parameter
    * <p>
@@ -77,7 +75,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    * a Base64urlUInt-encoded value.
    */
   private BigInteger dp;
-
   /**
    * 6.3.2.5. "dq" (Second Factor CRT Exponent) Parameter
    * <p>
@@ -85,7 +82,6 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    * of the second factor. It is represented as a Base64urlUInt- encoded value.
    */
   private BigInteger dq;
-
   /**
    * 6.3.2.6. "qi" (First CRT Coefficient) Parameter
    * <p>
@@ -95,6 +91,7 @@ public class RsaPrivateJwk extends RsaPublicJwk {
   private BigInteger qi;
 
   public RsaPrivateJwk() {
+    this.kty = KeyType.RSA;
   }
 
   /**
