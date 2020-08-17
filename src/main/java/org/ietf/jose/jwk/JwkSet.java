@@ -18,6 +18,8 @@ package org.ietf.jose.jwk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.json.bind.annotation.JsonbTypeDeserializer;
+import org.ietf.jose.adapter.JsonbJwkListDeserializer;
 import org.ietf.jose.jwk.key.AbstractJwk;
 
 /**
@@ -53,6 +55,7 @@ public class JwkSet {
    * preference among them, although applications of JWK Sets can choose to
    * assign a meaning to the order for their purposes, if desired.
    */
+  @JsonbTypeDeserializer(JsonbJwkListDeserializer.class)
   private List<AbstractJwk> keys;
 
   public JwkSet() {
