@@ -17,7 +17,8 @@ package org.ietf.jose.jwk.key;
 
 import ch.keybridge.lib.jose.AbstractHeader;
 import java.util.List;
-import java.util.Objects;
+import javax.json.bind.annotation.JsonbTypeDeserializer;
+import org.ietf.jose.adapter.JsonbJwkDeserializer;
 import org.ietf.jose.jwk.KeyOperationType;
 import org.ietf.jose.jwk.KeyType;
 import org.ietf.jose.jwk.PublicKeyUseType;
@@ -57,6 +58,7 @@ import org.ietf.jose.jwk.PublicKeyUseType;
  * Developer note: all sub-classes, which need to be the output of unmarshalling
  * a JWK JSON string, must be listed in JsonSubTypes.
  */
+@JsonbTypeDeserializer(JsonbJwkDeserializer.class)
 public abstract class AbstractJwk extends AbstractHeader {
 
   /**
@@ -179,39 +181,6 @@ public abstract class AbstractJwk extends AbstractHeader {
 
   public void setKey_ops(List<KeyOperationType> key_ops) {
     this.key_ops = key_ops;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = super.hashCode();
-    hash = 79 * hash + Objects.hashCode(this.kty);
-    hash = 79 * hash + Objects.hashCode(this.use);
-    hash = 79 * hash + Objects.hashCode(this.key_ops);
-    return hash;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    final AbstractJwk other = (AbstractJwk) obj;
-    if (!Objects.equals(this.kty, other.kty)) {
-      return false;
-    }
-    if (this.use != other.use) {
-      return false;
-    }
-    if (!Objects.equals(this.key_ops, other.key_ops)) {
-      return false;
-    }
-    return super.equals(obj);
   }
 
   @Override
