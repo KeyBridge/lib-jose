@@ -24,6 +24,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbTransient;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.ietf.jose.adapter.JsonbZonedDateTimeEpochAdapter;
@@ -159,7 +160,7 @@ public class JwtClaims extends JsonSerializable {
    * @see <a href="https://www.iana.org/assignments/jwt/jwt.xhtml">JSON Web
    * Token Claims</a>
    */
-  @XmlTransient
+  @JsonbTransient
   private Map<String, Object> claims;
 
   /**
@@ -168,7 +169,7 @@ public class JwtClaims extends JsonSerializable {
    */
   public JwtClaims() {
     this.jwtId = UUID.randomUUID().toString();
-    this.issuedAt = ZonedDateTime.now();
+    this.issuedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     this.claims = new HashMap<>();
   }
 
@@ -407,11 +408,22 @@ public class JwtClaims extends JsonSerializable {
    * @return this JwtClaims instance
    */
   public JwtClaims withClaim(String claimName, Object claimValue) {
+    return addClaim(claimName, claimValue);
+  }
+
+  /**
+   * Fluent method to add a claim with an arbitrary name that does not clash
+   * with one of the standard claim names.
+   *
+   * @param claimName  claim name
+   * @param claimValue claim value
+   * @return this JwtClaims instance
+   */
+  public JwtClaims addClaim(String claimName, Object claimValue) {
     if (RESERVED_CLAIM_NAMES.contains(claimName)) {
       throw new IllegalArgumentException("Cannot use reserved claim name " + claimName);
     }
-//    if (claims == null) {      claims = new HashMap<>();    }
-    claims.put(claimName, claimValue);
+    getClaims().put(claimName, claimValue);
     return this;
   }//</editor-fold>
 
