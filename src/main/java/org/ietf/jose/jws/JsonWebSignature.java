@@ -19,9 +19,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbTypeAdapter;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
+import org.ietf.jose.adapter.JsonbJwsHeaderAdapter;
 import org.ietf.jose.util.Base64Utility;
 import org.ietf.jose.util.JsonbUtility;
 
@@ -95,6 +97,7 @@ public class JsonWebSignature extends JsonSerializable {
    * are integrity protected.
    */
   @JsonbProperty("protected")
+  @JsonbTypeAdapter(JsonbJwsHeaderAdapter.class)
   private JwsHeader protectedHeader;
   /**
    * The "header" member MUST be present and contain the value JWS Unprotected
