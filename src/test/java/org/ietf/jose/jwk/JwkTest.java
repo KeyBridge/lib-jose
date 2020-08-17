@@ -1,9 +1,9 @@
 package org.ietf.jose.jwk;
 
-import org.ietf.jose.jwk.key.AbstractJwk;
 import java.io.IOException;
 import java.math.BigInteger;
 import org.ietf.TestFileReader;
+import org.ietf.jose.jwk.key.AbstractJwk;
 import org.ietf.jose.jwk.key.EllipticCurveJwk;
 import org.ietf.jose.jwk.key.RsaPrivateJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
@@ -102,10 +102,8 @@ public class JwkTest {
     assertTrue(deserialized.getKeys().get(0) instanceof EllipticCurveJwk);
     EllipticCurveJwk ecKey = (EllipticCurveJwk) deserialized.getKeys().get(0);
     assertEquals("P-256", ecKey.getCrv());
-    assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4")), ecKey
-                 .getX());
-    assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM")), ecKey
-                 .getY());
+    assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4")), ecKey.getX());
+    assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM")), ecKey.getY());
     assertEquals(PublicKeyUseType.enc, ecKey.getUse());
     assertEquals("1", ecKey.getKid());
 
@@ -128,12 +126,9 @@ public class JwkTest {
     assertTrue(deserialized.getKeys().get(0) instanceof EllipticCurveJwk);
     EllipticCurveJwk ecKey = (EllipticCurveJwk) deserialized.getKeys().get(0);
     assertEquals("P-256", ecKey.getCrv());
-    assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4")), ecKey
-                 .getX());
-    assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM")), ecKey
-                 .getY());
-    assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE")), ecKey
-                 .getD());
+    assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4")), ecKey.getX());
+    assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM")), ecKey.getY());
+    assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE")), ecKey.getD());
     assertEquals(PublicKeyUseType.enc, ecKey.getUse());
     assertEquals("1", ecKey.getKid());
 
