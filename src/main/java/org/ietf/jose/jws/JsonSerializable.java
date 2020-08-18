@@ -1,6 +1,5 @@
 package org.ietf.jose.jws;
 
-import java.io.IOException;
 import org.ietf.jose.util.JsonbUtility;
 
 /**
@@ -15,7 +14,7 @@ public abstract class JsonSerializable {
    * @return this class instance as a JSON encoded string.
    * @throws java.io.IOException on serialization error
    */
-  public String toJson() throws IOException {
+  public String toJson() {
     return new JsonbUtility().marshal(this);
   }
 
@@ -27,7 +26,7 @@ public abstract class JsonSerializable {
    */
   @Override
   public String toString() {
-    return new JsonbUtility().withFormatting(true).marshal(this);
+    return toJson();
   }
 
   /**
