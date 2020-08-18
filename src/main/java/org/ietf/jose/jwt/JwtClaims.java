@@ -25,8 +25,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 import org.ietf.jose.adapter.JsonbZonedDateTimeEpochAdapter;
 import org.ietf.jose.jws.JsonSerializable;
 import org.ietf.jose.util.JsonbReader;
@@ -144,7 +142,7 @@ public class JwtClaims extends JsonSerializable {
   private String jwtId;
 
   /**
-   * TODO: White an XML adapter to handle claims.
+   * TODO: Write an adapter to serialize/deserialize claims.
    * <p>
    * A collection of Public and/or Private claims. See RFC 7519 JSON Web Token
    * (JWT) sections 4.2 and 4.3.
@@ -388,15 +386,15 @@ public class JwtClaims extends JsonSerializable {
     this.claims = claims;
     return this;
   }
+
   /**
    * Internal set of reserved claim names. This prevents the user from adding a
    * claim for which they should use a setter method.
    */
-  @XmlTransient
   private static final Set<String> RESERVED_CLAIM_NAMES = Arrays.stream(JwtClaims.class.getDeclaredFields())
-    .filter(field -> field.isAnnotationPresent(XmlElement.class))
-    .flatMap(field -> Arrays.stream(field.getAnnotationsByType(XmlElement.class)))
-    .map(XmlElement::name)
+    .filter(field -> field.isAnnotationPresent(JsonbProperty.class))
+    .flatMap(field -> Arrays.stream(field.getAnnotationsByType(JsonbProperty.class)))
+    .map(JsonbProperty::value)
     .collect(Collectors.toSet());
 
   /**
@@ -446,7 +444,7 @@ public class JwtClaims extends JsonSerializable {
     claims.expirationTime = unmarshalZonedDateTime(valueMap.remove("exp"));
     claims.notBefore = unmarshalZonedDateTime(valueMap.remove("nbf"));
     claims.issuedAt = unmarshalZonedDateTime(valueMap.remove("iat"));
-    claims.claims = valueMap.isEmpty() ? null : valueMap;
+    claims.claims = valueMap.isEmpty() ? Collections.EMPTY_MAP : valueMap;
     return claims;
   }
 
@@ -467,7 +465,7 @@ public class JwtClaims extends JsonSerializable {
    * {@inheritDoc}
    */
   @Override
-  public String toJson() throws IOException {
+  public String toJson() {
     Map<String, Object> jsonObject = new LinkedHashMap<>();
 
     if (issuer != null) {
