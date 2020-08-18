@@ -20,7 +20,6 @@ package org.ietf.jose.jwk.key;
 
 import java.math.BigInteger;
 import org.ietf.TestFileReader;
-import org.ietf.jose.adapter.JsonbJwkAdapter;
 import org.ietf.jose.jwk.PublicKeyUseType;
 import org.ietf.jose.util.Base64Utility;
 import org.ietf.jose.util.JsonbUtility;
@@ -36,7 +35,6 @@ import static org.junit.Assert.assertNull;
 public class EllipticCurveJwkTest {
 
   private static JsonbUtility jsonb;
-  private static JsonbJwkAdapter adapter;
 
   public EllipticCurveJwkTest() {
   }
@@ -44,7 +42,6 @@ public class EllipticCurveJwkTest {
   @BeforeClass
   public static void setUpClass() {
     jsonb = new JsonbUtility();
-    adapter = new JsonbJwkAdapter();
   }
 
   @AfterClass
