@@ -104,8 +104,8 @@ public class JsonbReader {
   /**
    * Parse a JSON file into a container class. This method calls the JsonB
    * un-marshaller and returns a class containing all of the content defined in
-   * the XML file. Reads in a JSON data from the specified string and return the
-   * resulting content tree.
+   * the JSON file. Reads in a JSON data from the specified string and return
+   * the resulting content tree.
    *
    * @param <T>   the class type that is returned
    * @param json  the JSON source content
