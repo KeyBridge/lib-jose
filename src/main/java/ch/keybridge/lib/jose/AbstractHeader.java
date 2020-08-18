@@ -89,6 +89,8 @@ import org.ietf.jose.jws.X5CHeaderParameter;
  * <p>
  * In addition to the common parameters, each JWK will have members that are key
  * type specific. These members represent the parameters of the key.
+ * <p>
+ * SeeAlso: JwsHeader, JweHeader, JsonWebKey
  */
 // SeeAlso: JwsHeader, JweHeader, JsonWebKey
 public abstract class AbstractHeader {
