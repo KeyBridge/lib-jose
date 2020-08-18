@@ -19,8 +19,10 @@ import javax.json.bind.adapter.JsonbAdapter;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 
 /**
- * Converts EContentEncyptionAlgorithm enum values into Base64URL-encoded
- * strings and vice versa
+ * Json-B adapter for enumerated type.
+ *
+ * @author Key Bridge
+ * @since v0.10.0 created 2020-08-18
  */
 public class JsonbJweEncryptionAlgorithmTypeAdapter implements JsonbAdapter<JweEncryptionAlgorithmType, String> {
 
@@ -37,7 +39,6 @@ public class JsonbJweEncryptionAlgorithmTypeAdapter implements JsonbAdapter<JweE
    */
   @Override
   public JweEncryptionAlgorithmType adaptFromJson(String obj) throws Exception {
-    return JweEncryptionAlgorithmType.resolve(obj);
+    return obj == null || obj.isEmpty() ? null : JweEncryptionAlgorithmType.resolve(obj);
   }
 }
-//

@@ -21,7 +21,7 @@ import org.ietf.jose.util.Base64Utility;
 /**
  * Converts byte arrays into Base64URL-encoded strings and vice versa
  */
-public class JsonbByteArrayBase64UrlAdapter implements JsonbAdapter< byte[], String> {
+public class JsonbByteArrayBase64UrlAdapter implements JsonbAdapter<byte[], String> {
 
   /**
    * {@inheritDoc}
