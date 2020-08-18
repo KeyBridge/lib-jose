@@ -19,10 +19,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbTransient;
 import javax.json.bind.annotation.JsonbTypeAdapter;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 import org.ietf.jose.adapter.JsonbJwsHeaderAdapter;
 import org.ietf.jose.util.Base64Utility;
 import org.ietf.jose.util.JsonbUtility;
@@ -89,7 +87,7 @@ public class JsonWebSignature extends JsonSerializable {
    * The "payload" member MUST be present and contain the value BASE64URL(JWS
    * Payload).
    */
-  protected byte[] payload;
+  private byte[] payload;
   /**
    * The "protected" member MUST be present and contain the value
    * BASE64URL(UTF8(JWS Protected Header)) when the JWS Protected Header value
@@ -122,7 +120,7 @@ public class JsonWebSignature extends JsonSerializable {
    *        BASE64URL(JWS Payload))
    * </pre>
    */
-  @XmlTransient
+  @JsonbTransient
   private byte[] jwsSigningInput;
 
   /**
@@ -134,9 +132,9 @@ public class JsonWebSignature extends JsonSerializable {
   private List<Signature> signatures;
 
   /**
-   * Default constructor. Used by JSON (de)serialisers.
+   * Default no-arg constructor. Used by JSON (de)serialisers.
    */
-  private JsonWebSignature() {
+  public JsonWebSignature() {
   }
 
   public JsonWebSignature(byte[] payload, List<Signature> signatures) {
@@ -163,7 +161,6 @@ public class JsonWebSignature extends JsonSerializable {
    */
   public static JsonWebSignature fromJson(String json) throws IOException {
     JsonWebSignature jws = new JsonbUtility().unmarshal(json, JsonWebSignature.class);
-
     /**
      * Read the JSON again but with retained protected header order. This is
      * necessary later when verifying the digital signature on HMAC.
@@ -297,16 +294,55 @@ public class JsonWebSignature extends JsonSerializable {
    * A loosely-typed JWS representation that retains order of elements as in the
    * original JSON string.
    */
-  @XmlTransient
-  @XmlAccessorType(XmlAccessType.FIELD)
-  private static final class JwsFrame {
+  public static final class JwsFrame {
 
-    String payload;
+    private String payload;
     @JsonbProperty("protected")
-    String protectedHeaderJsonBase64Url;
-    Map<String, String> header;
-    String signature;
-    List<JwsFrame> signatures;
+    private String protectedHeaderJsonBase64Url;
+    private Map<String, String> header;
+    private String signature;
+    private List<JwsFrame> signatures;
+
+    //<editor-fold defaultstate="collapsed" desc="Getter and Setter">
+    public String getPayload() {
+      return payload;
+    }
+
+    public void setPayload(String payload) {
+      this.payload = payload;
+    }
+
+    public String getProtectedHeaderJsonBase64Url() {
+      return protectedHeaderJsonBase64Url;
+    }
+
+    public void setProtectedHeaderJsonBase64Url(String protectedHeaderJsonBase64Url) {
+      this.protectedHeaderJsonBase64Url = protectedHeaderJsonBase64Url;
+    }
+
+    public Map<String, String> getHeader() {
+      return header;
+    }
+
+    public void setHeader(Map<String, String> header) {
+      this.header = header;
+    }
+
+    public String getSignature() {
+      return signature;
+    }
+
+    public void setSignature(String signature) {
+      this.signature = signature;
+    }
+
+    public List<JwsFrame> getSignatures() {
+      return signatures;
+    }
+
+    public void setSignatures(List<JwsFrame> signatures) {
+      this.signatures = signatures;
+    }//</editor-fold>
 
   }
 
