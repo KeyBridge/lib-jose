@@ -37,10 +37,13 @@ import javax.json.bind.config.PropertyVisibilityStrategy;
 public class JsonbPropertyVisibilityStrategy implements PropertyVisibilityStrategy {
 
   /**
-   * {@inheritDoc}
+   * {@inheritDoc} Access all fields unless marked transient or 'static final'
    */
   @Override
   public boolean isVisible(Field field) {
+    /**
+     * Access all fields unless marked transient.
+     */
     for (Annotation annotation : field.getAnnotations()) {
       if (annotation instanceof JsonbTransient) {
         return false;
@@ -53,11 +56,13 @@ public class JsonbPropertyVisibilityStrategy implements PropertyVisibilityStrate
   }
 
   /**
-   * {@inheritDoc} Try to emulate XmlAccessType.FIELD. Ignore all methods unless
-   * specifically annotated.
+   * {@inheritDoc} Try to emulate `XmlAccessType.FIELD`.
    */
   @Override
   public boolean isVisible(Method method) {
+    /**
+     * Ignore all methods unless specifically annotated with `JsonbProperty`.
+     */
     for (Annotation annotation : method.getAnnotations()) {
       if (annotation instanceof JsonbProperty) {
         return true;
