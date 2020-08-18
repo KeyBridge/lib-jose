@@ -159,6 +159,7 @@ public class JwsHeader extends AbstractHeader {
   public JwsHeader() {
   }
 
+  //<editor-fold defaultstate="collapsed" desc="Getter and Setter">
   public URI getJku() {
     return this.jku;
   }
@@ -197,7 +198,7 @@ public class JwsHeader extends AbstractHeader {
 
   public void setCrit(List<String> crit) {
     this.crit = crit;
-  }
+  }//</editor-fold>
 
   @Override
   public int hashCode() {
