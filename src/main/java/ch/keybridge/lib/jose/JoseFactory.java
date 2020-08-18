@@ -273,8 +273,13 @@ public class JoseFactory {
 
     /**
      * Write object as a signed and encrypted JSON string.
+     * <p>
+     * Note that the object must be a proper object - it cannot be a primitive.
+     * To encode primitives (e.g. String, etc.) recompile this library with
+     * `StrictIJSON` disabled.
      *
-     * @param object           the object to be signed and encrypted
+     * @param object           the object to be signed and encrypted; Note that
+     *                         the object _cannot_ be a primitive String
      * @param senderPrivateKey the private key of the sender; it is used to
      *                         digitally sign the message
      * @param publicKey        the public key of the recipient; it is used to
