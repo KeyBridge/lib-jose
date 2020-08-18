@@ -12,17 +12,16 @@ public abstract class JsonSerializable {
    * Serialize this instance to a JSON string.
    *
    * @return this class instance as a JSON encoded string.
-   * @throws java.io.IOException on serialization error
    */
   public String toJson() {
     return new JsonbUtility().marshal(this);
   }
 
   /**
+   * {@inheritDoc}
+   * <p>
    * Safely serialize this instance to a JSON string. Returns an error message
    * on serialization error.
-   * <p>
-   * {@inheritDoc}
    */
   @Override
   public String toString() {
