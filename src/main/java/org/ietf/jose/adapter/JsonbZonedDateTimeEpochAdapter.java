@@ -24,20 +24,19 @@ import java.time.ZonedDateTime;
 import javax.json.bind.adapter.JsonbAdapter;
 
 /**
- * XML adapter to transform a (UTC) ZonedDateTime and epoch seconds.
+ * Json-b adapter to transform a (UTC) ZonedDateTime and epoch seconds.
  * <p>
  * From RFC 7519 § 2. Terminology:
- * <pre>
- *   NumericDate
- *       A JSON numeric value representing the number of seconds from
- *       1970-01-01T00:00:00Z UTC until the specified UTC date/time,
- *       ignoring leap seconds.  This is equivalent to the IEEE Std 1003.1,
- *       2013 Edition [POSIX.1] definition "Seconds Since the Epoch", in
- *       which each day is accounted for by exactly 86400 seconds, other
- *       than that non-integer values can be represented.  See RFC 3339
- *       [RFC3339] for details regarding date/times in general and UTC in
- *       particular.
- * </pre>
+ * <p>
+ * NumericDate
+ * <p>
+ * A JSON numeric value representing the number of seconds from
+ * 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap
+ * seconds. This is equivalent to the IEEE Std 1003.1, 2013 Edition [POSIX.1]
+ * definition "Seconds Since the Epoch", in which each day is accounted for by
+ * exactly 86400 seconds, other than that non-integer values can be represented.
+ * See RFC 3339 [RFC3339] for details regarding date/times in general and UTC in
+ * particular.
  *
  * @author Key Bridge
  * @since v0.8.0 added 06/02/18 replacing XmlAdapterInstantLong
