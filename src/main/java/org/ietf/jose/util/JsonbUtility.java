@@ -59,7 +59,7 @@ public class JsonbUtility {
      */
     JsonbConfig jsonbConfig = new JsonbConfig()
       .withStrictIJSON(true)
-      .withBinaryDataStrategy(BinaryDataStrategy.BASE_64_URL)
+      .withBinaryDataStrategy(BinaryDataStrategy.BASE_64)
       .withPropertyVisibilityStrategy(new JsonbPropertyVisibilityStrategy())
       .withAdapters(new JsonbBigIntegerBase64UrlAdapter())
       .withAdapters(new JsonbByteArrayBase64UrlAdapter())
