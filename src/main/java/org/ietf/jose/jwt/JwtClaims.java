@@ -446,7 +446,7 @@ public class JwtClaims extends JsonSerializable {
     claims.expirationTime = unmarshalZonedDateTime(valueMap.remove("exp"));
     claims.notBefore = unmarshalZonedDateTime(valueMap.remove("nbf"));
     claims.issuedAt = unmarshalZonedDateTime(valueMap.remove("iat"));
-    claims.claims = valueMap.isEmpty() ? Collections.EMPTY_MAP : valueMap;
+    claims.claims = valueMap.isEmpty() ? null : valueMap;
     return claims;
   }
 
@@ -521,7 +521,7 @@ public class JwtClaims extends JsonSerializable {
    * @param other another ZonedDateTime instance
    * @return true if the times are logically equal
    */
-  private static boolean equalZonedDateTime(ZonedDateTime one, ZonedDateTime other) {
+  private boolean isEqual(ZonedDateTime one, ZonedDateTime other) {
     /**
      * Same object or both null
      */
@@ -534,7 +534,7 @@ public class JwtClaims extends JsonSerializable {
     /**
      * return the logical time equality.
      */
-    return one.isEqual(other);
+    return one.truncatedTo(ChronoUnit.SECONDS).isEqual(other.truncatedTo(ChronoUnit.SECONDS));
   }
 
   @Override
@@ -561,13 +561,13 @@ public class JwtClaims extends JsonSerializable {
     if (!Objects.equals(this.jwtId, other.jwtId)) {
       return false;
     }
-    if (!equalZonedDateTime(this.expirationTime, other.expirationTime)) {
+    if (!isEqual(this.expirationTime, other.expirationTime)) {
       return false;
     }
-    if (!equalZonedDateTime(this.notBefore, other.notBefore)) {
+    if (!isEqual(this.notBefore, other.notBefore)) {
       return false;
     }
-    if (!equalZonedDateTime(this.issuedAt, other.issuedAt)) {
+    if (!isEqual(this.issuedAt, other.issuedAt)) {
       return false;
     }
     return Objects.equals(this.claims, other.claims);
