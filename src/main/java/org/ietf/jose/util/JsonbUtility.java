@@ -56,6 +56,9 @@ public class JsonbUtility {
     /**
      * Configure and create the reader and writer instance using the same base
      * configuration.
+     * <p>
+     * Note: The I-JSON message format (rfc7493) precludes encryption of simple
+     * primitives.
      */
     JsonbConfig jsonbConfig = new JsonbConfig()
       .withStrictIJSON(true)
@@ -125,6 +128,10 @@ public class JsonbUtility {
 
   /**
    * Marshal an entity class into a JSON String representation.
+   * <p>
+   * Note that the object must be a proper, complex object - it cannot be a
+   * primitive. To encode primitives (e.g. String, etc.) recompile this library
+   * with `StrictIJSON` disabled.
    *
    * @param <T>   the entity class type
    * @param clazz the entity class to be written
@@ -140,8 +147,8 @@ public class JsonbUtility {
   /**
    * Parse a JSON file into a container class. This method calls the JsonB
    * un-marshaller and returns a class containing all of the content defined in
-   * the XML file. Reads in a JSON data from the specified string and return the
-   * resulting content tree.
+   * the JSON file. Reads in a JSON data from the specified string and return
+   * the resulting content tree.
    *
    * @param <T>   the class type that is returned
    * @param json  the JSON source content
