@@ -42,7 +42,7 @@ public class JwtClaimsTest {
     /**
      * BUG: The JsonMarshaller FAILS to read or write JWT private claims.
      * <p>
-     * TODO: Add an XML adapter for the claims field.
+     * TODO: Add a JSON adapter for the claims field.
      */
 //    assertEquals(claim, new JsonbUtility().unmarshal(json, JwtClaims.class));
 //    java.lang.AssertionError:
