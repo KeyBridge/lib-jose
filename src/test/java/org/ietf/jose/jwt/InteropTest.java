@@ -13,7 +13,7 @@ import java.util.UUID;
 import javax.crypto.SecretKey;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.ietf.TestFileReader;
-import org.ietf.jose.adapter.JsonbZonedDateTimeEpochAdapter;
+import org.ietf.jose.adapter.JsonZonedDateTimeEpochAdapter;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JsonWebEncryption;
@@ -124,7 +124,7 @@ public class InteropTest {
     assertEquals(claims.getSubject(), claimsDecoded.getSubject());
     assertEquals(claims.getAudience().get(0), claimsDecoded.getAudience());
 
-    JsonbZonedDateTimeEpochAdapter epochAdapter = new JsonbZonedDateTimeEpochAdapter();
+    JsonZonedDateTimeEpochAdapter epochAdapter = new JsonZonedDateTimeEpochAdapter();
 
     assertEquals(epochAdapter.adaptFromJson(claims.getExpirationTime().getValue()), claimsDecoded.getExpirationTime());
     assertEquals(epochAdapter.adaptFromJson(claims.getNotBefore().getValue()), claimsDecoded.getNotBefore());

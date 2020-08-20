@@ -18,7 +18,7 @@ package org.ietf.jose.jwk.key;
 import ch.keybridge.lib.jose.AbstractHeader;
 import java.util.List;
 import javax.json.bind.annotation.JsonbTypeDeserializer;
-import org.ietf.jose.adapter.JsonbJwkDeserializer;
+import org.ietf.jose.adapter.JsonJwkDeserializer;
 import org.ietf.jose.jwk.KeyOperationType;
 import org.ietf.jose.jwk.KeyType;
 import org.ietf.jose.jwk.PublicKeyUseType;
@@ -58,7 +58,7 @@ import org.ietf.jose.jwk.PublicKeyUseType;
  * Developer note: all sub-classes, which need to be the output of unmarshalling
  * a JWK JSON string, must be listed in JsonSubTypes.
  */
-@JsonbTypeDeserializer(JsonbJwkDeserializer.class)
+@JsonbTypeDeserializer(JsonJwkDeserializer.class)
 public abstract class AbstractJwk extends AbstractHeader {
 
   /**

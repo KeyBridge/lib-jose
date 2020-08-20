@@ -17,7 +17,7 @@ package org.ietf.jose.jwa;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTypeAdapter;
-import org.ietf.jose.adapter.JsonbJweEncryptionAlgorithmTypeAdapter;
+import org.ietf.jose.adapter.JsonJweEncryptionAlgorithmTypeAdapter;
 import org.ietf.jose.jwe.encryption.AesGcmEncrypter;
 import org.ietf.jose.jwe.encryption.DefaultEncrypter;
 import org.ietf.jose.jwe.encryption.Encrypter;
@@ -72,7 +72,7 @@ import static org.ietf.jose.jwe.encryption.DefaultEncrypter.AesConfigurationType
  *    +-------------------------------------------------------------------+
  * </pre>
  */
-@JsonbTypeAdapter(JsonbJweEncryptionAlgorithmTypeAdapter.class)
+@JsonbTypeAdapter(JsonJweEncryptionAlgorithmTypeAdapter.class)
 public enum JweEncryptionAlgorithmType {
 
   /**

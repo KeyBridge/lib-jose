@@ -42,14 +42,14 @@ import static org.ietf.jose.jwk.KeyType.oct;
  * @author Key Bridge
  * @since v0.10.0 created 2020-08-17
  */
-public class JsonbJwkListDeserializer implements JsonbDeserializer<List<AbstractJwk>> {
+public class JsonJwkListDeserializer implements JsonbDeserializer<List<AbstractJwk>> {
 
   /**
    * Initialize a new reader.
    */
   private static final JsonbReader READER = new JsonbReader()
-    .withAdapters(new JsonbBigIntegerBase64UrlAdapter())
-    .withAdapters(new JsonbByteArrayBase64UrlAdapter());
+    .withAdapters(new JsonBigIntegerBase64UrlAdapter())
+    .withAdapters(new JsonByteArrayBase64UrlAdapter());
 
   /**
    * {@inheritDoc}

@@ -16,31 +16,29 @@
 package org.ietf.jose.adapter;
 
 import javax.json.bind.adapter.JsonbAdapter;
-import org.ietf.jose.jwe.JweHeader;
-import org.ietf.jose.util.Base64Utility;
-import org.ietf.jose.util.JsonbReader;
-import org.ietf.jose.util.JsonbWriter;
+import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 
 /**
- * Converts byte arrays into Base64URL-encoded strings and vice versa
+ * Json-B adapter for enumerated type.
+ *
+ * @author Key Bridge
+ * @since v0.10.0 created 2020-08-18
  */
-public class JsonbJweHeaderAdapter implements JsonbAdapter<JweHeader, String> {
+public class JsonJweEncryptionAlgorithmTypeAdapter implements JsonbAdapter<JweEncryptionAlgorithmType, String> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public String adaptToJson(JweHeader obj) throws Exception {
-    String protectedHeaderJson = new JsonbWriter().marshal(obj);
-    return Base64Utility.toBase64Url(protectedHeaderJson);
+  public String adaptToJson(JweEncryptionAlgorithmType obj) throws Exception {
+    return obj == null ? null : obj.getJoseAlgorithmName();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public JweHeader adaptFromJson(String obj) throws Exception {
-    String json = Base64Utility.fromBase64UrlToString(obj);
-    return new JsonbReader().unmarshal(json, JweHeader.class);
+  public JweEncryptionAlgorithmType adaptFromJson(String obj) throws Exception {
+    return obj == null || obj.isEmpty() ? null : JweEncryptionAlgorithmType.resolve(obj);
   }
 }

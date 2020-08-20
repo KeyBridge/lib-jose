@@ -24,9 +24,9 @@ import javax.json.bind.adapter.JsonbAdapter;
 import javax.json.bind.config.BinaryDataStrategy;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.bind.serializer.JsonbSerializer;
-import org.ietf.jose.adapter.JsonbBigIntegerBase64UrlAdapter;
-import org.ietf.jose.adapter.JsonbByteArrayBase64UrlAdapter;
-import org.ietf.jose.adapter.JsonbZonedDateTimeEpochAdapter;
+import org.ietf.jose.adapter.JsonBigIntegerBase64UrlAdapter;
+import org.ietf.jose.adapter.JsonByteArrayBase64UrlAdapter;
+import org.ietf.jose.adapter.JsonZonedDateTimeEpochAdapter;
 
 /**
  * Common JsonB marshaling and un-marshaling utilities. These methods help to
@@ -64,9 +64,9 @@ public class JsonbUtility {
       .withStrictIJSON(true)
       .withBinaryDataStrategy(BinaryDataStrategy.BASE_64)
       .withPropertyVisibilityStrategy(new JsonbPropertyVisibilityStrategy())
-      .withAdapters(new JsonbBigIntegerBase64UrlAdapter())
-      .withAdapters(new JsonbByteArrayBase64UrlAdapter())
-      .withAdapters(new JsonbZonedDateTimeEpochAdapter());
+      .withAdapters(new JsonBigIntegerBase64UrlAdapter())
+      .withAdapters(new JsonByteArrayBase64UrlAdapter())
+      .withAdapters(new JsonZonedDateTimeEpochAdapter());
     reader = new JsonbReader(jsonbConfig);
     writer = new JsonbWriter(jsonbConfig);
   }

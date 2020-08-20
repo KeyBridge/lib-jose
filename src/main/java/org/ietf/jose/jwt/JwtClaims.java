@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
-import org.ietf.jose.adapter.JsonbZonedDateTimeEpochAdapter;
+import org.ietf.jose.adapter.JsonZonedDateTimeEpochAdapter;
 import org.ietf.jose.jws.JsonSerializable;
 import org.ietf.jose.util.JsonbReader;
 import org.ietf.jose.util.JsonbWriter;
@@ -492,7 +492,7 @@ public class JwtClaims extends JsonSerializable {
     if (claims != null && !claims.isEmpty()) {
       jsonObject.putAll(claims);
     }
-    return new JsonbWriter().withAdapters(new JsonbZonedDateTimeEpochAdapter()).marshal(jsonObject);
+    return new JsonbWriter().withAdapters(new JsonZonedDateTimeEpochAdapter()).marshal(jsonObject);
   }
 
   @Override

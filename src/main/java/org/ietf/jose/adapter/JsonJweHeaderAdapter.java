@@ -16,7 +16,7 @@
 package org.ietf.jose.adapter;
 
 import javax.json.bind.adapter.JsonbAdapter;
-import org.ietf.jose.jws.JwsHeader;
+import org.ietf.jose.jwe.JweHeader;
 import org.ietf.jose.util.Base64Utility;
 import org.ietf.jose.util.JsonbReader;
 import org.ietf.jose.util.JsonbWriter;
@@ -24,13 +24,13 @@ import org.ietf.jose.util.JsonbWriter;
 /**
  * Converts byte arrays into Base64URL-encoded strings and vice versa
  */
-public class JsonbJwsHeaderAdapter implements JsonbAdapter<JwsHeader, String> {
+public class JsonJweHeaderAdapter implements JsonbAdapter<JweHeader, String> {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public String adaptToJson(JwsHeader obj) throws Exception {
+  public String adaptToJson(JweHeader obj) throws Exception {
     String protectedHeaderJson = new JsonbWriter().marshal(obj);
     return Base64Utility.toBase64Url(protectedHeaderJson);
   }
@@ -39,8 +39,8 @@ public class JsonbJwsHeaderAdapter implements JsonbAdapter<JwsHeader, String> {
    * {@inheritDoc}
    */
   @Override
-  public JwsHeader adaptFromJson(String obj) throws Exception {
+  public JweHeader adaptFromJson(String obj) throws Exception {
     String json = Base64Utility.fromBase64UrlToString(obj);
-    return new JsonbReader().unmarshal(json, JwsHeader.class);
+    return new JsonbReader().unmarshal(json, JweHeader.class);
   }
 }

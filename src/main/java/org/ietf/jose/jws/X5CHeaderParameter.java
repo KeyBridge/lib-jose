@@ -16,7 +16,7 @@
 package org.ietf.jose.jws;
 
 import javax.json.bind.annotation.JsonbTypeAdapter;
-import org.ietf.jose.adapter.JsonbX509CertificateAdapter;
+import org.ietf.jose.adapter.JsonX509CertificateAdapter;
 
 /**
  * RFC 7515 JSON Web Signature (JWS)
@@ -38,7 +38,7 @@ import org.ietf.jose.adapter.JsonbX509CertificateAdapter;
  *
  * @author Key Bridge
  */
-@JsonbTypeAdapter(JsonbX509CertificateAdapter.class)
+@JsonbTypeAdapter(JsonX509CertificateAdapter.class)
 public class X5CHeaderParameter {
 
   /**

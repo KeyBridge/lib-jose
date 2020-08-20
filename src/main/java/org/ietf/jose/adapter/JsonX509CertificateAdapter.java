@@ -58,7 +58,7 @@ import org.ietf.jose.jws.X5CHeaderParameter;
  * @author Key Bridge
  * @since v0.10.0 created 2020-08-17
  */
-public class JsonbX509CertificateAdapter implements JsonbAdapter<X5CHeaderParameter, String> {
+public class JsonX509CertificateAdapter implements JsonbAdapter<X5CHeaderParameter, String> {
 
   /**
    * {@inheritDoc}

@@ -24,7 +24,7 @@ import org.ietf.jose.util.Base64Utility;
  * Provides Base64 encoding and decoding as defined by
  * <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>.
  */
-public class JsonbBigIntegerBase64UrlAdapter implements JsonbAdapter<BigInteger, String> {
+public class JsonBigIntegerBase64UrlAdapter implements JsonbAdapter<BigInteger, String> {
 
   /**
    * Returns a byte array representation of the specified big integer without

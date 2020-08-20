@@ -39,14 +39,14 @@ import org.ietf.jose.util.JsonbReader;
  * @author Key Bridge
  * @since v0.10.0 created 2020-08-17
  */
-public class JsonbJwkDeserializer implements JsonbDeserializer<AbstractJwk> {
+public class JsonJwkDeserializer implements JsonbDeserializer<AbstractJwk> {
 
   /**
    * Initialize a new reader.
    */
   private static final JsonbReader READER = new JsonbReader()
-    .withAdapters(new JsonbBigIntegerBase64UrlAdapter())
-    .withAdapters(new JsonbByteArrayBase64UrlAdapter());
+    .withAdapters(new JsonBigIntegerBase64UrlAdapter())
+    .withAdapters(new JsonByteArrayBase64UrlAdapter());
 
   /**
    * {@inheritDoc}

@@ -41,7 +41,7 @@ import javax.json.bind.adapter.JsonbAdapter;
  * @author Key Bridge
  * @since v0.8.0 added 06/02/18 replacing XmlAdapterInstantLong
  */
-public class JsonbZonedDateTimeEpochAdapter implements JsonbAdapter<ZonedDateTime, Long> {
+public class JsonZonedDateTimeEpochAdapter implements JsonbAdapter<ZonedDateTime, Long> {
 
   /**
    * {@inheritDoc}

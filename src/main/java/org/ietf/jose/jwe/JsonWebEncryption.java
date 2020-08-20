@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTypeAdapter;
-import org.ietf.jose.adapter.JsonbJweHeaderAdapter;
+import org.ietf.jose.adapter.JsonJweHeaderAdapter;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwe.encryption.EncryptionResult;
@@ -55,7 +55,7 @@ public class JsonWebEncryption extends JsonSerializable {
    * Integrity-protected header contents
    */
   @JsonbProperty("protected")
-  @JsonbTypeAdapter(JsonbJweHeaderAdapter.class)
+  @JsonbTypeAdapter(JsonJweHeaderAdapter.class)
   private JweHeader protectedHeader;
   /**
    * Non-integrity-protected header contents
