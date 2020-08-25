@@ -18,13 +18,13 @@ package org.ietf.jose.jwe;
 import ch.keybridge.lib.jose.Profile;
 import ch.keybridge.lib.jose.Profile1;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import org.ietf.jose.jwt.JwtClaims;
 
 /**
  * RFC 7516
@@ -92,6 +92,17 @@ public class JweBuilder {
   }
 
   /**
+   * Add Jwt claims payload for signing or HMAC calculation
+   *
+   * @param claims JWT claims to sign and encrypt
+   * @return this builder
+   */
+  public JweBuilder withClaimsPayload(JwtClaims claims) {
+    this.payload = claims.toJson().getBytes(StandardCharsets.UTF_8);
+    return this;
+  }
+
+  /**
    * Add binary payload for signing or HMAC calculation
    *
    * @param payload data to sign
@@ -109,7 +120,7 @@ public class JweBuilder {
    * @return this builder
    */
   public JweBuilder withStringPayload(String payload) {
-    this.payload = payload.getBytes(UTF_8);
+    this.payload = payload.getBytes(StandardCharsets.UTF_8);
     return this;
   }
 
