@@ -272,7 +272,7 @@ public class JsonWebSignature extends JsonSerializable {
    * @return this JWS object encoded in compact serialization
    * @throws java.io.IOException on Error encountered while serializing
    */
-  public String getCompactForm() throws IOException {
+  public String toCompactForm() throws IOException {
     JwsHeader compactProtectedHeader;
     byte[] compactSignature;
     if (this.protectedHeader != null) {
