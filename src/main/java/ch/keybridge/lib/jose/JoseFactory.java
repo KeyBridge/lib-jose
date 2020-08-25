@@ -369,7 +369,7 @@ public class JoseFactory {
       GeneralSecurityException {
       final Key key = SecretKeyBuilder.fromSharedSecret(sharedSecret);
       return JwsBuilder.getInstance()
-        .withStringPayload(claims.toJson())
+        .withClaimsPayload(claims)
         .sign(key, PROFILE.getSignatureAlgSymmetric(), keyId)
         .buildCompact();
     }
@@ -391,7 +391,7 @@ public class JoseFactory {
     public static String createSignedToken(JwtClaims claims, PrivateKey privateKey, String keyId) throws IOException,
       GeneralSecurityException {
       return JwsBuilder.getInstance()
-        .withStringPayload(claims.toJson())
+        .withClaimsPayload(claims)
         .sign(privateKey, PROFILE.getSignatureAlgAsymmetric(), keyId)
         .buildCompact();
     }
@@ -413,7 +413,7 @@ public class JoseFactory {
       GeneralSecurityException {
       final SecretKey key = SecretKeyBuilder.fromSharedSecret(sharedSecret);
       return JweBuilder.getInstance()
-        .withStringPayload(claims.toJson())
+        .withClaimsPayload(claims)
         .buildJweJsonFlattened(key, keyId)
         .toCompactForm();
     }
@@ -434,7 +434,7 @@ public class JoseFactory {
     public static String createEncryptedToken(JwtClaims claims, PublicKey publicKey, String keyId) throws IOException,
       GeneralSecurityException {
       return JweBuilder.getInstance()
-        .withStringPayload(claims.toJson())
+        .withClaimsPayload(claims)
         .buildJweJsonFlattened(publicKey, keyId)
         .toCompactForm();
     }
