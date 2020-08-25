@@ -102,7 +102,7 @@ boolean isValid = SignatureValidator.isValid(decodedFromCompactForm.getSignature
 
 ## <a name="encrypted"></a> Encrypted JSON Web Tokens
 
-### <a name="encrypted-create"></a> How to create an encrypted JWK using a symmetric (secret) key
+### <a name="encrypted-create"></a> How to create an encrypted JWT using a symmetric (secret) key
 
 ```java
 /**
@@ -150,7 +150,7 @@ System.out.println(jwt);
 System.out.println();
 ```
 
-### <a name="encrypted-consume"></a> How to consume an encrypted JWK using a symmetric (secret) key
+### <a name="encrypted-consume"></a> How to consume an encrypted JWT using a symmetric (secret) key
 
 ```java
 /**
@@ -177,6 +177,6 @@ System.out.println("claims.getSubject() = " + claims.getSubject());
 assertEquals(jwe, jweDecoded);
 ```
 
-### <a name="encrypted"></a> How to verify an encrypted JWK 
+### <a name="encrypted"></a> How to verify an encrypted JWT 
 
 An encrypted JWT is implicitly validated during decryption. Unsuccessful decryption means that either an incorrect decryption key has been used or that the encrypted message has been tampered with and is invalid.
