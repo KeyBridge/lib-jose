@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.key.AbstractJwk;
+import org.ietf.jose.jwt.JwtClaims;
 import org.ietf.jose.util.Base64Utility;
 
 /**
@@ -42,6 +43,17 @@ public class JwsBuilder {
    */
   public static JwsBuilder getInstance() {
     return new JwsBuilder();
+  }
+
+  /**
+   * Add JWT claims payload for signing.
+   *
+   * @param claims claims data to sign
+   * @return this builder
+   */
+  public Signable withClaimsPayload(JwtClaims claims) {
+    byte[] payloadBytes = claims.toJson().getBytes(Base64Utility.DEFAULT_CHARSET);
+    return Signable.getInstance(payloadBytes);
   }
 
   /**
