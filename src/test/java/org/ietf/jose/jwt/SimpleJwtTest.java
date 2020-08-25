@@ -18,6 +18,7 @@
  */
 package org.ietf.jose.jwt;
 
+import com.thedeanda.lorem.LoremIpsum;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
@@ -38,6 +39,8 @@ import org.junit.Test;
  */
 public class SimpleJwtTest {
 
+  private LoremIpsum l = LoremIpsum.getInstance();
+
   private KeyPair keyPair;
   private String keyId = UUID.randomUUID().toString();
 
@@ -49,13 +52,13 @@ public class SimpleJwtTest {
   @Test
   public void testMethod() throws IOException, GeneralSecurityException, Exception {
 
-    String key = "8640a868-dedd-427c-8d6a-2116ee2976c3";
-    String secret = "ddb8ff562cb4e3557cffb767d63ab35122865662465f8e7d78d4f55c90c48a82";
+    String uid = UUID.randomUUID().toString();
+//    String secret = UUID.randomUUID().toString();
 
     JwtClaims joseClaims = new JwtClaims()
-      .withIssuer("8640a868-dedd-427c-8d6a-2116ee2976c3")
-      .withSubject("8640a868-dedd-427c-8d6a-2116ee2976c3")
-      .withAudience("https://keybridgewireless.com")
+      .withIssuer(uid)
+      .withSubject(uid)
+      .withAudience(l.getUrl())
       .withDuration(Duration.ofSeconds(3600));
 
     /**

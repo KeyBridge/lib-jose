@@ -22,7 +22,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
 import org.ietf.jose.adapter.JsonZonedDateTimeEpochAdapter;
@@ -61,6 +60,8 @@ import org.ietf.jose.util.JsonbWriter;
  * they are required or optional. All the names are short because a core goal of
  * JWTs is for the representation to be compact.
  *
+ * @see <a href="https://www.iana.org/assignments/jwt/jwt.xhtml">JWT Claims</a>
+ * @author Key Bridge
  * @since v0.9.2 add fluent setters
  */
 public class JwtClaims extends JsonSerializable {
@@ -300,6 +301,10 @@ public class JwtClaims extends JsonSerializable {
   }
 
   public JwtClaims withNotBefore(ZonedDateTime notBefore) {
+    /**
+     * Developer note: Must truncate the ZonedDateTime to seconds or EQUALS will
+     * fail to match due to nanosecond time component.
+     */
     this.notBefore = notBefore == null ? null : notBefore.truncatedTo(ChronoUnit.SECONDS);
     return this;
   }
@@ -335,6 +340,10 @@ public class JwtClaims extends JsonSerializable {
    * @return the current claims instance
    */
   public JwtClaims withIssuedAt(ZonedDateTime issuedAt) {
+    /**
+     * Developer note: Must truncate the ZonedDateTime to seconds or EQUALS will
+     * fail to match due to nanosecond time component.
+     */
     this.issuedAt = issuedAt == null ? null : issuedAt.truncatedTo(ChronoUnit.SECONDS);
     return this;
   }
@@ -382,46 +391,50 @@ public class JwtClaims extends JsonSerializable {
     this.claims = claims;
   }
 
-  public JwtClaims withClaims(Map<String, Object> claims) {
-    this.claims = claims;
+  /**
+   * Fluent method to add an enumerated claim that does not clash with one of
+   * the standard claim names.
+   *
+   * @param claim      the enumerated claim type
+   * @param claimValue the corresponding claim value. For complex claim objects
+   *                   the value should be externally transformed to a String
+   * @return the current JWT instance
+   */
+  public JwtClaims withClaim(ClaimType claim, Object claimValue) {
+    if (ClaimType.getJwtReservedClaims().contains(claim)) {
+      throw new IllegalArgumentException("Cannot use reserved claim name " + claim);
+    }
+    claims.put(claim.name(), claimValue);
     return this;
   }
 
   /**
-   * Internal set of reserved claim names. This prevents the user from adding a
-   * claim for which they should use a setter method.
-   */
-  private static final Set<String> RESERVED_CLAIM_NAMES = Arrays.stream(JwtClaims.class.getDeclaredFields())
-    .filter(field -> field.isAnnotationPresent(JsonbProperty.class))
-    .flatMap(field -> Arrays.stream(field.getAnnotationsByType(JsonbProperty.class)))
-    .map(JsonbProperty::value)
-    .collect(Collectors.toSet());
-
-  /**
    * Fluent method to add a claim with an arbitrary name that does not clash
    * with one of the standard claim names.
    *
-   * @param claimName  claim name
-   * @param claimValue claim value
+   * @param claim      the claim name
+   * @param claimValue the claim value; for complex claim objects the value
+   *                   should be externally transformed to a String
    * @return this JwtClaims instance
    */
-  public JwtClaims withClaim(String claimName, Object claimValue) {
-    return addClaim(claimName, claimValue);
+  public JwtClaims withClaim(String claim, Object claimValue) {
+    return addClaim(claim, claimValue);
   }
 
   /**
    * Fluent method to add a claim with an arbitrary name that does not clash
    * with one of the standard claim names.
    *
-   * @param claimName  claim name
-   * @param claimValue claim value
+   * @param claim      the claim name
+   * @param claimValue the claim value; for complex claim objects the value
+   *                   should be externally transformed to a String
    * @return this JwtClaims instance
    */
-  public JwtClaims addClaim(String claimName, Object claimValue) {
-    if (RESERVED_CLAIM_NAMES.contains(claimName)) {
-      throw new IllegalArgumentException("Cannot use reserved claim name " + claimName);
+  public JwtClaims addClaim(String claim, Object claimValue) {
+    if (ClaimType.getJwtReservedClaimNames().contains(claim)) {
+      throw new IllegalArgumentException("Cannot use reserved claim name " + claim);
     }
-    getClaims().put(claimName, claimValue);
+    claims.put(claim, claimValue);
     return this;
   }//</editor-fold>
 
@@ -492,6 +505,9 @@ public class JwtClaims extends JsonSerializable {
     if (claims != null && !claims.isEmpty()) {
       jsonObject.putAll(claims);
     }
+    /**
+     * Use the generic JsonbWriter since claims can be any object type.
+     */
     return new JsonbWriter().withAdapters(new JsonZonedDateTimeEpochAdapter()).marshal(jsonObject);
   }
 

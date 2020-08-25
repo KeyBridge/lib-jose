@@ -61,6 +61,7 @@ public class JwtClaimsTest {
     JwtClaims claims = new JwtClaims();
     claims.withClaim("email", "foo@bar.com");
     claims.withClaim("friends", Arrays.asList("John", "Jack", "Jeremy"));
+    claims.withClaim(ClaimType.email, "email@foo.bar");
 
     String json = claims.toJson();
     System.out.println("  toJson   " + json);
