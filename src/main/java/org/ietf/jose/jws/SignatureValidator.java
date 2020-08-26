@@ -4,7 +4,6 @@ import ch.keybridge.lib.jose.AbstractHeader;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.SecretKeyBuilder;
@@ -74,19 +73,19 @@ public class SignatureValidator {
    * @param key       a Key instance
    * @return true if signature is valid
    */
-  public static boolean isValid(Signature signature, PublicKey key) {
+  public static boolean isValid(Signature signature, Key key) {
     return isValid(signature.getProtectedHeader(), signature.getSigningInput(), key, signature.getSignatureBytes());
   }
 
   /**
-   * Validate signature using a Key instance
+   * Require that at least one signature in the provided list is valid.
    *
-   * @param signature a valid signature instance
-   * @param key       a Key instance; use SecretKeyBuilder if necessary.
-   * @return true if signature is valid
+   * @param jws a JSON web signature.
+   * @param key the key to match against
+   * @return TRUE if any one of the signatures is valid
    */
-  public static boolean isValid(Signature signature, SecretKey key) {
-    return isValid(signature.getProtectedHeader(), signature.getSigningInput(), key, signature.getSignatureBytes());
+  public static boolean isValid(JsonWebSignature jws, Key key) {
+    return jws.getSignatures().stream().anyMatch(s -> isValid(s, key));
   }
 
   /**
@@ -115,4 +114,5 @@ public class SignatureValidator {
     SecretKey key = SecretKeyBuilder.fromSharedSecret(sharedSecret);
     return isValid(signature, key);
   }
+
 }
