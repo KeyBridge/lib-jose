@@ -15,11 +15,12 @@
  */
 package org.ietf.jose.jwe;
 
-import ch.keybridge.lib.jose.Profile;
-import ch.keybridge.lib.jose.Profile1;
+import ch.keybridge.lib.jose.JoseProfile;
+import ch.keybridge.lib.jose.KeyBridgeJoseProfile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.PublicKey;
 import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
@@ -46,7 +47,13 @@ public class JweBuilder {
   /**
    * Default algorithms
    */
-  private static final Profile PROFILE = new Profile1();
+  private static final JoseProfile PROFILE = new KeyBridgeJoseProfile();
+  /**
+   * The default Jwe EncryptionAlgorithm.
+   * <p>
+   * AES_128_CBC_HMAC_SHA_256 authenticated encryption algorithm, as defined in
+   * RFC 7518 Section 5.2.3
+   */
   private JweEncryptionAlgorithmType encryptionAlgo = PROFILE.getContentEncAlgo();
   /**
    * Cannot set a default Key Management algorithm at this point because we
@@ -57,6 +64,17 @@ public class JweBuilder {
   private JweHeader protectedHeader = new JweHeader();
   private JweHeader unprotectedHeader;
   private byte[] payload;
+
+  /**
+   * A Key instance which is used to encrypt the random data encryption key. The
+   * key may be either the recipient's PublicKey or a shared SecretKey.
+   */
+  private Key key;
+  /**
+   * The corresponding identifier for the encryption key. This value gets
+   * written as the 'kid' field in the protected header. Can be null.
+   */
+  private String keyId;
 
   private JweBuilder() {
   }
@@ -169,6 +187,27 @@ public class JweBuilder {
   }
 
   /**
+   * Set the (public) encryption key and key id. The key may be either the
+   * recipient's PublicKey or a shared SecretKey.
+   *
+   * @param key   a Key instance which is used to encrypt the random data
+   *              encryption key
+   * @param keyId an identifier for the encryption key. This value gets written
+   *              as the 'kid' field in the protected header. Can be null.
+   * @return this builder
+   */
+  public JweBuilder withKey(Key key, String keyId) {
+    this.key = key;
+    this.keyId = keyId;
+    if (key instanceof SecretKey) {
+      keyMgmtAlgo = resolveKeyManagementAlgorithm((SecretKey) key);
+    } else if (keyMgmtAlgo == null) {
+      keyMgmtAlgo = PROFILE.getKeyMgmtAlgAsym();
+    }
+    return this;
+  }
+
+  /**
    * Encrypt the payload with the provided recipient's PublicKey
    *
    * @param key   public key
@@ -202,6 +241,20 @@ public class JweBuilder {
     keyMgmtAlgo = resolveKeyManagementAlgorithm(key);
     return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
                                          protectedHeader, unprotectedHeader, keyId);
+  }
+
+  /**
+   * Encrypt the payload with the provided key and converts the JWE instance
+   * into a single URL-safe string. Call this method _after_ setting the key.
+   *
+   * @return a single URL-safe encrypted string
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
+   * @throws GeneralSecurityException in case of failure to encrypt
+   */
+  public String build() throws IOException, GeneralSecurityException {
+    return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
+                                         protectedHeader, unprotectedHeader, keyId).toCompactForm();
   }
 
 }
