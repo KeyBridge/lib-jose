@@ -1,4 +1,4 @@
-package org.ietf.jose.demo;
+package org.ietf.test;
 
 import ch.keybridge.jose.JoseFactory;
 import java.io.IOException;

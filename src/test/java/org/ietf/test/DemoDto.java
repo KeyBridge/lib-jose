@@ -16,7 +16,7 @@
  * suppliers, if any. The intellectual and technical concepts contained herein
  * are proprietary.
  */
-package org.ietf.jose.demo;
+package org.ietf.test;
 
 import java.util.Objects;
 import java.util.UUID;
