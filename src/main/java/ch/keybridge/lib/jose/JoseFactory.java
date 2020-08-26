@@ -36,6 +36,8 @@ import org.ietf.jose.jwt.JwtClaims;
 import org.ietf.jose.util.JsonbUtility;
 
 /**
+ * @deprecated since v1.1.x use the Jw[x]Utility classes
+ *
  * lib-jose – Javascript Object Signing and Encryption.
  * <p>
  * This class is the entry point to the library. Provides easy access to the
@@ -50,10 +52,14 @@ import org.ietf.jose.util.JsonbUtility;
  * @author Andrius Druzinis-Vitkus
  * @since 0.0.1 created 14/02/2018
  */
+@Deprecated
 public class JoseFactory {
 
   private final static Logger LOG = Logger.getLogger(JoseFactory.class.getCanonicalName());
-  private static final Profile PROFILE = new Profile1();
+  /**
+   * The Key Bridge JOSE profile.
+   */
+  private static final JoseProfile PROFILE = new KeyBridgeJoseProfile();
 
   /**
    * Build, verify and decode Javascript Web Encryption objects.
@@ -89,7 +95,7 @@ public class JoseFactory {
      * @return non-null JWE instance
      * @throws IllegalArgumentException if the provided input is not a valid
      *                                  compact JWE string
-     * @throws java.io.IOException      on serialization error
+     * @throws java.io.IOException      on deserialization error
      */
     public static JsonWebEncryption fromCompactForm(String compactForm) throws IOException {
       return JsonWebEncryption.fromCompactForm(compactForm);
@@ -242,7 +248,7 @@ public class JoseFactory {
      */
     public static <T> T read(String json, Class<T> type, SecretKey secretKey) {
       try {
-        JsonWebEncryption jwe = JsonWebEncryption.fromJson(json);
+        JsonWebEncryption jwe = JsonWebEncryption.fromCompactForm(json);
         String payload = JweDecryptor.createFor(jwe)
           .decrypt(secretKey)
           .getAsString();
@@ -299,8 +305,7 @@ public class JoseFactory {
       try {
         String jsonPayload = new JsonbUtility().marshal(object);
 
-        JsonWebSignature jws = JwsBuilder.getInstance()
-          .withStringPayload(jsonPayload)
+        JsonWebSignature jws = JwsBuilder.getInstance().withStringPayload(jsonPayload)
           .sign(senderPrivateKey, PROFILE.getSignatureAlgAsymmetric(), signatureKeyId)
           .buildJsonWebSignature();
 
@@ -319,25 +324,25 @@ public class JoseFactory {
      *
      * @param object    the object to be signed and encrypted
      * @param secretKey valid AES secret key
-     * @param senderId  an identifier of the sender to be written as the 'kid'
+     * @param keyId     an identifier of the sender to be written as the 'kid'
      *                  (key ID) field of the JOSE protected header. Can be null
      *                  if an unset 'kid' protected header value is sufficient.
      * @return a valid JSON string if the operation is successful; null in case
      *         of failure
      */
-    public static String write(Object object, SecretKey secretKey, String senderId) {
+    public static String write(Object object, SecretKey secretKey, String keyId) {
       try {
         String jsonPayload = new JsonbUtility().marshal(object);
 
         JsonWebSignature jws = JwsBuilder.getInstance()
           .withStringPayload(jsonPayload)
-          .sign(secretKey, PROFILE.getSignatureAlgSymmetric(), senderId)
+          .sign(secretKey, PROFILE.getSignatureAlgSymmetric(), keyId)
           .buildJsonWebSignature();
 
         return JweBuilder.getInstance()
           .withStringPayload(jws.toJson())
-          .buildJweJsonFlattened(secretKey, senderId)
-          .toJson();
+          .withKey(secretKey, keyId)
+          .build();
       } catch (IOException | GeneralSecurityException e) {
         LOG.log(Level.SEVERE, null, e);
       }
@@ -371,7 +376,7 @@ public class JoseFactory {
       return JwsBuilder.getInstance()
         .withClaimsPayload(claims)
         .sign(key, PROFILE.getSignatureAlgSymmetric(), keyId)
-        .buildCompact();
+        .build();
     }
 
     /**
@@ -393,7 +398,7 @@ public class JoseFactory {
       return JwsBuilder.getInstance()
         .withClaimsPayload(claims)
         .sign(privateKey, PROFILE.getSignatureAlgAsymmetric(), keyId)
-        .buildCompact();
+        .build();
     }
 
     /**
