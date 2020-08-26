@@ -9,8 +9,8 @@ import org.ietf.jose.jwa.JwsAlgorithmType;
  * JoseFactory.
  *
  * @author Andrius Druzinis-Vitkus
- * @see JoseFactory
  * @since 0.0.1 created 2019-01-15
+ * @author Key Bridge
  * @since v1.0.2 rename to JoseProfile
  */
 public interface JoseProfile {
