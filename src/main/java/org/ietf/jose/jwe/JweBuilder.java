@@ -15,7 +15,6 @@
  */
 package org.ietf.jose.jwe;
 
-import org.ietf.jose.JoseProfile;
 import ch.keybridge.jose.KeyBridgeJoseProfile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +22,7 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.PublicKey;
 import javax.crypto.SecretKey;
+import org.ietf.jose.JoseProfile;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwt.JwtClaims;
@@ -255,6 +255,20 @@ public class JweBuilder {
   public String build() throws IOException, GeneralSecurityException {
     return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
                                          protectedHeader, unprotectedHeader, keyId).toCompactForm();
+  }
+
+  /**
+   * Encrypt the payload with the provided key and converts the JWE instance
+   * into a single URL-safe string. Call this method _after_ setting the key.
+   *
+   * @return a JWE object, marshaled to JSON
+   * @throws IOException              in case of failure to serialise the
+   *                                  protected header to JSON
+   * @throws GeneralSecurityException in case of failure to encrypt
+   */
+  public String buildJson() throws IOException, GeneralSecurityException {
+    return JsonWebEncryption.getInstance(payload, encryptionAlgo, keyMgmtAlgo, key,
+                                         protectedHeader, unprotectedHeader, keyId).toJson();
   }
 
 }
