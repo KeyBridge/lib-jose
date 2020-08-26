@@ -18,13 +18,13 @@
  */
 package ch.keybridge.jose;
 
-import org.ietf.jose.JoseProfile;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import javax.crypto.SecretKey;
+import org.ietf.jose.JoseProfile;
 import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
 import org.ietf.jose.jwe.JweDecryptor;
@@ -69,12 +69,13 @@ public class JwtUtility {
    * @param keyId        an identifier for the encryption key. This value gets
    *                     written as the 'kid' field in the protected header. Can
    *                     be null.
-   * @return an encoded token that is ready to use as a Bearer token.
+   * @return a compact-form JWS encoded token that is ready to use as a Bearer
+   *         token.
    * @throws IOException              in case of failure to serialize the claims
    *                                  to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public static String writeSignedToken(JwtClaims claims, String sharedSecret, String keyId) throws IOException, GeneralSecurityException {
+  public static String sign(JwtClaims claims, String sharedSecret, String keyId) throws IOException, GeneralSecurityException {
     final Key key = SecretKeyBuilder.fromSharedSecret(sharedSecret);
     return JwsBuilder.getInstance()
       .withClaimsPayload(claims)
@@ -91,12 +92,13 @@ public class JwtUtility {
    * @param keyId      an identifier for the encryption key. This value gets
    *                   written as the 'kid' field in the protected header. Can
    *                   be null.
-   * @return an encoded token that is ready to use as a Bearer token.
+   * @return a compact-form JWS encoded token that is ready to use as a Bearer
+   *         token.
    * @throws IOException              in case of failure to serialize the claims
    *                                  to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public static String writeSignedToken(JwtClaims claims, PrivateKey privateKey, String keyId) throws IOException, GeneralSecurityException {
+  public static String sign(JwtClaims claims, PrivateKey privateKey, String keyId) throws IOException, GeneralSecurityException {
     return JwsBuilder.getInstance()
       .withClaimsPayload(claims)
       .sign(privateKey, PROFILE.getSignatureAlgAsymmetric(), keyId)
@@ -106,15 +108,15 @@ public class JwtUtility {
   /**
    * Parse a signed JSON Web Token signed
    *
-   * @param jwt          the raw encoded token
-   * @param sharedSecret the shared secret key corresponding that this token was
-   *                     signed with
+   * @param compactFormJws the raw encoded token as a compact-form JWS string
+   * @param sharedSecret   the shared secret key corresponding that this token
+   *                       was signed with
    * @return the JWT claims
    * @throws Exception if the JWT cannot be parsed or if the signature is not
    *                   valid
    */
-  public JwtClaims readSignedToken(String jwt, String sharedSecret) throws Exception {
-    JsonWebSignature jws = JwtReader.read(jwt).getJsonWebSignature();
+  public static JwtClaims verifySignature(String compactFormJws, String sharedSecret) throws Exception {
+    JsonWebSignature jws = JwtReader.read(compactFormJws).getJsonWebSignature();
     final Key key = SecretKeyBuilder.fromSharedSecret(sharedSecret);
     if (!SignatureValidator.isValid(jws, key)) {
       throw new GeneralSecurityException("Invalid signature");
@@ -125,15 +127,15 @@ public class JwtUtility {
   /**
    * Parse a signed JSON Web Token.
    *
-   * @param jwt       the raw encoded token
-   * @param publicKey the public key corresponding to the private key that this
-   *                  token was signed with
+   * @param compactFormJws the raw encoded token as a compact-form JWS string
+   * @param publicKey      the public key corresponding to the private key that
+   *                       this token was signed with
    * @return the JWT claims
    * @throws Exception if the JWT cannot be parsed or if the signature is not
    *                   valid
    */
-  public JwtClaims readSignedToken(String jwt, PublicKey publicKey) throws Exception {
-    JsonWebSignature jws = JwtReader.read(jwt).getJsonWebSignature();
+  public static JwtClaims verifySignature(String compactFormJws, PublicKey publicKey) throws Exception {
+    JsonWebSignature jws = JwtReader.read(compactFormJws).getJsonWebSignature();
     if (!SignatureValidator.isValid(jws, publicKey)) {
       throw new GeneralSecurityException("Invalid signature");
     }
@@ -148,12 +150,13 @@ public class JwtUtility {
    * @param keyId        an identifier for the encryption key. This value gets
    *                     written as the 'kid' field in the protected header. Can
    *                     be null.
-   * @return an encoded token that is ready to use as a Bearer token.
+   * @return a compact-form JWE encoded token that is ready to use as a Bearer
+   *         token.
    * @throws IOException              in case of failure to serialize the claims
    *                                  to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public static String writeEncryptedToken(JwtClaims claims, String sharedSecret, String keyId) throws IOException, GeneralSecurityException {
+  public static String encrypt(JwtClaims claims, String sharedSecret, String keyId) throws IOException, GeneralSecurityException {
     final SecretKey key = SecretKeyBuilder.fromSharedSecret(sharedSecret);
     return JweBuilder.getInstance()
       .withClaimsPayload(claims)
@@ -170,12 +173,13 @@ public class JwtUtility {
    * @param recipientKeyId     an identifier for the encryption key. This value
    *                           gets written as the 'kid' field in the protected
    *                           header. Can be null.
-   * @return an encoded token that is ready to use as a Bearer token.
+   * @return a compact-form JWE encoded token that is ready to use as a Bearer
+   *         token.
    * @throws IOException              in case of failure to serialize the claims
    *                                  to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public static String writeEncryptedToken(JwtClaims claims, PublicKey recipientPublicKey, String recipientKeyId) throws IOException, GeneralSecurityException {
+  public static String encrypt(JwtClaims claims, PublicKey recipientPublicKey, String recipientKeyId) throws IOException, GeneralSecurityException {
     return JweBuilder.getInstance()
       .withClaimsPayload(claims)
       .buildJweJsonFlattened(recipientPublicKey, recipientKeyId)
@@ -185,15 +189,15 @@ public class JwtUtility {
   /**
    * Parse an encrypted JSON Web Token.
    *
-   * @param jwt the raw encoded token
-   * @param key the private or shared secret key corresponding to the public (or
-   *            shared secret) key that this token was encrypted with the JWT
-   *            claims
+   * @param compactFormJwe the raw encoded token as a compact-form JWE string
+   * @param key            the private or shared secret key corresponding to the
+   *                       public (or shared secret) key that this token was
+   *                       encrypted with the JWT claims
    * @return the JWT claims
    * @throws Exception if the JWT cannot be parsed or cannot be decrypted
    */
-  public JwtClaims parseEncryptedToken(String jwt, Key key) throws Exception {
-    JsonWebEncryption jwe = JwtReader.read(jwt).getJsonWebEncryption();
+  public static JwtClaims decrypt(String compactFormJwe, Key key) throws Exception {
+    JsonWebEncryption jwe = JwtReader.read(compactFormJwe).getJsonWebEncryption();
     String json = JweDecryptor.createFor(jwe).decrypt(key).getAsString();
     return JwtClaims.fromJson(json);
   }
@@ -201,14 +205,14 @@ public class JwtUtility {
   /**
    * Parse an encrypted JSON Web Token.
    *
-   * @param jwt          the raw encoded token
-   * @param sharedSecret the shared secret key that this token was encrypted
-   *                     with
+   * @param compactFormJwe the raw encoded token as a compact-form JWE string
+   * @param sharedSecret   the shared secret key that this token was encrypted
+   *                       with
    * @return the JWT claims
    * @throws Exception if the JWT cannot be parsed or cannot be decrypted
    */
-  public JwtClaims readEncryptedToken(String jwt, String sharedSecret) throws Exception {
-    JsonWebEncryption jwe = JwtReader.read(jwt).getJsonWebEncryption();
+  public static JwtClaims decrypt(String compactFormJwe, String sharedSecret) throws Exception {
+    JsonWebEncryption jwe = JwtReader.read(compactFormJwe).getJsonWebEncryption();
     String json = JweDecryptor.createFor(jwe).decrypt(sharedSecret).getAsString();
     return JwtClaims.fromJson(json);
   }
@@ -222,12 +226,13 @@ public class JwtUtility {
    * @param keyId        an identifier for the encryption key. This value gets
    *                     written as the 'kid' field in the protected header. Can
    *                     be null.
-   * @return the JWT claims
+   * @return a compact-form signed JWE encoded token that is ready to use as a
+   *         Bearer token.
    * @throws IOException              in case of failure to serialize the claims
    *                                  to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public static String writeSignedEncryptedToken(JwtClaims claims, String sharedSecret, String keyId) throws IOException, GeneralSecurityException {
+  public static String signAndEncrypt(JwtClaims claims, String sharedSecret, String keyId) throws IOException, GeneralSecurityException {
     final SecretKey secretKey = SecretKeyBuilder.fromSharedSecret(sharedSecret);
     JsonWebSignature jws = JwsBuilder.getInstance()
       .withClaimsPayload(claims)
@@ -260,16 +265,17 @@ public class JwtUtility {
    *                           ID) field of the JWE protected header. Can be
    *                           null if an unset 'kid' protected header value is
    *                           sufficient.
-   * @return the JWT claims
+   * @return a compact-form signed JWE encoded token that is ready to use as a
+   *         Bearer token.
    * @throws IOException              in case of failure to serialize the claims
    *                                  to JSON
    * @throws GeneralSecurityException in case of failure to sign
    */
-  public static String writeSignedEncryptedToken(JwtClaims claims,
-                                                 PrivateKey senderPrivateKey,
-                                                 PublicKey recipientPublicKey,
-                                                 String senderKeyId,
-                                                 String recipientKeyId) throws IOException, GeneralSecurityException {
+  public static String signAndEncrypt(JwtClaims claims,
+                                      PrivateKey senderPrivateKey,
+                                      PublicKey recipientPublicKey,
+                                      String senderKeyId,
+                                      String recipientKeyId) throws IOException, GeneralSecurityException {
     JsonWebSignature jws = JwsBuilder.getInstance().withClaimsPayload(claims)
       .sign(senderPrivateKey, PROFILE.getSignatureAlgAsymmetric(), senderKeyId)
       .buildJsonWebSignature();
@@ -283,8 +289,8 @@ public class JwtUtility {
   /**
    * Parse a JSON Web Token signed and encrypted with a keyed hash (HMAC).
    *
-   * @param jwt          the raw encoded token
-   * @param sharedSecret an arbitrary shared secret
+   * @param compactFormJwe the raw encoded token as a compact-form JWE string
+   * @param sharedSecret   an arbitrary shared secret
    * @return the JWT claims
    * @throws GeneralSecurityException if the JWT cannot be decrypted
    * @throws IOException              if the descrypted text fails to parse into
@@ -292,9 +298,9 @@ public class JwtUtility {
    * @throws Exception                if the JsonWebSignature fails to parse a
    *                                  JwtClaims
    */
-  public static JwtClaims readSignedEncryptedToken(String jwt, String sharedSecret) throws GeneralSecurityException, IOException, Exception {
+  public static JwtClaims decryptAndVerifySignature(String compactFormJwe, String sharedSecret) throws GeneralSecurityException, IOException, Exception {
     final SecretKey secretKey = SecretKeyBuilder.fromSharedSecret(sharedSecret);
-    JsonWebEncryption jwe = JsonWebEncryption.fromJson(jwt);
+    JsonWebEncryption jwe = JsonWebEncryption.fromCompactForm(compactFormJwe);
     String payload = JweDecryptor.createFor(jwe).decrypt(sharedSecret).getAsString(); // throws GeneralSecurityException
     JsonWebSignature jws = JsonWebSignature.fromJson(payload); // throws IOException
     if (jws.getSignatures().isEmpty()) {
@@ -310,7 +316,8 @@ public class JwtUtility {
    * Parse a JSON Web Token signed with a recipient private key and encrypted
    * with a sender public key
    *
-   * @param jwt                 the raw encoded token
+   * @param compactFormJwe      the raw encoded token as a compact-form JWE
+   *                            string
    * @param recipientPrivateKey the recipient's private key; it is used to
    *                            decrypt the message
    * @param senderPublicKey     the sender's public key; it is used to validate
@@ -322,10 +329,10 @@ public class JwtUtility {
    * @throws Exception                if the JsonWebSignature fails to parse a
    *                                  JwtClaims
    */
-  public static JwtClaims readSignedEncryptedToken(String jwt,
-                                                   PrivateKey recipientPrivateKey,
-                                                   PublicKey senderPublicKey) throws GeneralSecurityException, IOException, Exception {
-    JsonWebEncryption jwe = JsonWebEncryption.fromJson(jwt);
+  public static JwtClaims decryptAndVerifySignature(String compactFormJwe,
+                                                    PrivateKey recipientPrivateKey,
+                                                    PublicKey senderPublicKey) throws GeneralSecurityException, IOException, Exception {
+    JsonWebEncryption jwe = JsonWebEncryption.fromCompactForm(compactFormJwe);
     String payload = JweDecryptor.createFor(jwe)
       .decrypt(recipientPrivateKey)
       .getAsString();
