@@ -31,7 +31,7 @@ public class JwtReader {
    * Private constructor because the class should be accessed via static
    * readCompactForm method
    *
-   * @see JwtReader#readCompactForm(String)
+   * @see JwtReader#read(String)
    */
   private JwtReader() {
   }
@@ -45,7 +45,7 @@ public class JwtReader {
    *                                  JWT
    * @throws IllegalArgumentException if the JWT (compact form) is not valid
    */
-  public static JwtReader readCompactForm(String compactForm) throws IOException {
+  public static JwtReader read(String compactForm) throws IOException {
     final int dots = countDots(compactForm);
     JwtReader jwt = new JwtReader();
     switch (dots) {
