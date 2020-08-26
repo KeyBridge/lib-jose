@@ -259,5 +259,20 @@ public class JwsBuilder {
       }
       return buildJsonWebSignature().toCompactForm();
     }
+
+    /**
+     * Build a Json Web Signature compact string: a string which contains the
+     * payload and a single signature.
+     *
+     * @return a JWS object, marshaled to JSON
+     * @throws java.io.IOException      on error
+     * @throws GeneralSecurityException in case of failure to sign
+     */
+    public String buildJson() throws IOException, GeneralSecurityException {
+      if (signatures.isEmpty()) {
+        sign();
+      }
+      return buildJsonWebSignature().toJson();
+    }
   }
 }
