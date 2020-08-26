@@ -11,8 +11,10 @@ import org.ietf.jose.jwa.JwsAlgorithmType;
  * @author Andrius Druzinis-Vitkus
  * @see JoseFactory
  * @since 0.0.1 created 2019-01-15
+ * @since v1.0.2 rename to JoseProfile
  */
-public interface Profile {
+public interface JoseProfile {
+
   /**
    * The content encryption algorithm to use in JWEs.
    *
@@ -21,7 +23,8 @@ public interface Profile {
   JweEncryptionAlgorithmType getContentEncAlgo();
 
   /**
-   * The key management algorithm when using symmetric key encryption (shared secrets).
+   * The key management algorithm when using symmetric key encryption (shared
+   * secrets).
    *
    * @return key management algorithm
    */
