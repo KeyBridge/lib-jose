@@ -37,7 +37,8 @@ import org.ietf.jose.jwt.JwtReader;
 
 /**
  * A JWT utility class that provides methods for easy token creation (write) and
- * parting (read).
+ * parsing (read). Tokens may be signed and/or encrypted. Signed tokens may be
+ * verified. Encrypted tokens may be decrypted.
  * <p>
  * RFC7519 JWT JSON Web Token, describes representation of claims encoded in
  * JSON and protected by JWS (signing) and/or JWE (encryption).
