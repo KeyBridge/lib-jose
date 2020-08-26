@@ -114,7 +114,7 @@ public class JwsUtility {
    * @throws GeneralSecurityException if the signature does not match
    */
   public static <T> T verify(String compactFormJws, Class<T> type, Key key) throws IOException, GeneralSecurityException {
-    JsonWebSignature jws = JsonWebSignature.fromCompactForm(compactFormJws); // throws IOException
+    JsonWebSignature jws = parseJsonWebSignature(compactFormJws);
     String jsonText = jws.getStringPayload();
     if (!SignatureValidator.isValid(jws, key)) {
       throw new GeneralSecurityException("Invalid signature");
@@ -127,21 +127,38 @@ public class JwsUtility {
    * contains the payload and a single signature. Reads and returns the
    * deserialized object from a compact-form, signed JSON string.
    *
-   * @param <T>            class of the object contained in the message
-   * @param compactFormJws a compact-form JWS string
-   * @param type           class of the object contained in the message
-   * @param sharedSecret   a shared secret key
+   * @param <T>          class of the object contained in the message
+   * @param jwsText      a compact-form JWS string _or_ json encoded
+   *                     JsonWebSignature instance
+   * @param type         class of the object contained in the message
+   * @param sharedSecret a shared secret key
    * @return an instance of the class of the object
    * @throws IOException              on deserialization error
    * @throws GeneralSecurityException if the signature does not match
    */
-  public static <T> T verify(String compactFormJws, Class<T> type, String sharedSecret) throws IOException, GeneralSecurityException {
-    JsonWebSignature jws = JsonWebSignature.fromCompactForm(compactFormJws); // throws IOException
+  public static <T> T verify(String jwsText, Class<T> type, String sharedSecret) throws IOException, GeneralSecurityException {
+    JsonWebSignature jws = parseJsonWebSignature(jwsText);
     String jsonText = jws.getStringPayload();
     if (!SignatureValidator.isValid(jws, SecretKeyBuilder.fromSharedSecret(sharedSecret))) {
       throw new GeneralSecurityException("Invalid signature");
     }
     return new JsonbUtility().unmarshal(jsonText, type);
+  }
+
+  /**
+   * Internal method to parse the JWS text into a JsonWebSignature instance.
+   *
+   * @param jwsText a compact-form JWS string _or_ json encoded JsonWebSignature
+   *                instance
+   * @return a JsonWebSignature instance.
+   * @throws IOException on deserialization error
+   */
+  private static JsonWebSignature parseJsonWebSignature(String jwsText) throws IOException {
+    if (jwsText.trim().startsWith("{")) {
+      return JsonWebSignature.fromJson(jwsText); // throws IOException
+    } else {
+      return JsonWebSignature.fromCompactForm(jwsText); // throws IOException
+    }
   }
 
 }

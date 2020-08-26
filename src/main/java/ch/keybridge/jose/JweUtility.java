@@ -64,18 +64,19 @@ public class JweUtility {
    * </pre> See RFC 7516 Section 7.1 for more information about the JWE Compact
    * Serialization.
    *
-   * @param <T>            class of the object contained in the message
-   * @param compactFormJwe a compact-form JWE string
-   * @param type           class of the object contained in the message
-   * @param key            either a valid AES shared secret key or the
-   *                       recipient's private key
+   * @param <T>     class of the object contained in the message
+   * @param jweText a compact-form JWE string _or_ json encoded
+   *                JsonWebEncryption instance
+   * @param type    class of the object contained in the message
+   * @param key     either a valid AES shared secret key or the recipient's
+   *                private key
    * @return instance of the specified object class
    * @throws IOException              on deserialization error if the string
    *                                  cannot be parsed to a JWE intance
    * @throws GeneralSecurityException if the key fails to decrypt the string
    */
-  public static <T> T decrypt(String compactFormJwe, Class<T> type, Key key) throws IOException, GeneralSecurityException {
-    JsonWebEncryption jwe = JsonWebEncryption.fromCompactForm(compactFormJwe); // throws IOException
+  public static <T> T decrypt(String jweText, Class<T> type, Key key) throws IOException, GeneralSecurityException {
+    JsonWebEncryption jwe = parsJsonWebEncryption(jweText); // throws IOException
     String jsonPayload = JweDecryptor.createFor(jwe)
       .decrypt(key) // throws GeneralSecurityException
       .getAsString();
@@ -98,17 +99,18 @@ public class JweUtility {
    * </pre> See RFC 7516 Section 7.1 for more information about the JWE Compact
    * Serialization.
    *
-   * @param <T>            class of the object contained in the message
-   * @param compactFormJwe a compact-form JWE string
-   * @param type           class of the object contained in the message
-   * @param sharedSecret   a shared secret key
+   * @param <T>          class of the object contained in the message
+   * @param jweText      a compact-form JWE string _or_ json encoded
+   *                     JsonWebEncryption instance
+   * @param type         class of the object contained in the message
+   * @param sharedSecret a shared secret key
    * @return instance of the specified object class
    * @throws IOException              on deserialization error if the string
    *                                  cannot be parsed to a JWE intance
    * @throws GeneralSecurityException if the key fails to decrypt the string
    */
-  public static <T> T decrypt(String compactFormJwe, Class<T> type, String sharedSecret) throws IOException, GeneralSecurityException {
-    JsonWebEncryption jwe = JsonWebEncryption.fromCompactForm(compactFormJwe); // throws IOException
+  public static <T> T decrypt(String jweText, Class<T> type, String sharedSecret) throws IOException, GeneralSecurityException {
+    JsonWebEncryption jwe = parsJsonWebEncryption(jweText); // throws IOException
     String jsonPayload = JweDecryptor.createFor(jwe)
       .decrypt(sharedSecret) // throws GeneralSecurityException
       .getAsString();
@@ -158,6 +160,23 @@ public class JweUtility {
       .withStringPayload(jsonPayload)
       .withKey(secretKey, keyId)
       .build(); // throws IOException, GeneralSecurityException
+  }
+
+  /**
+   * Internal method to parse the JWW text into a JsonWebEncryption instance.
+   *
+   * @param jweText a compact-form JWE string _or_ json encoded
+   *                JsonWebEncryption instance
+   * @return a JsonWebEncryption instance.
+   * @throws IOException on deserialization error
+   */
+  private static JsonWebEncryption parsJsonWebEncryption(String jweText) throws IOException {
+    if (jweText.trim().startsWith("{")) {
+      return JsonWebEncryption.fromJson(jweText); // throws IOException
+    } else {
+      return JsonWebEncryption.fromCompactForm(jweText); // throws IOException
+    }
+
   }
 
 }
