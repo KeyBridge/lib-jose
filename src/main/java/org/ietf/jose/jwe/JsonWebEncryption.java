@@ -114,8 +114,8 @@ public class JsonWebEncryption extends JsonSerializable {
    * @return a valid JWE instance
    * @throws java.io.IOException      if the protectedHeader fails to marshal to
    *                                  JSON
-   * @throws GeneralSecurityException thrown if requested algorithms are not
-   *                                  available
+   * @throws GeneralSecurityException if the requested encryption algorithm is
+   *                                  not available
    */
   public static JsonWebEncryption getInstance(final byte[] payload,
                                               final JweEncryptionAlgorithmType contentEnc,
@@ -221,9 +221,8 @@ public class JsonWebEncryption extends JsonSerializable {
    * Serialization.
    *
    * @return non-null string
-   * @throws java.io.IOException on JSON marshal error
    */
-  public String toCompactForm() throws IOException {
+  public String toCompactForm() {
     return toBase64Url(new JsonbWriter().marshal(protectedHeader)) + '.'
       + toBase64Url(encryptedKey) + '.'
       + toBase64Url(initializationVector) + '.'
