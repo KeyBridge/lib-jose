@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.keybridge.lib.jose;
+package ch.keybridge.jose;
 
+import org.ietf.jose.JoseProfile;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;

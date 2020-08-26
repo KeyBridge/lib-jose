@@ -1,5 +1,6 @@
-package ch.keybridge.lib.jose;
+package ch.keybridge.jose;
 
+import org.ietf.jose.JoseProfile;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwa.JwsAlgorithmType;

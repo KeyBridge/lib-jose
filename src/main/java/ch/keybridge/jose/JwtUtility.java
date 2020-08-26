@@ -16,8 +16,9 @@
  * suppliers, if any. The intellectual and technical concepts contained herein
  * are proprietary.
  */
-package ch.keybridge.lib.jose;
+package ch.keybridge.jose;
 
+import org.ietf.jose.JoseProfile;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
