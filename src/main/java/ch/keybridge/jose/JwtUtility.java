@@ -346,4 +346,36 @@ public class JwtUtility {
     return jws.getClaims(); // throws Exception
   }
 
+  /**
+   * Text Wrap a compact form JWT to 80 characters. This produces a clean column
+   * of text.
+   * <p>
+   * Note: This produces a non-standard, proprietary text format. The text must
+   * be unformatted prior to reading.
+   *
+   * @param compactFormJwt the compact form JWT string
+   * @return the same string, wrapped at 80 characters.
+   */
+  public static String format(String compactFormJwt) {
+    StringBuilder sb = new StringBuilder(compactFormJwt);
+    int lineWidth = 80;
+    int i = lineWidth;
+    while (i < sb.length()) {
+      sb.insert(i, "\n");
+      i += lineWidth;
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Unwrap a compact form JWT to a clean JWT string. This produces a clean
+   * compact-form JWT string ready for parsing.
+   *
+   * @param compactFormattedJwt the compact formatted JWT string
+   * @return the same string, unwrapped
+   */
+  public static String unformat(String compactFormattedJwt) {
+    return compactFormattedJwt.replaceAll("\\s", "");
+  }
+
 }

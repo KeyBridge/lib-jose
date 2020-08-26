@@ -128,8 +128,8 @@ public class JwtUtilityTest {
   public void testSignEncryptAndDecryptVerifyKeyPair() throws Exception {
 //    System.out.println("  Start with   " + claims);
     String jsonCompact = JwtUtility.signAndEncrypt(claims, senderKeyPair.getPrivate(), recipientKeyPair.getPublic(), senderKeyId, recipientKeyId);
-//    System.out.println("    jsonCompact " + jsonCompact);
-//    System.out.println("    jsonCompact " + jsonCompact.length());
+    System.out.println("    jsonCompact " + jsonCompact);
+    System.out.println("    jsonCompact " + jsonCompact.length());
     JwtClaims recovered = JwtUtility.decryptAndVerifySignature(jsonCompact, recipientKeyPair.getPrivate(), senderKeyPair.getPublic());
 //    System.out.println("  Verified as  " + recovered);
     Assert.assertEquals(claims, recovered);
@@ -148,30 +148,37 @@ public class JwtUtilityTest {
     Assert.assertEquals(claims, recovered);
     System.out.println("testSignEncryptAndDecryptVerify KeyPair OK");
 
+    wrapText(jsonCompact);
+
   }
 
   @Test
-  public void testParseEncryptedToken() throws Exception {
+  public void testSignEncryptAndDecryptVerifySharedSecretFormatted() throws Exception {
+    System.out.println("  Start with   " + claims);
+    String jsonCompact = JwtUtility.signAndEncrypt(claims, sharedSecret, recipientKeyId);
+    String jsonCompactFormatted = JwtUtility.format(jsonCompact);
+    String jsonCompactUnFormatted = JwtUtility.unformat(jsonCompactFormatted);
+    JwtClaims recovered = JwtUtility.decryptAndVerifySignature(jsonCompactUnFormatted, sharedSecret);
+    System.out.println("  Verified as  " + recovered);
+    Assert.assertEquals(claims, recovered);
+    System.out.println("testSignEncryptAndDecryptVerify formatted KeyPair OK");
+
+    wrapText(jsonCompact);
+
   }
 
-  @Test
-  public void testReadEncryptedToken() throws Exception {
-  }
+  private void wrapText(String text) {
+    StringBuilder sb = new StringBuilder(text);
 
-  @Test
-  public void testWriteSignedEncryptedToken_3args() throws Exception {
-  }
-
-  @Test
-  public void testWriteSignedEncryptedToken_5args() throws Exception {
-  }
-
-  @Test
-  public void testReadSignedEncryptedToken_String_String() throws Exception {
-  }
-
-  @Test
-  public void testReadSignedEncryptedToken_3args() throws Exception {
+    int lineWidth = 80;
+    int i = lineWidth;
+    while (i < sb.length()) {
+      sb.insert(i, "\n");
+      i += lineWidth;
+    }
+    System.out.println("---");
+    System.out.println(sb.toString());
+    System.out.println("---");
   }
 
 }
