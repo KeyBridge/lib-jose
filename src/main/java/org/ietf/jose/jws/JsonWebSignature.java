@@ -15,6 +15,7 @@
  */
 package org.ietf.jose.jws;
 
+import org.ietf.jose.JsonSerializable;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -211,8 +212,8 @@ public class JsonWebSignature extends JsonSerializable {
   public static JsonWebSignature fromCompactForm(String text) throws IOException {
     StringTokenizer tokenizer = new StringTokenizer(Objects.requireNonNull(text), ".");
     if (tokenizer.countTokens() != 3) {
-      throw new IllegalArgumentException("JWS compact form must have 3 elements separated by dots. Supplied string "
-        + "has " + tokenizer.countTokens() + ".");
+      throw new IllegalArgumentException("JWS compact form must have 3 elements separated by dots. "
+        + "Supplied string has " + tokenizer.countTokens() + ".");
     }
     JsonWebSignature jws = new JsonWebSignature();
     String protectedHeaderBase64Url = tokenizer.nextToken();

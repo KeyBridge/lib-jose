@@ -1,4 +1,4 @@
-package org.ietf.jose.jws;
+package org.ietf.jose;
 
 import org.ietf.jose.util.JsonbUtility;
 
@@ -25,7 +25,7 @@ public abstract class JsonSerializable {
    */
   @Override
   public String toString() {
-    return toJson();
+    return new JsonbUtility().withFormatting(true).marshal(this);
   }
 
   /**

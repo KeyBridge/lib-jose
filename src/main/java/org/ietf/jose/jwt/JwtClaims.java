@@ -25,7 +25,7 @@ import java.util.*;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
 import org.ietf.jose.adapter.JsonZonedDateTimeEpochAdapter;
-import org.ietf.jose.jws.JsonSerializable;
+import org.ietf.jose.JsonSerializable;
 import org.ietf.jose.util.JsonbReader;
 import org.ietf.jose.util.JsonbWriter;
 

@@ -39,6 +39,11 @@ public class JwtUtilityTest {
   private static LoremIpsum l = LoremIpsum.getInstance();
   private static Random r = new Random();
 
+  /**
+   * Create or retrieve the shared secret or the sender's key pair. If
+   * available, a key id can help to find the key in a database or keystore.
+   * When using a shared secret the key id is typically required.
+   */
   private static KeyPair senderKeyPair;
   private static KeyPair recipientKeyPair;
   private static String sharedSecret;
@@ -64,6 +69,11 @@ public class JwtUtilityTest {
 
   @Before
   public void setUp() {
+    /**
+     * Create a JWT claims object. The minimum configuration required the
+     * issuer, audience and subject. Declare a duration if the token has a
+     * time-to-live.
+     */
     claims = new JwtClaims()
       .withIssuer(senderKeyId)
       .withAudience(l.getUrl())
@@ -77,6 +87,11 @@ public class JwtUtilityTest {
 
   @Test
   public void testSignAndVerifyKeyPair() throws Exception {
+    /**
+     * Sign the JWT claims with the sender's private key. A shared secret could
+     * alternatively be used. The result is a JSE compact-form encoded JSON
+     * string.
+     */
 //    System.out.println("  Start with   " + claims);
     String jsonCompact = JwtUtility.sign(claims, senderKeyPair.getPrivate(), senderKeyId);
 //    System.out.println("    jsonCompact " + jsonCompact);

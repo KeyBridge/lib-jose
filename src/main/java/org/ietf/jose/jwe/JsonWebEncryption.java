@@ -27,7 +27,7 @@ import org.ietf.jose.adapter.JsonJweHeaderAdapter;
 import org.ietf.jose.jwa.JweEncryptionAlgorithmType;
 import org.ietf.jose.jwa.JweKeyAlgorithmType;
 import org.ietf.jose.jwe.encryption.EncryptionResult;
-import org.ietf.jose.jws.JsonSerializable;
+import org.ietf.jose.JsonSerializable;
 import org.ietf.jose.util.CryptographyUtility;
 import org.ietf.jose.util.JsonbReader;
 import org.ietf.jose.util.JsonbUtility;
@@ -285,15 +285,4 @@ public class JsonWebEncryption extends JsonSerializable {
     return other instanceof JsonWebEncryption;
   }
 
-  @Override
-  public String toString() {
-    return "JsonWebEncryption(protectedHeader=" + this.getProtectedHeader()
-      + ", unprotected=" + this.getUnprotected()
-      + ", encryptedKey=" + java.util.Arrays.toString(this.getEncryptedKey())
-      + ", initializationVector=" + java.util.Arrays.toString(this.getInitializationVector())
-      + ", ciphertext=" + java.util.Arrays.toString(this.getCiphertext())
-      + ", authenticationTag=" + java.util.Arrays.toString(this.getAuthenticationTag())
-      + ", additionalAuthenticationData=" + java.util.Arrays.toString(this.getAdditionalAuthenticationData())
-      + ")";
-  }
 }
