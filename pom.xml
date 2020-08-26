@@ -45,6 +45,8 @@
     - add JwsUtility for easier object signing / verification
     - deprecate JoseFactory; prefer to use Jw[s]Utility classes
     v1.1.0 - utility release using Jw[x]Utility classes and using JSON-B
+    - move utility classes to 'ch.keybridge.jose' package
+    - move abstract class to 'org.ietf.jose' package
 
 
 
