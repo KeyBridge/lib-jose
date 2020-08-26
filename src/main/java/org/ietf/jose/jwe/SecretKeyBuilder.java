@@ -59,7 +59,7 @@ public class SecretKeyBuilder {
    * @throws java.security.NoSuchAlgorithmException if no Provider supports a
    *                                                MessageDigestSpi
    *                                                implementation for the
-   *                                                specified algorithm. Note:
+   *                                                'SHA-256' algorithm. Note:
    *                                                this should NEVER be thrown
    *                                                as all JRE implementations
    *                                                MUST support SHA-256.
