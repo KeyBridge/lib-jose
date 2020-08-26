@@ -22,6 +22,7 @@ import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
 import javax.json.bind.annotation.JsonbTypeAdapter;
 import org.ietf.jose.adapter.JsonJwsHeaderAdapter;
+import org.ietf.jose.jwt.JwtClaims;
 import org.ietf.jose.util.Base64Utility;
 import org.ietf.jose.util.JsonbUtility;
 
@@ -203,7 +204,7 @@ public class JsonWebSignature extends JsonSerializable {
    *
    * @param text a valid compact JWS string
    * @return non-null JWE instance
-   * @throws IOException              on serialization error
+   * @throws IOException              on deserialization error
    * @throws IllegalArgumentException if the provided input is not a valid
    *                                  compact JWS string
    */
@@ -225,6 +226,16 @@ public class JsonWebSignature extends JsonSerializable {
 
     jws.jwsSigningInput = (protectedHeaderBase64Url + '.' + payloadBase64Url).getBytes(StandardCharsets.US_ASCII);
     return jws;
+  }
+
+  /**
+   * Get the JWT claims.
+   *
+   * @return the JWT claims encoded in this JWS entity.
+   * @throws java.lang.Exception on parse error
+   */
+  public JwtClaims getClaims() throws Exception {
+    return JwtClaims.fromJson(getStringPayload());
   }
 
   /**
