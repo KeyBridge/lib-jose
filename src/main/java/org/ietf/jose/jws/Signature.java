@@ -101,7 +101,8 @@ public class Signature {
    *
    * @param payload   data to sign
    * @param key       a valid JWK instance
-   * @param algorithm the JwsAlgorithmType
+   * @param algorithm The "alg" (algorithm) Header Parameter identifies the
+   *                  cryptographic algorithm used to secure the JWS.
    * @return a JWS instance
    * @throws IOException              in case of failure to serialise the
    *                                  protected header to JSON
