@@ -169,6 +169,7 @@ public class JwtClaims extends JsonSerializable {
   public JwtClaims() {
     this.jwtId = UUID.randomUUID().toString();
     this.issuedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    this.notBefore = issuedAt;
     this.claims = new HashMap<>();
   }
 
