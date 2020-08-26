@@ -31,14 +31,53 @@ This implementation includes a default profile with algorithms selected to run o
 See the [Java Cryptography Architecture (JCA) Documentation](https://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html) for more information about algorithm selection.
 
 
-## Hello World JWE example
+# Hello world JWT example
 
-**Sign and encrypt**
-
-Start with a clear text input and a set of keys.
+A JSON web token can be signed and/or encrypted, and a public / private key pair or
+a shared secret may be used. Here we show the simplest case: signing a JWT claims
+object with a shared secret.
 
 ```java
-String sampleText = "sample text to sign and encrypt";
+/**
+ * Create a JWT claims object. The minimum configuration required the
+ * issuer, audience and subject. Declare a duration if the token has a
+ * time-to-live.
+ */
+ JwtClaims  claims = new JwtClaims()
+   .withIssuer(senderKeyId)
+   .withAudience(senderKeyId)
+   .withSubject(recipientKeyId)
+   .withDuration(Duration.ofDays(30));
+
+/**
+ * Create or retrieve the shared secret or the sender's key pair. If
+ * available, a key id can help to find the key in a database or keystore.
+ * When using a shared secret the key id is typically required.
+ */
+private static String sharedSecret;
+private static String senderKeyId;
+
+/**
+ * Sign the JWT claims with the sender's private key. A shared secret could
+ * alternatively be used. The result is a JSE compact-form encoded JSON
+ * string. This is the JSON Web Token.
+ */
+String jsonWebToken = JwtUtility.sign(claims, sharedSecret, senderKeyId);
+```
+
+
+
+## Hello World JWE example
+
+**Encrypt**
+
+JWE can be used to encrypt arbitrary text content. 
+In our implementation the payload must be Java object that 
+can be readily serializable to / from JSON using the JSON-B. 
+JSON-B is a standard binding layer for converting Java objects to/from JSON messages
+
+```java
+JsonObject sampleText = ....
 
 // the private key of the sender; it is used to digitally sign the message
 PrivateKey privateKey = ... 
