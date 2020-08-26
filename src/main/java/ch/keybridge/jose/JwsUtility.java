@@ -105,7 +105,7 @@ public class JwsUtility {
    * deserialized object from a compact-form, signed JSON string.
    *
    * @param <T>            class of the object contained in the message
-   * @param compactFormJws
+   * @param compactFormJws a compact-form JWS string
    * @param type           class of the object contained in the message
    * @param key            either a valid AES shared secret key or the
    *                       recipient's private key
@@ -128,7 +128,7 @@ public class JwsUtility {
    * deserialized object from a compact-form, signed JSON string.
    *
    * @param <T>            class of the object contained in the message
-   * @param compactFormJws
+   * @param compactFormJws a compact-form JWS string
    * @param type           class of the object contained in the message
    * @param sharedSecret   a shared secret key
    * @return an instance of the class of the object
