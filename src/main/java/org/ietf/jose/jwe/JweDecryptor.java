@@ -10,7 +10,6 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.Key;
-import java.security.PrivateKey;
 
 /**
  * A JWE decryption utility. Accepts a JweJsonFlattened instance, decrypts the
@@ -42,40 +41,29 @@ public class JweDecryptor {
   }
 
   /**
-   * Decrypt using bytes of the shared secret key used to encrypt they
-   * plaintext.
-   *
-   * @param secret bytes of the shared secret.
-   * @return DecryptionResult containing the decrypted plaintext
-   * @throws GeneralSecurityException in case of failure to unwrap the key or
-   *                                  decrypt
-   */
-  public DecryptionResult decrypt(byte[] secret) throws GeneralSecurityException {
-    SecretKey key = KeyUtility.convertSecretToKey("AES", secret);
-    return decryptGeneric(key);
-  }
-
-  /**
-   * Decrypt using a (shared) SecretKey
-   *
-   * @param key a (shared) SecretKey
-   * @return DecryptionResult containing the decrypted plaintext
-   * @throws GeneralSecurityException in case of failure to unwrap the key or
-   *                                  decrypt
-   */
-  public DecryptionResult decrypt(SecretKey key) throws GeneralSecurityException {
-    return decryptGeneric(key);
-  }
-
-  /**
-   * Decrypt using a private key
+   * Decrypt using a private key or a (shared) SecretKey
    *
    * @param key a private key
    * @return DecryptionResult containing the decrypted plaintext
    * @throws GeneralSecurityException in case of failure to unwrap the key or
    *                                  decrypt
    */
-  public DecryptionResult decrypt(PrivateKey key) throws GeneralSecurityException {
+  public DecryptionResult decrypt(Key key) throws GeneralSecurityException {
+    return decryptGeneric(key);
+  }
+
+  /**
+   * Decrypt using bytes of the shared secret key that was used to encrypt they
+   * plaintext.
+   *
+   * @param secret bytes of the shared secret. This is converted to a SecretKey
+   *               instance.
+   * @return DecryptionResult containing the decrypted plaintext
+   * @throws GeneralSecurityException in case of failure to unwrap the key or
+   *                                  decrypt
+   */
+  public DecryptionResult decrypt(byte[] secret) throws GeneralSecurityException {
+    SecretKey key = KeyUtility.convertSecretToKey("AES", secret);
     return decryptGeneric(key);
   }
 
