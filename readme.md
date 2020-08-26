@@ -43,8 +43,8 @@ This implementation includes a default profile with algorithms selected to run o
 
 See the [Java Cryptography Architecture (JCA) Documentation](https://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html) for more information about algorithm selection.
 
-OpenJDK, Oracle JDK, and some non-US JDK distributions have JCE policy files that 
-do not allow strong encryption. For these JDKs you must 
+Note that the OpenJDK, Oracle JDK, and some non-US JDK and JRE distributions have JCE policy files that 
+do not allow strong encryption. For these JDKs and JREs you must 
 [install JCE policy files](docs/jce-installation.md) that support full length encryption keys.
 An incorrect or missing JCE policy may result in key length errors during runtime.
 
