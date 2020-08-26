@@ -15,11 +15,14 @@
  */
 package org.ietf.jose.jws;
 
+import ch.keybridge.lib.jose.JoseProfile;
+import ch.keybridge.lib.jose.KeyBridgeJoseProfile;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
+import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.key.AbstractJwk;
 import org.ietf.jose.jwt.JwtClaims;
@@ -32,6 +35,11 @@ import org.ietf.jose.util.Base64Utility;
  * @since 0.0.1 created 14/02/2018
  */
 public class JwsBuilder {
+
+  /**
+   * Default algorithms
+   */
+  private static final JoseProfile PROFILE = new KeyBridgeJoseProfile();
 
   private JwsBuilder() {
   }
@@ -105,6 +113,23 @@ public class JwsBuilder {
      */
     private JwsHeader header;
 
+    /**
+     * The "alg" (algorithm) Header Parameter identifies the cryptographic
+     * algorithm used to secure the JWS.
+     */
+    private JwsAlgorithmType signatureAlgo;
+
+    /**
+     * A Key instance which is used to encrypt the random data encryption key.
+     * The key may be either the recipient's PublicKey or a shared SecretKey.
+     */
+    private Key key;
+    /**
+     * The corresponding identifier for the encryption key. This value gets
+     * written as the 'kid' field in the protected header. Can be null.
+     */
+    private String keyId;
+
     private Signable() {
     }
 
@@ -137,6 +162,29 @@ public class JwsBuilder {
     }
 
     /**
+     * Set the (public) encryption key and key id. The key may be either the
+     * recipient's PublicKey or a shared SecretKey. Sets the signature
+     * algorithm.
+     *
+     * @param key   a Key instance which is used to encrypt the random data
+     *              encryption key
+     * @param keyId an identifier for the encryption key. This value gets
+     *              written as the 'kid' field in the protected header. Can be
+     *              null.
+     * @return this builder
+     */
+    public Signable withKey(Key key, String keyId) {
+      this.key = key;
+      this.keyId = keyId;
+      if (key instanceof SecretKey) {
+        signatureAlgo = PROFILE.getSignatureAlgSymmetric();
+      } else if (signatureAlgo == null) {
+        signatureAlgo = PROFILE.getSignatureAlgAsymmetric();
+      }
+      return this;
+    }
+
+    /**
      * Sign using a JWK
      *
      * @param key       a JWK instance
@@ -164,8 +212,7 @@ public class JwsBuilder {
      *                                  protected header to JSON
      * @throws GeneralSecurityException in case of failure to sign
      */
-    public Signable sign(Key key, JwsAlgorithmType algorithm, String keyId) throws IOException,
-      GeneralSecurityException {
+    public Signable sign(Key key, JwsAlgorithmType algorithm, String keyId) throws IOException, GeneralSecurityException {
       if (protectedHeader == null) {
         this.protectedHeader = new JwsHeader();
       }
@@ -176,24 +223,41 @@ public class JwsBuilder {
     }
 
     /**
-     * Build a GeneralJsonSignature instance: A GeneralJsonSignature object with
-     * one or more signatures
+     * Sign the JWS using the provided Key instance. This method must be called
+     * _after_ the key is set.
      *
-     * @return a GeneralJsonSignature instance
+     * @return withClaimsPayload
+     * @throws IOException              in case of failure to serialise the
+     *                                  protected header to JSON
+     * @throws GeneralSecurityException in case of failure to sign
+     */
+    public Signable sign() throws IOException, GeneralSecurityException {
+      return sign(key, signatureAlgo, keyId);
+    }
+
+    /**
+     * Build a Json Web Signature instance: A Json Web Signature object with one
+     * or more signatures is returned.
+     *
+     * @return a JsonWebSignature instance
      */
     public JsonWebSignature buildJsonWebSignature() {
       return new JsonWebSignature(payload, signatures);
     }
 
     /**
-     * Build a GeneralJsonSignature compact string: a string which contains the
+     * Build a Json Web Signature compact string: a string which contains the
      * payload and a single signature.
      *
-     * @return a GeneralJsonSignature compact string
-     * @throws java.io.IOException on error
+     * @return a Json Web Signature compact string
+     * @throws java.io.IOException      on error
+     * @throws GeneralSecurityException in case of failure to sign
      */
-    public String buildCompact() throws IOException {
-      return buildJsonWebSignature().getCompactForm();
+    public String build() throws IOException, GeneralSecurityException {
+      if (signatures.isEmpty()) {
+        sign();
+      }
+      return buildJsonWebSignature().toCompactForm();
     }
   }
 }
