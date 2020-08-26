@@ -94,8 +94,8 @@ See the following examples for useful sample code:
 * [JSON Web Encryption examples](src/main/java/org/ietf/jose/jwe/examples.md)
 * [JoseFactory utility class examples](docs/examples.md)
 
-All code used in these examples and other sample code are available in the unit test. See
-`src/test/java/org/ietf/jose/` and 
+All code used in these examples and other sample code are available in the unit test. See   
+`src/test/java/org/ietf/jose/` and   
 `src/test/java/ch/keybridge/jose`.
 
 
