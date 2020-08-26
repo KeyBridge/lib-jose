@@ -4,7 +4,7 @@
 
   <groupId>keybridge.lib</groupId>
   <artifactId>jose</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <packaging>jar</packaging>
 
   <name>lib-jose</name>
@@ -40,6 +40,11 @@
     v0.10.0 - remove all XML annotation; upgrade fasterXML to JsonB
     v1.0.0 - first release 2020-08-18  'ta da'
     v1.0.1 - add support for enumerated JWT claim types from the IANA registry
+    v1.0.2 - add JwtUtility for easier JWT handling
+    - add JweUtility for easier encryption / decryption
+    - add JwsUtility for easier object signing / verification
+    - deprecate JoseFactory; prefer to use Jw[s]Utility classes
+    v1.1.0 - utility release using Jw[x]Utility classes and using JSON-B
 
 
 
@@ -82,7 +87,6 @@
       <version>1.1.5</version>
       <scope>provided</scope>
     </dependency>
-
     <!-- JSON-B API -->
     <dependency>
       <groupId>jakarta.json.bind</groupId>
@@ -90,7 +94,6 @@
       <version>1.0.1</version>
       <scope>provided</scope>
     </dependency>
-
     <!-- Yasson (JSON-B implementation) -->
     <dependency>
       <groupId>org.eclipse</groupId>
@@ -100,15 +103,12 @@
     </dependency>
 
 
-
-
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-
     <!-- Interoperability testing-->
     <dependency>
       <groupId>org.bitbucket.b_c</groupId>
