@@ -1,5 +1,12 @@
 package org.ietf.jose.jwt;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwe.JsonWebEncryption;
 import org.ietf.jose.jwe.JweBuilder;
@@ -10,14 +17,6 @@ import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.SignatureValidator;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -83,7 +82,7 @@ public class Examples {
       .withStringPayload(joseClaimsJson)
       // sign it with our private key
       .sign(keyPair.getPrivate(), JwsAlgorithmType.RS256, keyId);
-    String jwt = jwsBuilder.buildCompact();
+    String jwt = jwsBuilder.build();
     System.out.println("JWT:");
     System.out.println(jwt);
     System.out.println();
@@ -91,7 +90,7 @@ public class Examples {
     /**
      * Consume the JWT
      */
-    JwtReader jwtDecoded = JwtReader.readCompactForm(jwt);
+    JwtReader jwtDecoded = JwtReader.read(jwt);
     /**
      * The JWT can be either a JWS (JSON Web Signature) or a JWE (JSON Web
      * Encryption) object, and the type can be determined with JWT::getType.
@@ -120,7 +119,8 @@ public class Examples {
     /**
      * Validate the JWT by using the SignatureValidator class
      */
-    boolean isValid = SignatureValidator.isValid(decodedFromCompactForm.getSignatures().get(0), keyPair.getPublic());
+    boolean isValid = SignatureValidator.isValid(decodedFromCompactForm.getSignatures().get(0),
+                                                 keyPair.getPublic());
     assertTrue(isValid);
     System.out.println();
   }
@@ -165,7 +165,7 @@ public class Examples {
      */
     JsonWebEncryption jwe = JweBuilder.getInstance()
       .withStringPayload(joseClaimsJson)
-        .buildJweJsonFlattened(SecretKeyBuilder.fromBytes(secret), null);
+      .buildJweJsonFlattened(SecretKeyBuilder.fromBytes(secret), null);
     String jwt = jwe.toCompactForm();
     System.out.println("JsonWebEncryption JWT:");
     System.out.println(jwt);
@@ -174,7 +174,7 @@ public class Examples {
     /**
      * Consume the JWT
      */
-    JwtReader jwtDecoded = JwtReader.readCompactForm(jwt);
+    JwtReader jwtDecoded = JwtReader.read(jwt);
     /**
      * In this instance we have a JWE.
      */

@@ -111,7 +111,7 @@ public class InteropTest {
     // over the clouds and through the interwebs.
     System.out.println("jose4j JWT: " + jwt);
 
-    JwtReader reader = JwtReader.readCompactForm(jwt);
+    JwtReader reader = JwtReader.read(jwt);
     assertEquals(JwtReader.JwtType.signed, reader.getType());
     JsonWebSignature jwsDecoded = reader.getJsonWebSignature();
     System.out.println(jwsDecoded);
@@ -221,7 +221,7 @@ public class InteropTest {
     String signedJwtCompact = JwsBuilder.getInstance()
       .withStringPayload(claimJson)
       .sign(rsaPrivateJwk, JwsAlgorithmType.RS256)
-      .buildCompact();
+      .build();
 
     JsonWebSignature jwsDecoded = JsonWebSignature.fromCompactForm(signedJwtCompact);
     assertEquals(1, jwsDecoded.getSignatures().size());

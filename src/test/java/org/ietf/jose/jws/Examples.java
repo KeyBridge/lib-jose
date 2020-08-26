@@ -52,7 +52,7 @@ public class Examples {
       // sign it with our private key and specify a random UUID as the key ID
       .sign(keyPair.getPrivate(), JwsAlgorithmType.RS256, keyId);
     String jwsJsonGeneral = jwsBuilder.buildJsonWebSignature().toJson();
-    String jwsCompact = jwsBuilder.buildCompact();
+    String jwsCompact = jwsBuilder.build();
 
     System.out.println("JWS JSON general:\n" + new JsonbUtility().withFormatting(true).marshal(jwsBuilder.buildJsonWebSignature()));
     System.out.println();

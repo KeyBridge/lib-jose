@@ -25,8 +25,11 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.UUID;
+import javax.crypto.SecretKey;
 import org.ietf.jose.jwa.JwsAlgorithmType;
+import org.ietf.jose.jwe.SecretKeyBuilder;
 import org.ietf.jose.jws.JsonWebSignature;
 import org.ietf.jose.jws.JwsBuilder;
 import org.ietf.jose.jws.SignatureValidator;
@@ -73,7 +76,7 @@ public class SimpleJwtTest {
       .withStringPayload(joseClaimsJson)
       .sign(keyPair.getPrivate(), JwsAlgorithmType.RS256, keyId); // throws GeneralSecurityException
 
-    String jwt = jwsBuilder.buildCompact();
+    String jwt = jwsBuilder.build();
     System.out.println("JWT:");
     System.out.println(jwt);
     System.out.println(jwt.length() + " chars ");
@@ -81,7 +84,7 @@ public class SimpleJwtTest {
     /**
      * Consume the JWT
      */
-    JwtReader jwtDecoded = JwtReader.readCompactForm(jwt);
+    JwtReader jwtDecoded = JwtReader.read(jwt);
 
     /**
      * In this instance we have a JWS.
@@ -105,6 +108,54 @@ public class SimpleJwtTest {
      */
     boolean isValid = SignatureValidator.isValid(decodedFromCompactForm.getSignatures().get(0), keyPair.getPublic());
     System.out.println(" valid signature " + isValid);
+
+  }
+
+  @Test
+  public void createConsumeAndValidateSignedExample() throws NoSuchAlgorithmException, IOException, GeneralSecurityException, Exception {
+
+    /**
+     * Create a JWT claims set object. Please refer to RFC 7519 § 4.1.
+     * Registered Claim Names for details about each claim.
+     * <p>
+     * The following fields are automatically set in the JwtClaims constructor:
+     * [jwtid, issuedAt, notBefore]
+     * <p>
+     * If the issuer is key bridge the `scope` claim will be set. If you are
+     * issuing your own JWT do not include a scope claim; it will ignored.
+     */
+    JwtClaims jwtClaims = new JwtClaims()
+      .withIssuer("issuer is Key Bridge URL")
+      .withSubject("subject is the user Consumer key")
+      .withAudience("audience is key bridge URL")
+      .withDuration(Duration.ofDays(7)) // sets the expiration
+      .withClaim(ClaimType.scope, Arrays.asList("scope-1", "scope-2", "scope-3")); // key bridge only
+    /**
+     * Retrieve the subject's shared secret
+     */
+    String consumerKey = UUID.randomUUID().toString();
+    System.out.println("debug consumerKey = " + consumerKey);
+
+    SecretKey key = SecretKeyBuilder.fromSharedSecret(consumerKey); // throws NoSuchAlgorithmException
+    String keyId = "keyId";
+
+    String jwt = JwsBuilder.getInstance()
+      .withClaimsPayload(jwtClaims)
+      .withKey(key, keyId)
+      .build();
+
+    System.out.println("JWS = " + jwt);
+
+//      .sign(key, JwsAlgorithmType.RS256, keyId) // throws IOException, GeneralSecurityException
+//      .buildJsonWebSignature()
+//      .toCompactForm();
+    /**
+     * Consume the JWT
+     */
+    JsonWebSignature jws = JwtReader.read(jwt).getJsonWebSignature();
+
+    JwtClaims claims = jws.getClaims(); // throws Exception
+//    boolean isValid = SignatureValidator.isValid(jws.getSignatures(), key);
 
   }
 

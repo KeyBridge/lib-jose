@@ -177,11 +177,11 @@ public class DemoTest {
     KeyGenerator generator = KeyGenerator.getInstance("HmacSHA256");
     SecretKey key = SecretKeyBuilder.fromBytes(generator.generateKey().getEncoded());
 
-    String json = JoseFactory.SignAndEncrypt.write(dto, key, "myKeyId");
-//    System.out.println("  Original                   : " + dto);
-//    System.out.println("  Signed and encrypted JSON  : " + json);
+    String jsonompact = JoseFactory.SignAndEncrypt.write(dto, key, "myKeyId");
+    System.out.println("  Original                   : " + dto);
+    System.out.println("  Signed and encrypted JSON  : " + jsonompact);
 
-    DemoDto decryptedDto = JoseFactory.SignAndEncrypt.read(json, DemoDto.class, key);
+    DemoDto decryptedDto = JoseFactory.SignAndEncrypt.read(jsonompact, DemoDto.class, key);
 
     Assert.assertEquals(dto, decryptedDto);
 
