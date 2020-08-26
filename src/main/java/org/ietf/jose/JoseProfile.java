@@ -23,15 +23,15 @@ public interface JoseProfile {
   JweEncryptionAlgorithmType getContentEncAlgo();
 
   /**
-   * The key management algorithm when using symmetric key encryption (shared
-   * secrets).
+   * The key management algorithm when using public keys for key encryption.
    *
    * @return key management algorithm
    */
   JweKeyAlgorithmType getKeyMgmtAlgAsym();
 
   /**
-   * The key management algorithm when using public keys for key encryption.
+   * The key management algorithm when using symmetric key encryption (shared
+   * secrets).
    *
    * @return key management algorithm
    */

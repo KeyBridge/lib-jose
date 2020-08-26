@@ -25,15 +25,28 @@ A number of examples are defined in:
  
  * [7520 JOSE](https://tools.ietf.org/html/rfc7520)    Examples of Protecting Content Using JOSE
 
-## Installation and key length errors
-
-OpenJDK, Oracle JDK, and some non-US JDK distributions have JCE policy files that do not allow strong encryption. For these JDKs you must [install JCE policy files](docs/jce-installation.md) that support full length encryption keys.
-
 ## Implementation profile
 
+The various JOSE RFCs include many options to the developer for algorithm and encoding selection.
+To ensure internal interoperability with our own systems and services, and to improve 
+interoperability with users, Key Bridge has established and uses a JOSE profile
+that specifies algorithm selections for all encryption and signing functions.
 This implementation includes a default profile with algorithms selected to run on all JVM instances. 
 
+| Parameter | Profile Selection | Description |
+|---|---|---|
+| ContentEncAlgo         | `A128CBC-HS256`        |  The JWE content encryption algorithm.  AES_128_CBC_HMAC_SHA_256 authenticated encryption algorithm, as defined in  RFC 7518 Section 5.2.3 |
+| KeyMgmtAlgAsym         | `RSA/ECB/PKCS1Padding` |  The key management algorithm when using public keys for key encryption.  Encrypts a JWE CEK with RSAES-PKCS1-v1_5 as defined in RFC3447 |
+| KeyMgmtAlgSymmetric    | `A256KW`               |  The key management algorithm when using symmetric key encryption (shared secrets). AES Key Wrap with default initial value using 256-bit key. |
+| SignatureAlgAsymmetric | `SHA256withRSA`        |  The digital signature algorithm.   RSASSA-PKCS1-v1_5 using SHA-256 |
+| SignatureAlgSymmetric  | `HmacSHA256`           |  The keyed hash (HMAC) algorithm.  HMAC using SHA-256 |
+
 See the [Java Cryptography Architecture (JCA) Documentation](https://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html) for more information about algorithm selection.
+
+OpenJDK, Oracle JDK, and some non-US JDK distributions have JCE policy files that 
+do not allow strong encryption. For these JDKs you must 
+[install JCE policy files](docs/jce-installation.md) that support full length encryption keys.
+An incorrect or missing JCE policy may result in key length errors during runtime.
 
 
 # Hello world JWT example
