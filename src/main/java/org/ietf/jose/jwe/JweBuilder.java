@@ -15,8 +15,8 @@
  */
 package org.ietf.jose.jwe;
 
-import ch.keybridge.lib.jose.JoseProfile;
-import ch.keybridge.lib.jose.KeyBridgeJoseProfile;
+import org.ietf.jose.JoseProfile;
+import ch.keybridge.jose.KeyBridgeJoseProfile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;

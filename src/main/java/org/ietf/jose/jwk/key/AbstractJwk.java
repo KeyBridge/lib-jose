@@ -15,7 +15,7 @@
  */
 package org.ietf.jose.jwk.key;
 
-import ch.keybridge.lib.jose.AbstractHeader;
+import org.ietf.jose.AbstractHeader;
 import java.util.List;
 import javax.json.bind.annotation.JsonbTypeDeserializer;
 import org.ietf.jose.adapter.JsonJwkDeserializer;

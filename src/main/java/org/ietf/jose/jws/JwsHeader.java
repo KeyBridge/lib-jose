@@ -15,7 +15,7 @@
  */
 package org.ietf.jose.jws;
 
-import ch.keybridge.lib.jose.AbstractHeader;
+import org.ietf.jose.AbstractHeader;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;

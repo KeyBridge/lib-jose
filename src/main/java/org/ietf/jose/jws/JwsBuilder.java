@@ -15,14 +15,14 @@
  */
 package org.ietf.jose.jws;
 
-import ch.keybridge.lib.jose.JoseProfile;
-import ch.keybridge.lib.jose.KeyBridgeJoseProfile;
+import ch.keybridge.jose.KeyBridgeJoseProfile;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import javax.crypto.SecretKey;
+import org.ietf.jose.JoseProfile;
 import org.ietf.jose.jwa.JwsAlgorithmType;
 import org.ietf.jose.jwk.key.AbstractJwk;
 import org.ietf.jose.jwt.JwtClaims;

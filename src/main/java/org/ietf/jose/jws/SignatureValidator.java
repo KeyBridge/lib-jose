@@ -1,6 +1,6 @@
 package org.ietf.jose.jws;
 
-import ch.keybridge.lib.jose.AbstractHeader;
+import org.ietf.jose.AbstractHeader;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;

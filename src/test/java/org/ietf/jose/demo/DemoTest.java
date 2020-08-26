@@ -1,6 +1,6 @@
 package org.ietf.jose.demo;
 
-import ch.keybridge.lib.jose.JoseFactory;
+import ch.keybridge.jose.JoseFactory;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
