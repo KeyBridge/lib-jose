@@ -24,8 +24,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
-import org.ietf.jose.adapter.JsonZonedDateTimeEpochAdapter;
+import javax.json.bind.annotation.JsonbTypeAdapter;
 import org.ietf.jose.JsonSerializable;
+import org.ietf.jose.adapter.JsonZonedDateTimeEpochAdapter;
 import org.ietf.jose.util.JsonbReader;
 import org.ietf.jose.util.JsonbWriter;
 
@@ -109,6 +110,7 @@ public class JwtClaims extends JsonSerializable {
    * number containing a NumericDate value. Use of this claim is OPTIONAL.
    */
   @JsonbProperty("exp")
+  @JsonbTypeAdapter(JsonZonedDateTimeEpochAdapter.class)
   private ZonedDateTime expirationTime;
   /**
    * 4.1.5. "nbf" (Not Before) Claim The "nbf" (not before) claim identifies the
@@ -120,6 +122,7 @@ public class JwtClaims extends JsonSerializable {
    * NumericDate value. Use of this claim is OPTIONAL.
    */
   @JsonbProperty("nbf")
+  @JsonbTypeAdapter(JsonZonedDateTimeEpochAdapter.class)
   private ZonedDateTime notBefore;
   /**
    * 4.1.6. "iat" (Issued At) Claim The "iat" (issued at) claim identifies the
@@ -128,6 +131,7 @@ public class JwtClaims extends JsonSerializable {
    * Use of this claim is OPTIONAL.
    */
   @JsonbProperty("iat")
+  @JsonbTypeAdapter(JsonZonedDateTimeEpochAdapter.class)
   private ZonedDateTime issuedAt;
   /**
    * 4.1.7. "jti" (JWT ID) Claim The "jti" (JWT ID) claim provides a unique
