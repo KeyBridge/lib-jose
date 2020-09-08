@@ -25,9 +25,7 @@ import org.ietf.jose.jwe.encryption.Encrypter;
 import static org.ietf.jose.jwe.encryption.DefaultEncrypter.AesConfigurationType.*;
 
 /**
- * RFC-7518
- * <p>
- * 5. Cryptographic Algorithms for Content Encryption
+ * RFC-7518 5. Cryptographic Algorithms for Content Encryption
  * <p>
  * JWE uses cryptographic algorithms to encrypt and integrity-protect the
  * plaintext and to integrity-protect the Additional Authenticated Data.
