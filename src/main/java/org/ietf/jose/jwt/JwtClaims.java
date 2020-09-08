@@ -111,7 +111,7 @@ public class JwtClaims extends JsonSerializable {
    */
   @JsonbProperty("exp")
   @JsonbTypeAdapter(JsonZonedDateTimeEpochAdapter.class)
-  private ZonedDateTime expirationTime;
+  private ZonedDateTime expiresAt;
   /**
    * 4.1.5. "nbf" (Not Before) Claim The "nbf" (not before) claim identifies the
    * time before which the JWT MUST NOT be accepted for processing. The
@@ -269,12 +269,12 @@ public class JwtClaims extends JsonSerializable {
     return this;
   }
 
-  public ZonedDateTime getExpirationTime() {
-    return expirationTime;
+  public ZonedDateTime getExpiresAt() {
+    return expiresAt;
   }
 
-  public void setExpirationTime(ZonedDateTime expirationTime) {
-    this.expirationTime = expirationTime;
+  public void setExpiresAt(ZonedDateTime expiresAt) {
+    this.expiresAt = expiresAt;
   }
 
   public JwtClaims withExpirationTime(ZonedDateTime expirationTime) {
@@ -282,7 +282,7 @@ public class JwtClaims extends JsonSerializable {
      * Developer note: Must truncate the ZonedDateTime to seconds or EQUALS will
      * fail to match due to nanosecond time component.
      */
-    this.expirationTime = expirationTime == null ? null : expirationTime.truncatedTo(ChronoUnit.SECONDS);
+    this.expiresAt = expirationTime == null ? null : expirationTime.truncatedTo(ChronoUnit.SECONDS);
     return this;
   }
 
@@ -293,7 +293,7 @@ public class JwtClaims extends JsonSerializable {
    * @return the current claims instance.
    */
   public JwtClaims withDuration(Duration duration) {
-    this.expirationTime = issuedAt.plus(duration);
+    this.expiresAt = issuedAt.plus(duration);
     return this;
   }
 
@@ -459,7 +459,7 @@ public class JwtClaims extends JsonSerializable {
     claims.subject = (String) valueMap.remove("sub");
     claims.audience = (String) valueMap.remove("aud");
     claims.jwtId = (String) valueMap.remove("jti");
-    claims.expirationTime = unmarshalZonedDateTime(valueMap.remove("exp"));
+    claims.expiresAt = unmarshalZonedDateTime(valueMap.remove("exp"));
     claims.notBefore = unmarshalZonedDateTime(valueMap.remove("nbf"));
     claims.issuedAt = unmarshalZonedDateTime(valueMap.remove("iat"));
     claims.claims = valueMap.isEmpty() ? Collections.EMPTY_MAP : valueMap;
@@ -498,8 +498,8 @@ public class JwtClaims extends JsonSerializable {
     if (jwtId != null) {
       jsonObject.put("jti", jwtId);
     }
-    if (expirationTime != null) {
-      jsonObject.put("exp", expirationTime.toEpochSecond());
+    if (expiresAt != null) {
+      jsonObject.put("exp", expiresAt.toEpochSecond());
     }
     if (notBefore != null) {
       jsonObject.put("nbf", notBefore.toEpochSecond());
@@ -522,7 +522,7 @@ public class JwtClaims extends JsonSerializable {
     hash = 97 * hash + Objects.hashCode(this.issuer);
     hash = 97 * hash + Objects.hashCode(this.subject);
     hash = 97 * hash + Objects.hashCode(this.audience);
-    hash = 97 * hash + Objects.hashCode(this.expirationTime);
+    hash = 97 * hash + Objects.hashCode(this.expiresAt);
     hash = 97 * hash + Objects.hashCode(this.notBefore);
     hash = 97 * hash + Objects.hashCode(this.issuedAt);
     hash = 97 * hash + Objects.hashCode(this.jwtId);
@@ -580,7 +580,7 @@ public class JwtClaims extends JsonSerializable {
     if (!Objects.equals(this.jwtId, other.jwtId)) {
       return false;
     }
-    if (!isEqual(this.expirationTime, other.expirationTime)) {
+    if (!isEqual(this.expiresAt, other.expiresAt)) {
       return false;
     }
     if (!isEqual(this.notBefore, other.notBefore)) {

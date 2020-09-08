@@ -4,7 +4,7 @@
 
   <groupId>keybridge.lib</groupId>
   <artifactId>jose</artifactId>
-  <version>1.1.1</version>
+  <version>1.2.0</version>
   <packaging>jar</packaging>
 
   <name>lib-jose</name>
@@ -48,7 +48,7 @@
     - move utility classes to 'ch.keybridge.jose' package
     - move abstract class to 'org.ietf.jose' package
     v1.1.1 - patch JwtClaims to correctly encode epoch seconds
-
+    v1.2.0 - rename JwtClaims expirationTime field to expiresAt to match OAuth + OpenId implementation
 
 
 

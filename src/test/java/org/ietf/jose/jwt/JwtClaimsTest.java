@@ -23,7 +23,7 @@ public class JwtClaimsTest {
     claim.setAudience("someAudience");
     claim.setIssuedAt(now);
     claim.setNotBefore(now.plusHours(1));
-    claim.setExpirationTime(now.plusHours(2));
+    claim.setExpiresAt(now.plusHours(2));
     claim.withClaim("privateName", "privateValue");
 
 //    String json = new JsonbUtility().withFormatting(true).marshal(claim);

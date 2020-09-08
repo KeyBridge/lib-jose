@@ -126,7 +126,7 @@ public class InteropTest {
 
     JsonZonedDateTimeEpochAdapter epochAdapter = new JsonZonedDateTimeEpochAdapter();
 
-    assertEquals(epochAdapter.adaptFromJson(claims.getExpirationTime().getValue()), claimsDecoded.getExpirationTime());
+    assertEquals(epochAdapter.adaptFromJson(claims.getExpirationTime().getValue()), claimsDecoded.getExpiresAt());
     assertEquals(epochAdapter.adaptFromJson(claims.getNotBefore().getValue()), claimsDecoded.getNotBefore());
     assertEquals(epochAdapter.adaptFromJson(claims.getIssuedAt().getValue()), claimsDecoded.getIssuedAt());
     assertEquals(claims.getJwtId(), claimsDecoded.getJwtId());
@@ -134,7 +134,7 @@ public class InteropTest {
     JwtClaims joseClaims = new JwtClaims();
     joseClaims.setIssuer("Issuer");
     joseClaims.setAudience("Audience");
-    joseClaims.setExpirationTime(ZonedDateTime.ofInstant(Instant.ofEpochSecond(claims.getExpirationTime().getValue()), ZoneId.of("UTC")));
+    joseClaims.setExpiresAt(ZonedDateTime.ofInstant(Instant.ofEpochSecond(claims.getExpirationTime().getValue()), ZoneId.of("UTC")));
     joseClaims.setNotBefore(ZonedDateTime.ofInstant(Instant.ofEpochSecond(claims.getNotBefore().getValue()), ZoneId.of("UTC")));
     joseClaims.setIssuedAt(ZonedDateTime.ofInstant(Instant.ofEpochSecond(claims.getIssuedAt().getValue()), ZoneId.of("UTC")));
     joseClaims.setJwtId(claims.getJwtId());

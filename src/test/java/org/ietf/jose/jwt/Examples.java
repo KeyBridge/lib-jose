@@ -47,7 +47,7 @@ public class Examples {
       .withIssuer("Issuer")
       .withAudience("Audience");
     // Set the expiration time of this JWT to be two hours from now
-    joseClaims.setExpirationTime(ZonedDateTime.now().plus(2, ChronoUnit.HOURS));
+    joseClaims.setExpiresAt(ZonedDateTime.now().plus(2, ChronoUnit.HOURS));
     // A JWT must be processed on or after the Not Before values. Let's set this to one minute from now
     joseClaims.setNotBefore(ZonedDateTime.now().minus(1, ChronoUnit.MINUTES));
     joseClaims.setIssuedAt(ZonedDateTime.now());
