@@ -20,7 +20,7 @@ public class JwtClaimsTest {
     ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC")).truncatedTo(ChronoUnit.SECONDS);
 
     JwtClaims claim = new JwtClaims();
-    claim.setAudience("someAudience");
+    claim.withAudience("someAudience");
     claim.setIssuedAt(now);
     claim.setNotBefore(now.plusHours(1));
     claim.setExpiresAt(now.plusHours(2));
@@ -52,7 +52,7 @@ public class JwtClaimsTest {
     JwtClaims reconstituted = JwtClaims.fromJson(jsonDirect);
     System.out.println("  original      " + claim.toJson());
     System.out.println("  reconstituted " + reconstituted.toJson());
-    assertEquals(claim, JwtClaims.fromJson(jsonDirect));
+    assertEquals(claim, reconstituted);
     System.out.println("JwtClaimsTest equals   OK ");
   }
 

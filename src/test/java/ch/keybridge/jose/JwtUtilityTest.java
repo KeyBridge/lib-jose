@@ -141,12 +141,12 @@ public class JwtUtilityTest {
 
   @Test
   public void testSignEncryptAndDecryptVerifyKeyPair() throws Exception {
-//    System.out.println("  Start with   " + claims);
+    System.out.println("  Start with   " + claims);
     String jsonCompact = JwtUtility.signAndEncrypt(claims, senderKeyPair.getPrivate(), recipientKeyPair.getPublic(), senderKeyId, recipientKeyId);
-    System.out.println("    jsonCompact " + jsonCompact);
-    System.out.println("    jsonCompact " + jsonCompact.length());
+//    System.out.println("    jsonCompact " + jsonCompact);
+//    System.out.println("    jsonCompact " + jsonCompact.length());
     JwtClaims recovered = JwtUtility.decryptAndVerifySignature(jsonCompact, recipientKeyPair.getPrivate(), senderKeyPair.getPublic());
-//    System.out.println("  Verified as  " + recovered);
+    System.out.println("  Verified as  " + recovered);
     Assert.assertEquals(claims, recovered);
     System.out.println("testSignEncryptAndDecryptVerify KeyPair OK");
   }
@@ -154,12 +154,12 @@ public class JwtUtilityTest {
   @Test
   public void testSignEncryptAndDecryptVerifySharedSecret() throws Exception {
 
-    System.out.println("  Start with   " + claims);
+//    System.out.println("  Start with   " + claims);
     String jsonCompact = JwtUtility.signAndEncrypt(claims, sharedSecret, recipientKeyId);
 //    System.out.println("    jsonCompact " + jsonCompact);
 //    System.out.println("    jsonCompact " + jsonCompact.length());
     JwtClaims recovered = JwtUtility.decryptAndVerifySignature(jsonCompact, sharedSecret);
-    System.out.println("  Verified as  " + recovered);
+//    System.out.println("  Verified as  " + recovered);
     Assert.assertEquals(claims, recovered);
     System.out.println("testSignEncryptAndDecryptVerify KeyPair OK");
 
@@ -169,12 +169,12 @@ public class JwtUtilityTest {
 
   @Test
   public void testSignEncryptAndDecryptVerifySharedSecretFormatted() throws Exception {
-    System.out.println("  Start with   " + claims);
+//    System.out.println("  Start with   " + claims);
     String jsonCompact = JwtUtility.signAndEncrypt(claims, sharedSecret, recipientKeyId);
     String jsonCompactFormatted = JwtUtility.format(jsonCompact);
     String jsonCompactUnFormatted = JwtUtility.unformat(jsonCompactFormatted);
     JwtClaims recovered = JwtUtility.decryptAndVerifySignature(jsonCompactUnFormatted, sharedSecret);
-    System.out.println("  Verified as  " + recovered);
+//    System.out.println("  Verified as  " + recovered);
     Assert.assertEquals(claims, recovered);
     System.out.println("testSignEncryptAndDecryptVerify formatted KeyPair OK");
 

@@ -16,10 +16,7 @@
 package org.ietf.jose.jwt;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import javax.json.bind.annotation.JsonbProperty;
@@ -64,6 +61,7 @@ import org.ietf.jose.util.JsonbWriter;
  * @see <a href="https://www.iana.org/assignments/jwt/jwt.xhtml">JWT Claims</a>
  * @author Key Bridge
  * @since v0.9.2 add fluent setters
+ * @since v1.3.0 2020-09-19 change 'aud' from singleton to collection
  */
 public class JwtClaims extends JsonSerializable {
 
@@ -99,7 +97,7 @@ public class JwtClaims extends JsonSerializable {
    * generally application specific. Use of this claim is OPTIONAL.
    */
   @JsonbProperty("aud")
-  private String audience;
+  private Collection<String> audience;
   /**
    * 4.1.4. "exp" (Expiration Time) Claim The "exp" (expiration time) claim
    * identifies the expiration time on or after which the JWT MUST NOT be
@@ -243,8 +241,11 @@ public class JwtClaims extends JsonSerializable {
    *
    * @return the recipients that the JWT is intended for.
    */
-  public String getAudience() {
-    return this.audience;
+  public Collection<String> getAudience() {
+    if (audience == null) {
+      audience = new HashSet<>();
+    }
+    return audience;
   }
 
   /**
@@ -253,8 +254,18 @@ public class JwtClaims extends JsonSerializable {
    *
    * @param audience the recipients that the JWT is intended for.
    */
+  public void setAudience(Collection<String> audience) {
+    this.audience = audience == null ? new HashSet<>() : new HashSet<>(audience);
+  }
+
+  /**
+   * Helper method to add a single audience entry. The "aud" (audience) claim
+   * identifies the recipients that the JWT is intended for.
+   *
+   * @param audience the recipients that the JWT is intended for.
+   */
   public void setAudience(String audience) {
-    this.audience = audience;
+    this.audience = new HashSet<>(Collections.singleton(audience));
   }
 
   /**
@@ -265,7 +276,7 @@ public class JwtClaims extends JsonSerializable {
    * @return the current claims instance
    */
   public JwtClaims withAudience(String audience) {
-    this.audience = audience;
+    getAudience().add(audience);
     return this;
   }
 
@@ -287,13 +298,28 @@ public class JwtClaims extends JsonSerializable {
   }
 
   /**
-   * Convenience helper method to set the expiration time.
+   * Convenience helper method to set the expiration time in hours, minutes,
+   * seconds.
    *
    * @param duration the JWT duration. Typically this should be 3600 seconds.
    * @return the current claims instance.
    */
   public JwtClaims withDuration(Duration duration) {
     this.expiresAt = issuedAt.plus(duration);
+    return this;
+  }
+
+  /**
+   * Convenience helper method to set the expiration time in years, months,
+   * days.
+   * <p>
+   * Careful: Tokens should not be set to live too long.
+   *
+   * @param period the JWT duration.
+   * @return the current claims instance.
+   */
+  public JwtClaims withPeriod(Period period) {
+    this.expiresAt = issuedAt.plus(period);
     return this;
   }
 
@@ -457,7 +483,18 @@ public class JwtClaims extends JsonSerializable {
     JwtClaims claims = new JwtClaims();
     claims.issuer = (String) valueMap.remove("iss");
     claims.subject = (String) valueMap.remove("sub");
-    claims.audience = (String) valueMap.remove("aud");
+    /**
+     * 2020-09-19: Some implementations provide 'aud' as a singleton string.
+     * Inspect the parsed JSON and unmarshal accordingly.
+     */
+    if (valueMap.containsKey("aud") && valueMap.get("aud") != null) {
+      Object aud = valueMap.remove("aud");
+      if (aud instanceof Collection) {
+        claims.audience = (Collection<String>) aud;
+      } else if (aud instanceof String) {
+        claims.audience = Collections.singleton((String) aud);
+      }
+    }
     claims.jwtId = (String) valueMap.remove("jti");
     claims.expiresAt = unmarshalZonedDateTime(valueMap.remove("exp"));
     claims.notBefore = unmarshalZonedDateTime(valueMap.remove("nbf"));
@@ -492,7 +529,7 @@ public class JwtClaims extends JsonSerializable {
     if (subject != null) {
       jsonObject.put("sub", subject);
     }
-    if (audience != null) {
+    if (audience != null && !audience.isEmpty()) {
       jsonObject.put("aud", audience);
     }
     if (jwtId != null) {
@@ -574,9 +611,6 @@ public class JwtClaims extends JsonSerializable {
     if (!Objects.equals(this.subject, other.subject)) {
       return false;
     }
-    if (!Objects.equals(this.audience, other.audience)) {
-      return false;
-    }
     if (!Objects.equals(this.jwtId, other.jwtId)) {
       return false;
     }
@@ -587,6 +621,9 @@ public class JwtClaims extends JsonSerializable {
       return false;
     }
     if (!isEqual(this.issuedAt, other.issuedAt)) {
+      return false;
+    }
+    if (!this.getAudience().containsAll(other.getAudience()) || !other.getAudience().containsAll(getAudience())) {
       return false;
     }
     return Objects.equals(this.claims, other.claims);

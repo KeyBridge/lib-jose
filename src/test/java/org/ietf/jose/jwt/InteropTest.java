@@ -122,7 +122,10 @@ public class InteropTest {
 
     assertEquals(claims.getIssuer(), claimsDecoded.getIssuer());
     assertEquals(claims.getSubject(), claimsDecoded.getSubject());
-    assertEquals(claims.getAudience().get(0), claimsDecoded.getAudience());
+
+    assertTrue(claims.getAudience().containsAll(claimsDecoded.getAudience()));
+    assertTrue(claimsDecoded.getAudience().containsAll(claims.getAudience()));
+//    assertEquals(claims.getAudience(), claimsDecoded.getAudience());
 
     JsonZonedDateTimeEpochAdapter epochAdapter = new JsonZonedDateTimeEpochAdapter();
 
