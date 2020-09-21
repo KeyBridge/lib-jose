@@ -259,16 +259,6 @@ public class JwtClaims extends JsonSerializable {
   }
 
   /**
-   * Helper method to add a single audience entry. The "aud" (audience) claim
-   * identifies the recipients that the JWT is intended for.
-   *
-   * @param audience the recipients that the JWT is intended for.
-   */
-  public void setAudience(String audience) {
-    this.audience = new HashSet<>(Collections.singleton(audience));
-  }
-
-  /**
    * The "aud" (audience) claim identifies the recipients that the JWT is
    * intended for.
    *
@@ -277,6 +267,18 @@ public class JwtClaims extends JsonSerializable {
    */
   public JwtClaims withAudience(String audience) {
     getAudience().add(audience);
+    return this;
+  }
+
+  /**
+   * Helper method to add a collection of audience entries. The "aud" (audience)
+   * claim identifies the recipients that the JWT is intended for.
+   *
+   * @param audience the recipients that the JWT is intended for.
+   * @return the current claims instance
+   */
+  public JwtClaims withAudience(Collection<String> audience) {
+    getAudience().addAll(audience);
     return this;
   }
 
@@ -423,6 +425,30 @@ public class JwtClaims extends JsonSerializable {
   }
 
   /**
+   * Copies all of the mappings from the specified map to this map (optional
+   * operation).
+   *
+   * @param claims the new set of claims.
+   */
+  public void addClaims(Map<String, Object> claims) {
+    if (claims.keySet().stream().allMatch(c -> ClaimType.getJwtReservedClaimNames().contains(c))) {
+      throw new IllegalArgumentException("Cannot use reserved claim name");
+    }
+    this.claims.putAll(claims);
+  }
+
+  /**
+   * Get a single claim value corresponding to the indicated name.
+   *
+   * @param claim the enumerated claim type
+   * @return the corresponding claim value. For complex claim objects the value
+   *         should be externally transformed to a String
+   */
+  public Object getClaim(ClaimType claim) {
+    return claims.get(claim.name());
+  }
+
+  /**
    * Fluent method to add an enumerated claim that does not clash with one of
    * the standard claim names.
    *
@@ -432,11 +458,7 @@ public class JwtClaims extends JsonSerializable {
    * @return the current JWT instance
    */
   public JwtClaims withClaim(ClaimType claim, Object claimValue) {
-    if (ClaimType.getJwtReservedClaims().contains(claim)) {
-      throw new IllegalArgumentException("Cannot use reserved claim name " + claim);
-    }
-    claims.put(claim.name(), claimValue);
-    return this;
+    return addClaim(claim.name(), claimValue);
   }
 
   /**
