@@ -24,7 +24,7 @@ public class JwtClaimsTest {
     claim.setIssuedAt(now);
     claim.setNotBefore(now.plusHours(1));
     claim.setExpiresAt(now.plusHours(2));
-    claim.withClaim("privateName", "privateValue");
+    claim.addClaim("privateName", "privateValue");
 
 //    String json = new JsonbUtility().withFormatting(true).marshal(claim);
     String jsonDirect = claim.toJson();
@@ -59,8 +59,8 @@ public class JwtClaimsTest {
   @Test
   public void testCustomClaims() throws IOException, Exception {
     JwtClaims claims = new JwtClaims();
-    claims.withClaim("email", "foo@bar.com");
-    claims.withClaim("friends", Arrays.asList("John", "Jack", "Jeremy"));
+    claims.addClaim("email", "foo@bar.com");
+    claims.addClaim("friends", Arrays.asList("John", "Jack", "Jeremy"));
     claims.withClaim(ClaimType.email, "email@foo.bar");
 
     String json = claims.toJson();

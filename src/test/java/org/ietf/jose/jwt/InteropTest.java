@@ -136,7 +136,7 @@ public class InteropTest {
 
     JwtClaims joseClaims = new JwtClaims();
     joseClaims.setIssuer("Issuer");
-    joseClaims.setAudience("Audience");
+    joseClaims.withAudience("Audience");
     joseClaims.setExpiresAt(ZonedDateTime.ofInstant(Instant.ofEpochSecond(claims.getExpirationTime().getValue()), ZoneId.of("UTC")));
     joseClaims.setNotBefore(ZonedDateTime.ofInstant(Instant.ofEpochSecond(claims.getNotBefore().getValue()), ZoneId.of("UTC")));
     joseClaims.setIssuedAt(ZonedDateTime.ofInstant(Instant.ofEpochSecond(claims.getIssuedAt().getValue()), ZoneId.of("UTC")));
@@ -217,7 +217,7 @@ public class InteropTest {
       .withExpirationTime(ZonedDateTime.now().plus(5, ChronoUnit.MINUTES))
       .withJwtId(UUID.randomUUID().toString())
       .withSubject("Test")
-      .withClaim("email", "foo@bar.com");
+      .addClaim("email", "foo@bar.com");
 
     String claimJson = claims.toJson();
 
