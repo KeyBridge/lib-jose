@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
  * JSON Web Token Claims. Provides a complete list of enumerated JWT claim names
  * and their referencing source.
  *
+ * @see <a href="https://www.iana.org/assignments/jwt/jwt.xhtml#claims">JSON Web
+ * Token Claims</a>
  * @author Key Bridge
  * @since v1.0.1 created 2020-08-25
  */
@@ -265,6 +267,10 @@ public enum ClaimType {
   jcard,
   /**
    * Actor	[RFC8693, Section 4.1]
+   * <p>
+   * The "act" (actor) claim provides a means within a JWT to express that
+   * delegation has occurred and identify the acting party to whom authority has
+   * been delegated. The object type of this claim is {@code Actor}.
    */
   act,
   /**
@@ -273,11 +279,18 @@ public enum ClaimType {
   scope,
   /**
    * Client Identifier	[RFC8693, Section 4.3]
+   * <p>
+   * The "client_id" claim carries the client identifier of the OAuth 2.0
+   * [RFC6749] client that requested the token.
    */
   client_id,
   /**
    * Authorized Actor - the party that is authorized to become the actor
    * [RFC8693, Section 4.4]
+   * <p>
+   * The "may_act" claim makes a statement that one party is authorized to
+   * become the actor and act on behalf of another party. The object type of
+   * this claim is {@code Actor}.
    */
   may_act;
 
