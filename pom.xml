@@ -50,6 +50,7 @@
     v1.1.1 - patch JwtClaims to correctly encode epoch seconds
     v1.2.0 - rename JwtClaims expirationTime field to expiresAt to match OAuth + OpenId implementation
     v1.3.0 change JwtClaims 'aud' from singleton to collection for improved interoperability with other RFC 7519 implementations
+    - add RFC 8693 Actor claim object
 
 
 
