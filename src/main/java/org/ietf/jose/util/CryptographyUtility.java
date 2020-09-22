@@ -249,7 +249,7 @@ public class CryptographyUtility {
     } else if (jwk instanceof RsaPrivateJwk) {
       RsaPrivateJwk rsaKey = (RsaPrivateJwk) jwk;
       return sign(payloadBytes, rsaKey.getPrivateKey(), algorithm.getJavaAlgorithmName());
-    } else if (jwk instanceof EllipticCurveJwk) {
+    } else if (jwk instanceof EllipticCurvePrivateJwk) {
       throw new UnsupportedOperationException("Elliptic curve keys are not supported");
     }
     throw new UnsupportedOperationException("Unsupported key type " + jwk.getClass().getCanonicalName());
