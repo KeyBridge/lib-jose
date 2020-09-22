@@ -64,14 +64,18 @@ public class RsaPublicJwk extends AbstractJwk {
   @JsonbProperty("e")
   protected BigInteger publicExponent;
 
+  /**
+   * Default no-arg constructor. Sets the 'key' value to `RSA`.
+   */
   public RsaPublicJwk() {
-    this.kty = KeyType.RSA;
+    super(KeyType.RSA);
   }
 
-  public static RsaPublicJwk getInstance(RSAPublicKey publicKey) {
+  public static RsaPublicJwk getInstance(RSAPublicKey publicKey, String keyId) {
     RsaPublicJwk jwkRsaKey = new RsaPrivateJwk();
     jwkRsaKey.setPublicExponent(publicKey.getPublicExponent());
     jwkRsaKey.setModulus(publicKey.getModulus());
+    jwkRsaKey.setKid(keyId);
     return jwkRsaKey;
   }
 
