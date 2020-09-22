@@ -16,6 +16,9 @@
 package org.ietf.jose.jwk.key;
 
 import java.math.BigInteger;
+import java.security.interfaces.ECPublicKey;
+import javax.json.bind.annotation.JsonbTypeAdapter;
+import org.ietf.jose.adapter.EllipticCurveTypeAdapter;
 import org.ietf.jose.jwk.KeyType;
 
 /**
@@ -30,29 +33,25 @@ import org.ietf.jose.jwk.KeyType;
  * <p>
  * An Elliptic Curve public key is represented by a pair of coordinates drawn
  * from a finite field, which together define a point on an Elliptic Curve. The
- * following members MUST be present for all Elliptic Curve public keys: "crv",
- * "x"
+ * "crv" and "x" members MUST be present for all Elliptic Curve public.
  * <p>
- * 6.2.2. Parameters for Elliptic Curve Private Keys
- * <p>
- * In addition to the members used to represent Elliptic Curve public keys, the
- * following member MUST be present to represent Elliptic Curve private keys.
- * <p>
- * 6.2.2.1. "d" (ECC Private Key) Parameter
+ * The "y" member MUST also be present for Elliptic Curve public keys for the
+ * "P-256", "P-384", and "P-521" curves.
  *
  * @author Key Bridge
+ * @since v1.3.0 created 2020-09-21
  */
-public class EllipticCurveJwk extends AbstractJwk {
+public class EllipticCurvePublicJwk extends AbstractJwk {
 
   /**
    * 6.2.1.1. "crv" (Curve) Parameter
    * <p>
    * The "crv" (curve) parameter identifies the cryptographic curve used with
-   * the key. Curve values from [DSS] used by this specification are:
-   * <p>
-   * "P-256", "P-384", "P-521"
+   * the key. Curve values from [DSS] used by this specification are: "P-256",
+   * "P-384", "P-521".
    */
-  private String crv;
+  @JsonbTypeAdapter(EllipticCurveTypeAdapter.class)
+  protected EllipticCurveType crv;
   /**
    * 6.2.1.2. "x" (X Coordinate) Parameter
    * <p>
@@ -63,7 +62,7 @@ public class EllipticCurveJwk extends AbstractJwk {
    * coordinate for the curve specified in the "crv" parameter. For example, if
    * the value of "crv" is "P-521", the octet string must be 66 octets long.
    */
-  private BigInteger x;
+  protected BigInteger x;
   /**
    * 6.2.1.3. "y" (Y Coordinate) Parameter
    * <p>
@@ -74,28 +73,36 @@ public class EllipticCurveJwk extends AbstractJwk {
    * coordinate for the curve specified in the "crv" parameter. For example, if
    * the value of "crv" is "P-521", the octet string must be 66 octets long.
    */
-  private BigInteger y;
+  protected BigInteger y;
 
   /**
-   * 6.2.2.1. "d" (ECC Private Key) Parameter
-   * <p>
-   * The "d" (ECC private key) parameter contains the Elliptic Curve private key
-   * value. It is represented as the base64url encoding of the octet string
-   * representation of the private key value, as defined in Section 2.3.7 of
-   * SEC1 [SEC1]. The length of this octet string MUST be
-   * ceiling(log-base-2(n)/8) octets (where n is the order of the curve).
+   * Default no-arg constructor. Sets the 'key' value to `EC`.
    */
-  private BigInteger d;
-
-  public EllipticCurveJwk() {
-    this.kty = KeyType.EC;
+  public EllipticCurvePublicJwk() {
+    super(KeyType.EC);
   }
 
-  public String getCrv() {
+  /**
+   * Construct a new EC public key instance.
+   *
+   * @param publicKey the EC public key instance
+   * @param keyId     the key id
+   * @return a new JWK
+   */
+  public static EllipticCurvePublicJwk getInstance(ECPublicKey publicKey, String keyId) {
+    EllipticCurvePublicJwk jwk = new EllipticCurvePrivateJwk();
+    jwk.setX(publicKey.getW().getAffineX());
+    jwk.setY(publicKey.getW().getAffineY());
+    jwk.setCrv(EllipticCurveType.fromFieldSize(publicKey.getParams().getCurve().getField().getFieldSize()));
+    jwk.setKid(keyId);
+    return jwk;
+  }
+
+  public EllipticCurveType getCrv() {
     return this.crv;
   }
 
-  public void setCrv(String crv) {
+  public void setCrv(EllipticCurveType crv) {
     this.crv = crv;
   }
 
@@ -113,14 +120,6 @@ public class EllipticCurveJwk extends AbstractJwk {
 
   public void setY(BigInteger y) {
     this.y = y;
-  }
-
-  public BigInteger getD() {
-    return this.d;
-  }
-
-  public void setD(BigInteger d) {
-    this.d = d;
   }
 
 }
