@@ -40,8 +40,12 @@ public class SymmetricJwk extends AbstractJwk {
    */
   private byte[] k;
 
+  /**
+   * Default no-arg constructor. Sets the 'key' value to `oct` for "Octet
+   * sequence" (used to represent symmetric keys)
+   */
   public SymmetricJwk() {
-    this.kty = KeyType.oct;
+    super(KeyType.oct);
   }
 
   public byte[] getK() {
