@@ -27,7 +27,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import javax.json.bind.annotation.JsonbProperty;
-import org.ietf.jose.jwk.KeyType;
 
 /**
  * RFC 7518 JSON Web Algorithms (JWA)
@@ -90,8 +89,11 @@ public class RsaPrivateJwk extends RsaPublicJwk {
    */
   private BigInteger qi;
 
+  /**
+   * Default no-arg constructor. Sets the 'key' value to `RSA`.
+   */
   public RsaPrivateJwk() {
-    this.kty = KeyType.RSA;
+    super();
   }
 
   /**
@@ -167,6 +169,13 @@ public class RsaPrivateJwk extends RsaPublicJwk {
     return jwkRsaKey;
   }
 
+  /**
+   * Get the RSA private key from this JWK instance.
+   *
+   * @return the RSA private key
+   * @throws NoSuchAlgorithmException if the key factory fails to instantiate
+   * @throws InvalidKeySpecException  if the RSA key fails to build
+   */
   public PrivateKey getPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException {
     KeyFactory kf = KeyFactory.getInstance("RSA");
     RSAPrivateKeySpec spec = new RSAPrivateKeySpec(getModulus(), getPrivateExponent());
@@ -174,6 +183,14 @@ public class RsaPrivateJwk extends RsaPublicJwk {
     return kf.generatePrivate(spec);
   }
 
+  /**
+   * Get the public / private key pair. The public key is reconstructed from the
+   * private key.
+   *
+   * @return a Key Pair
+   * @throws NoSuchAlgorithmException if the key factory fails to instantiate
+   * @throws InvalidKeySpecException  if the RSA key fails to build
+   */
   public KeyPair getKeyPair() throws NoSuchAlgorithmException, InvalidKeySpecException {
     KeyFactory kf = KeyFactory.getInstance("RSA");
     return new KeyPair(kf.generatePublic(new RSAPublicKeySpec(getModulus(), getPublicExponent())),
