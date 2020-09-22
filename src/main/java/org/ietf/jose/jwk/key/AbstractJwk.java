@@ -15,9 +15,9 @@
  */
 package org.ietf.jose.jwk.key;
 
-import org.ietf.jose.AbstractHeader;
 import java.util.List;
 import javax.json.bind.annotation.JsonbTypeDeserializer;
+import org.ietf.jose.AbstractHeader;
 import org.ietf.jose.adapter.JsonJwkDeserializer;
 import org.ietf.jose.jwk.KeyOperationType;
 import org.ietf.jose.jwk.KeyType;
@@ -156,7 +156,8 @@ public abstract class AbstractJwk extends AbstractHeader {
    */
   protected List<KeyOperationType> key_ops;
 
-  public AbstractJwk() {
+  public AbstractJwk(KeyType kty) {
+    this.kty = kty;
   }
 
   public KeyType getKty() {
