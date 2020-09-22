@@ -81,7 +81,9 @@ public class JsonJwkListDeserializer implements JsonbDeserializer<List<AbstractJ
        * EC public and private keys use the same container.
        */
       case EC:
-        abstractJwk = READER.unmarshal(jsonString, EllipticCurveJwk.class);
+        abstractJwk = jsonObject.containsKey("d")
+                      ? READER.unmarshal(jsonString, EllipticCurvePrivateJwk.class)
+                      : READER.unmarshal(jsonString, EllipticCurvePublicJwk.class);
         break;
       /**
        * RSA private keys have additional fields. Look for just one.
