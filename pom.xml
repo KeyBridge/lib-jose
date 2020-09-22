@@ -51,7 +51,7 @@
     v1.2.0 - rename JwtClaims expirationTime field to expiresAt to match OAuth + OpenId implementation
     v1.3.0 change JwtClaims 'aud' from singleton to collection for improved interoperability with other RFC 7519 implementations
     - add RFC 8693 Actor claim object
-
+    - add incremental support for Elliptic Curve Cryptography (ECC) keys; deserialize not complete
 
 
 
@@ -130,7 +130,7 @@
     <dependency>
       <groupId>keybridge.lib</groupId>
       <artifactId>cryptography</artifactId>
-      <version>4.2.0</version>
+      <version>5.0.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>

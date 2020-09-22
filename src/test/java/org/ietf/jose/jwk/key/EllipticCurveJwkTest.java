@@ -26,7 +26,6 @@ import org.ietf.jose.util.JsonbUtility;
 import org.junit.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  *
@@ -60,15 +59,15 @@ public class EllipticCurveJwkTest {
   public void ecPublicKeyTest() throws Exception {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-public-key.json");
     // marshal to object
-    EllipticCurveJwk ecKey = jsonb.unmarshal(json, EllipticCurveJwk.class);
+    EllipticCurvePublicJwk ecKey = jsonb.unmarshal(json, EllipticCurvePublicJwk.class);
 //    EllipticCurveJwk ecKey = (EllipticCurveJwk) adapter.adaptFromJson(json);
 
-    assertEquals("P-521", ecKey.getCrv());
+    assertEquals(EllipticCurveType.P_521, ecKey.getCrv());
     assertEquals(PublicKeyUseType.sig, ecKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", ecKey.getKid());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt")), ecKey.getX());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1")), ecKey.getY());
-    assertNull(ecKey.getD());
+//    assertNull(ecKey.getD());
 //    System.out.println(jsonb.withFormatting(true).marshal(ecKey));
 
   }
@@ -77,16 +76,16 @@ public class EllipticCurveJwkTest {
   public void ecPrivateKeyTest() {
     String json = TestFileReader.getTestCase("/rfc7520/section3-jwk-examples/ec-private-key.json");
 
-    EllipticCurveJwk ecKey = new JsonbUtility().unmarshal(json, EllipticCurveJwk.class);
+    EllipticCurvePrivateJwk ecKey = new JsonbUtility().unmarshal(json, EllipticCurvePrivateJwk.class);
 
-    assertEquals("P-521", ecKey.getCrv());
+    assertEquals(EllipticCurveType.P_521, ecKey.getCrv());
     assertEquals(PublicKeyUseType.sig, ecKey.getUse());
     assertEquals("bilbo.baggins@hobbiton.example", ecKey.getKid());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AHKZLLOsCOzz5cY97ewNUajB957y-C-U88c3v13nmGZx6sYl_oJXu9A5RkTKqjqvjyekWF-7ytDyRXYgCF5cj0Kt")), ecKey.getX());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AdymlHvOiLxXkEhayXQnNCvDX4h9htZaCJN34kfmC6pV5OhQHiraVySsUdaQkAgDPrwQrJmbnX9cwlGfP-HqHZR1")), ecKey.getY());
     assertEquals(new BigInteger(1, Base64Utility.fromBase64Url("AAhRON2r9cqXX1hg-RoI6R1tX5p2rUAYdmpHZoC1XNM56KtscrX6zbKipQrCW9CGZH3T4ubpnoTKLDYJ_fF3_rJt")), ecKey.getD());
 
-    EllipticCurveJwk keyReconverted = new JsonbUtility().unmarshal(new JsonbUtility().marshal(ecKey), EllipticCurveJwk.class);
+    EllipticCurvePrivateJwk keyReconverted = new JsonbUtility().unmarshal(new JsonbUtility().marshal(ecKey), EllipticCurvePrivateJwk.class);
     assertEquals(ecKey, keyReconverted);
   }
 }

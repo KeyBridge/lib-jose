@@ -37,7 +37,7 @@ public class Examples {
     System.out.println("  " + new JsonbUtility().marshal(jwkPrivateKey));
     System.out.println();
 
-    RsaPublicJwk jwkPublicKey = RsaPublicJwk.getInstance((RSAPublicKey) keyPair.getPublic());
+    RsaPublicJwk jwkPublicKey = RsaPublicJwk.getInstance((RSAPublicKey) keyPair.getPublic(), null);
     System.out.println("  Public key:");
     System.out.println("  " + new JsonbUtility().marshal(jwkPublicKey));
     System.out.println();

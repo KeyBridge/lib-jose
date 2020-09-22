@@ -20,7 +20,7 @@ package org.ietf.jose.jwk;
 
 import org.ietf.TestFileReader;
 import org.ietf.jose.jwk.key.AbstractJwk;
-import org.ietf.jose.jwk.key.EllipticCurveJwk;
+import org.ietf.jose.jwk.key.EllipticCurvePublicJwk;
 import org.ietf.jose.jwk.key.RsaPublicJwk;
 import org.ietf.jose.util.JsonbUtility;
 import org.junit.*;
@@ -61,7 +61,7 @@ public class JwkSetTest {
 
     JwkSet jwkSet = new JwkSet();
 
-    jwkSet.addKey(jsonb.unmarshal(ecPublic, EllipticCurveJwk.class));
+    jwkSet.addKey(jsonb.unmarshal(ecPublic, EllipticCurvePublicJwk.class));
     jwkSet.addKey(jsonb.unmarshal(rsaPublic, RsaPublicJwk.class));
 
     String json = new JsonbUtility().withFormatting(true).marshal(jwkSet);
@@ -84,7 +84,7 @@ public class JwkSetTest {
 
     JwkSet jwkSet = new JwkSet();
 
-    jwkSet.addKey(jsonb.unmarshal(ecPublic, EllipticCurveJwk.class));
+    jwkSet.addKey(jsonb.unmarshal(ecPublic, EllipticCurvePublicJwk.class));
     jwkSet.addKey(jsonb.unmarshal(rsaPublic, RsaPublicJwk.class));
 
     System.out.println(" jwkset has " + jwkSet.getKeys().size() + " entries ");
