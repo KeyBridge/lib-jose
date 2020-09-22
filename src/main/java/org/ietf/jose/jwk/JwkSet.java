@@ -44,6 +44,8 @@ import org.ietf.jose.jwk.key.AbstractJwk;
  * Implementations SHOULD ignore JWKs within a JWK Set that use "kty" (key type)
  * values that are not understood by them, that are missing required members, or
  * for which values are out of the supported ranges.
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc7517">JSON Web Key (JWK)</a>
  */
 public class JwkSet {
 
@@ -58,6 +60,9 @@ public class JwkSet {
   @JsonbTypeDeserializer(JsonJwkListDeserializer.class)
   private List<AbstractJwk> keys;
 
+  /**
+   * Default no-arg constructor. Initializes the the internal keys list.
+   */
   public JwkSet() {
     this.keys = new ArrayList<>();
   }
