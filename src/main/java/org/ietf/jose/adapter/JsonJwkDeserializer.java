@@ -68,10 +68,12 @@ public class JsonJwkDeserializer implements JsonbDeserializer<AbstractJwk> {
     AbstractJwk abstractJwk = null;
     switch (KeyType.valueOf(jsonObject.getString("kty"))) {
       /**
-       * EC public and private keys use the same container.
+       * EC private keys have one additional field.
        */
       case EC:
-        abstractJwk = READER.unmarshal(jsonString, EllipticCurveJwk.class);
+        abstractJwk = jsonObject.containsKey("d")
+                      ? READER.unmarshal(jsonString, EllipticCurvePrivateJwk.class)
+                      : READER.unmarshal(jsonString, EllipticCurvePublicJwk.class);
         break;
       /**
        * RSA private keys have additional fields. Look for just one.
